@@ -1,7 +1,7 @@
 {
   "port": 3000,
   "host": "0.0.0.0",
-  "defaultGame": "press-space",
+  "defaultGame": "morse",
   "timings": {
     "soloCountdownMs": 8000,
     "versusCountdownMs": 3000,

@@ -116,10 +116,12 @@ export interface GameModule<S = unknown, DV = unknown, PV = unknown, C = unknown
   /** A participant is gone for good (grace expired or kicked). Return a state whose outcome() is over. */
   onForfeit?(state: S, seat: Seat, gameNow: number): S
   outcome(state: S): GameOutcome
-  /** What the projector sees. */
-  displayView(state: S): DV
+  /** What the projector sees. gameNow is the round clock at build time so views can extrapolate locally. */
+  displayView(state: S, gameNow: number): DV
   /** What one seat sees. Private per seat: P1's view can differ from P2's. */
-  playerView(state: S, seat: Seat): PV
+  playerView(state: S, seat: Seat, gameNow: number): PV
+  /** A player entered their name after the round: attach it to anything the game persisted (ghost runs). */
+  onName?(data: unknown, info: { seat: Seat; name: string; at: number }): unknown
 }
 
 /** Keys currently held on this laptop: code -> performance.now() when pressed. Used for local prediction. */
@@ -128,6 +130,8 @@ export type HeldKeys = Record<string, number>
 export interface GameDisplayProps<DV> {
   view: DV
   names: Record<Seat, string>
+  /** Server time when this view was built; pair with serverNow() to extrapolate the round clock. */
+  builtAt: number
   serverNow: () => number
   reducedMotion: boolean
 }
@@ -138,6 +142,7 @@ export interface GamePlayerProps<PV> {
   held: HeldKeys
   /** performance.now() at render; ticks continuously while a key is held. */
   localNow: number
+  builtAt: number
   serverNow: () => number
   reducedMotion: boolean
 }

@@ -109,7 +109,7 @@ export const pressSpace: GameModule<State, PressSpaceDisplayView, PressSpacePlay
     return { over: state.over, winner: state.mode === 'versus' ? state.winner : undefined, seats, headline }
   },
 
-  displayView(state) {
+  displayView(state, _gameNow) {
     return {
       target: state.target,
       mode: state.mode,
@@ -121,7 +121,7 @@ export const pressSpace: GameModule<State, PressSpaceDisplayView, PressSpacePlay
     }
   },
 
-  playerView(state, seat) {
+  playerView(state, seat, _gameNow) {
     const ms = state.finishedMs[seat]
     return {
       target: state.target,

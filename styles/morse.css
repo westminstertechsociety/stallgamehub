@@ -1,0 +1,326 @@
+/* Morse glyphs: dots are discs, dashes are bars; seat fill with an ink stroke so contrast is ink-vs-ground. */
+
+.glyphs {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28em;
+  font-size: var(--glyph, 1em);
+  height: 1em;
+  vertical-align: middle;
+}
+
+.glyph {
+  display: inline-block;
+  height: 0.5em;
+  border-radius: 999px;
+  background: var(--tone, var(--ink));
+  box-shadow: inset 0 0 0 0.06em var(--ink);
+  flex: none;
+}
+
+.glyph-dot {
+  width: 0.5em;
+}
+
+.glyph-dash {
+  width: 1.4em;
+}
+
+.glyph-live {
+  transition: none;
+}
+
+.glyphs-P1 {
+  --tone: var(--p1);
+}
+
+.glyphs-P2 {
+  --tone: var(--p2);
+}
+
+.glyphs-ghost {
+  --tone: var(--ground-3);
+}
+
+.glyphs-ink {
+  --tone: var(--ink);
+}
+
+/* Projector */
+.morse-display {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: var(--space-6);
+  min-height: 0;
+  --glyph: clamp(22px, 2.4vw, 48px);
+}
+
+.morse-word {
+  display: grid;
+  gap: var(--space-2);
+  align-items: baseline;
+}
+
+.morse-target {
+  font-size: clamp(80px, 11vw, 220px);
+  letter-spacing: 0.06em;
+}
+
+.morse-learn-letter {
+  font-size: clamp(96px, 14vw, 280px);
+}
+
+.morse-learn-pattern {
+  --glyph: clamp(36px, 4vw, 80px);
+}
+
+.slots {
+  display: flex;
+  gap: 0.12em;
+  font-size: var(--display-lane);
+  font-weight: 800;
+  font-stretch: 118%;
+  line-height: 1;
+}
+
+.slot {
+  position: relative;
+  width: 0.95em;
+  height: 1.1em;
+  display: grid;
+  place-items: center;
+  background: var(--ground);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 0.04em var(--ground-3);
+}
+
+.slot-filled {
+  background: var(--ink);
+  color: var(--ground);
+  box-shadow: none;
+}
+
+.slot-target {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: var(--ground-3);
+}
+
+.slot-ghost.slot-filled {
+  background: var(--muted);
+}
+
+.morse-stream-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  margin-top: var(--space-4);
+  min-height: 1.6em;
+  overflow: hidden;
+}
+
+.stream {
+  display: flex;
+  gap: var(--space-5);
+  align-items: flex-end;
+  overflow: hidden;
+  justify-content: flex-end;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.stream-group {
+  display: grid;
+  justify-items: center;
+  gap: 0.2em;
+  flex: none;
+}
+
+.stream-letter {
+  font-size: 0.55em;
+  font-weight: 700;
+  min-height: 1.2em;
+  color: var(--muted);
+}
+
+.stream-ok .stream-letter {
+  color: var(--ink);
+}
+
+.stream-bad .glyph {
+  background: var(--ground);
+}
+
+.stream-bad .stream-letter {
+  text-decoration: line-through;
+  text-decoration-thickness: 0.12em;
+}
+
+.morse-lane-end {
+  display: grid;
+  justify-items: end;
+  gap: var(--space-2);
+}
+
+.morse-wins {
+  font-size: var(--display-lane);
+  font-weight: 800;
+  font-stretch: 118%;
+  line-height: 0.9;
+}
+
+.morse-learn-lane {
+  min-height: 1.2em;
+}
+
+.morse-feedback {
+  font-size: var(--display-body);
+  font-weight: 700;
+  animation: rise var(--dur-base) var(--ease-out);
+}
+
+.morse-feedback-bad {
+  color: var(--muted);
+}
+
+/* Player laptop */
+.morse-play {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(280px, 2fr);
+  gap: var(--space-6);
+  min-height: 0;
+  --glyph: 22px;
+}
+
+.morse-play-main {
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: var(--space-5);
+  min-width: 0;
+}
+
+.morse-play .slots {
+  font-size: 64px;
+}
+
+.morse-learn-target {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  --glyph: 32px;
+}
+
+.morse-learn-big {
+  font-size: 112px;
+  font-weight: 800;
+  font-stretch: 118%;
+  line-height: 1;
+}
+
+.morse-live {
+  display: grid;
+  gap: var(--space-2);
+  min-height: 120px;
+  align-content: center;
+  --glyph: 40px;
+}
+
+.morse-live-symbols {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  min-height: 1.2em;
+  font-size: var(--glyph);
+}
+
+.morse-live-empty {
+  font-size: var(--play-body);
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.morse-live-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: var(--play-small);
+  color: var(--muted);
+  font-weight: 600;
+  min-height: 24px;
+}
+
+.commit-ring {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: conic-gradient(var(--ink) calc(var(--p, 0) * 1turn), var(--ground-3) 0);
+}
+
+.morse-wrong {
+  animation: shake var(--dur-fast) var(--ease-out);
+}
+
+@keyframes shake {
+  0% {
+    transform: translateX(0);
+  }
+  30% {
+    transform: translateX(-6px);
+  }
+  60% {
+    transform: translateX(6px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.cheat {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-1) var(--space-4);
+  align-content: start;
+  padding: var(--space-4);
+  background: var(--ground);
+  --glyph: 16px;
+  font-stretch: 88%;
+  overflow: hidden;
+}
+
+.cheat-cell {
+  display: grid;
+  grid-template-columns: 1.4em auto;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 2px var(--space-2);
+  font-size: var(--play-body);
+  font-weight: 700;
+  border-radius: var(--radius-ui);
+}
+
+.cheat-cell-hint {
+  background: var(--ink);
+  color: var(--ground);
+}
+
+.cheat-cell-hint .glyph {
+  background: var(--ground);
+  box-shadow: none;
+}
+
+.cheat-letter {
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 900px) {
+  .morse-play {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(0, 1fr);
+  }
+  .cheat {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}

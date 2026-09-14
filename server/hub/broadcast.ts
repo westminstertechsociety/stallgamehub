@@ -12,7 +12,7 @@ import type {
   SeatSummary,
 } from '@/lib/shared/protocol'
 import type { HubDeps, HubState, SeatState } from './session'
-import { lobbyOptions } from './session'
+import { lobbyOptions, roundClock } from './session'
 
 export interface ViewExtras {
   reducedMotion: boolean
@@ -84,6 +84,11 @@ export function topEntries(entries: LeaderboardEntry[], game: GameModule, perVar
   return out
 }
 
+function gameNowOf(st: HubState, now: number): number {
+  if (st.round) return roundClock(st.round, now)
+  return st.results?.gameNow ?? 0
+}
+
 function safeView<T>(label: string, fn: () => T): T | null {
   try {
     return fn()
@@ -129,7 +134,7 @@ export function buildDisplayView(st: HubState, deps: HubDeps, now: number, extra
       : null,
     game:
       (st.phase === 'PLAYING' || st.phase === 'RESULTS') && gameState !== undefined
-        ? safeView('display', () => game.displayView(gameState))
+        ? safeView('display', () => game.displayView(gameState, gameNowOf(st, now)))
         : null,
     results: resultsView(st, game),
     leaderboard: topEntries(deps.leaderboard, game, deps.config.leaderboard.showTop),
@@ -180,7 +185,9 @@ export function buildPlayerView(
     other: seatSummary(other),
     lobby: inLobby ? { options, cursor: s.cursor, ready: s.choice, otherReady: other.choice } : null,
     game:
-      participant && gameState !== undefined ? safeView('player', () => game.playerView(gameState, seat)) : null,
+      participant && gameState !== undefined
+        ? safeView('player', () => game.playerView(gameState, seat, gameNowOf(st, now)))
+        : null,
     results: r
       ? {
           headline: r.outcome.headline ?? '',

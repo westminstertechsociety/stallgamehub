@@ -77,6 +77,8 @@ export interface ResultsState {
   variantId: string
   participants: Seat[]
   gameState: unknown
+  /** Round clock at the moment the round ended, so results views can render the final frame. */
+  gameNow: number
   holdEndsAt: number | null
   namingDeadline: number | null
   naming: Partial<Record<Seat, NamingState>>
@@ -798,6 +800,7 @@ function enterResults(ctx: Ctx, outcome: GameOutcome) {
     variantId: round.variantId,
     participants: [...round.participants],
     gameState: round.gameState,
+    gameNow: roundClock(round, ctx.now),
     holdEndsAt: anyNaming ? null : ctx.now + ctx.t.resultsHoldMs,
     namingDeadline: anyNaming ? ctx.now + ctx.t.namingCapMs : null,
     naming,
@@ -857,6 +860,11 @@ function submitName(ctx: Ctx, seat: Seat) {
     }
     r.entries.push(entry)
     ctx.effects.push({ type: 'leaderboard.add', entry })
+    const game = ctx.game
+    if (game.onName) {
+      const data = game.onName(ctx.deps.gameData[game.id], { seat, name, at: ctx.now })
+      if (data !== undefined) ctx.effects.push({ type: 'gameData.set', gameId: game.id, data })
+    }
   }
   if (Object.keys(r.naming).length === 0) {
     r.holdEndsAt = ctx.now + ctx.t.resultsHoldMs

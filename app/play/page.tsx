@@ -174,6 +174,7 @@ function PlayInner() {
             seat={mySeat}
             held={held}
             localNow={localNow}
+            builtAt={view.serverNow}
             serverNow={hub.serverNow}
             reducedMotion={view.reducedMotion}
           />

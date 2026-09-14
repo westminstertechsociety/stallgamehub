@@ -27,7 +27,15 @@ function Playing({ view, serverNow }: { view: DisplayView; serverNow: () => numb
   const views = gameViews[view.gameId]
   const names = { P1: seatLabel('P1', view.seats.P1.name), P2: seatLabel('P2', view.seats.P2.name) }
   if (!views || view.game == null) return <p className="lead">Loading the game.</p>
-  return <views.Display view={view.game} names={names} serverNow={serverNow} reducedMotion={view.reducedMotion} />
+  return (
+    <views.Display
+      view={view.game}
+      names={names}
+      builtAt={view.serverNow}
+      serverNow={serverNow}
+      reducedMotion={view.reducedMotion}
+    />
+  )
 }
 
 export default function DisplayPage() {
