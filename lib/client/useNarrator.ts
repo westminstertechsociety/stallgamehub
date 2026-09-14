@@ -33,12 +33,13 @@ export function useNarrator(view: DisplayView | null, triviaEveryMs = TRIVIA_DEF
           if (before.phase === 'ATTRACT') voice.say('lobby.wake', { priority: 2, cooldownMs: 20000 })
           break
         case 'COUNTDOWN':
-          voice.say(view.countdown?.mode === 'versus' ? 'countdown.versus' : 'countdown.solo', { priority: 2 })
+          // A countdown starting always cuts in over the lobby welcome.
+          voice.say(view.countdown?.mode === 'versus' ? 'countdown.versus' : 'countdown.solo', { priority: 3 })
           break
         case 'PLAYING': {
           const morse = view.game as MorseDisplayView | null
           const key = morse?.learn ? 'learn.start' : 'versus.start'
-          voice.say(key, { priority: 2 })
+          voice.say(key, { priority: 3 })
           lastTrivia.current = Date.now()
           break
         }
@@ -56,7 +57,7 @@ export function useNarrator(view: DisplayView | null, triviaEveryMs = TRIVIA_DEF
     }
 
     if (view.phase === 'COUNTDOWN' && before.countdown && view.countdown && before.countdown.mode !== view.countdown.mode) {
-      voice.say(view.countdown.mode === 'versus' ? 'countdown.versus' : 'countdown.solo', { priority: 2 })
+      voice.say(view.countdown.mode === 'versus' ? 'countdown.versus' : 'countdown.solo', { priority: 3 })
     }
 
     if (view.phase === 'RESULTS' && !before.results?.offer && view.results?.offer) {

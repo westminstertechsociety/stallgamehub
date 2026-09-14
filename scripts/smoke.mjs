@@ -93,11 +93,17 @@ await sleep(300)
 await tap(p1)
 await sleep(250)
 check(display.latest?.phase === 'LOBBY', 'space wakes the hub')
-await pickOption(p1, 'solo')
-check(display.latest?.countdown?.mode === 'solo' && display.latest.countdown.joinable, 'solo countdown that a second player can join')
+const quick = Boolean(display.latest?.lobby?.quick)
+if (quick) {
+  await tap(p1)
+  await sleep(250)
+} else {
+  await pickOption(p1, 'solo')
+}
+check(display.latest?.countdown?.mode === 'solo' && display.latest.countdown.joinable, 'one confirmed seat: solo countdown that a second player can join')
 await tap(p2)
 await sleep(250)
-check(display.latest?.countdown?.mode === 'versus', 'second seat converts it to head-to-head')
+check(display.latest?.countdown?.mode === 'versus', 'second seat confirms: head-to-head')
 check(await until(() => display.latest?.phase === 'PLAYING', 6000), 'round starts')
 for (let i = 0; i < 10; i++) await press(p2, 30)
 check(await until(() => display.latest?.phase === 'RESULTS', 3000) && display.latest.results.winner === 'P2', 'P2 wins press-space')
@@ -113,21 +119,38 @@ control.emit('control:cmd', { cmd: 'selectGame', gameId: 'morse' })
 await sleep(300)
 await tap(p1)
 await sleep(250)
-await pickOption(p1, 'timeattack')
-check(await until(() => display.latest?.phase === 'PLAYING', 10000), 'time attack starts after the solo countdown')
-for (let w = 0; w < 3; w++) {
+// Head-to-head with P2 confirmed but idle: P1 keys every word and qualifies as the winner.
+if (quick) {
+  await tap(p1)
+  await sleep(200)
+  await tap(p2)
+} else {
+  await pickOption(p1, 'versus')
+  await pickOption(p2, 'versus')
+}
+await sleep(250)
+check(display.latest?.countdown?.mode === 'versus', 'morse head-to-head countdown')
+check(await until(() => display.latest?.phase === 'PLAYING', 6000), 'morse round starts')
+for (let w = 0; w < 2; w++) {
   const word = display.latest.game.word
   for (const ch of word) await keyLetter(p1, ch)
   check(await until(() => display.latest?.phase === 'RESULTS' || display.latest?.game?.phase === 'between' || display.latest?.game?.word !== word, 3000), `keyed ${word}`)
   await sleep(2800)
 }
-check(await until(() => display.latest?.phase === 'RESULTS', 5000), 'three words done')
-check(p1.latest?.results?.naming != null, 'time attack asks for a name')
+check(await until(() => display.latest?.phase === 'RESULTS', 8000), 'best of three decided')
+check(display.latest?.results?.winner === 'P1', 'P1 wins the match')
+check(p1.latest?.results?.naming != null, 'winner asked for a name')
 for (let i = 0; i < 3; i++) {
   await hold(p1)
   await sleep(150)
 }
-check(await until(() => display.latest?.results?.entries?.length === 1, 3000), `time attack on the leaderboard: ${display.latest?.results?.entries?.[0]?.scoreText ?? '?'}`)
+check(await until(() => display.latest?.results?.entries?.length === 1, 3000), `head-to-head on the leaderboard: ${display.latest?.results?.entries?.[0]?.scoreText ?? '?'}`)
+const voiceRes = await fetch(URL + '/voice/manifest.json').catch(() => null)
+check(voiceRes?.ok, 'narrator manifest served')
+const manifest = voiceRes?.ok ? await voiceRes.json() : null
+const firstClip = manifest && Object.values(manifest.clips)[0]?.[0]?.file
+const clipRes = firstClip ? await fetch(URL + '/voice/' + firstClip, { method: 'HEAD' }).catch(() => null) : null
+check(clipRes?.ok && /audio/.test(clipRes.headers.get('content-type') ?? ''), `narrator clip served (${clipRes?.headers.get('content-type')})`)
 control.emit('control:cmd', { cmd: 'forceAttract' })
 await sleep(300)
 if (before.length === 0) {

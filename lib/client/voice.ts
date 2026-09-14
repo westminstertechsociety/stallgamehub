@@ -15,7 +15,7 @@ export interface VoiceManifest {
 }
 
 export interface SayOptions {
-  /** 0 background trivia, 1 feedback, 2 phase cues, 3 must be heard. Higher interrupts lower. */
+  /** 0 background trivia, 1 feedback, 2 phase cues, 3 must be heard. Higher interrupts lower; 3 also interrupts 3. */
   priority?: number
   /** Do not repeat this key within this many ms. */
   cooldownMs?: number
@@ -122,7 +122,7 @@ export function say(key: string, opts: SayOptions = {}): boolean {
   const now = Date.now()
   const last = lastSaid.get(key) ?? -Infinity
   if (opts.cooldownMs != null && now - last < opts.cooldownMs) return false
-  if (current && current.priority >= priority) return false
+  if (current && (current.priority > priority || (current.priority === priority && priority < 3))) return false
   if (muted) return false
   const list = manifest?.clips[key] ?? []
   let text: string | null = null
