@@ -284,3 +284,31 @@ test('idle ticks return the same state reference', () => {
   const s = morse.init(ctxFor('versus', 'versus', ['P1', 'P2']))
   assert.equal(morse.onTick(s, 50), s)
 })
+
+test('an exact tie with the ghost goes to the player whichever seat they sit in', () => {
+  let s = morse.init(ctxFor('solo', 'timeattack', ['P1']))
+  let t = 100
+  for (let i = 0; i < 3; i++) {
+    ;({ state: s, t } = keyWord(s, 'P1', s.word, t))
+    t += 1100
+    s = morse.onTick(s, t)
+  }
+  const data = morse.outcome(s).data as { ghosts: Record<string, { events: { type: 'down' | 'up'; t: number; d?: number; g?: number }[] }> }
+  for (const seat of ['P1', 'P2'] as const) {
+    let g = morse.init(ctxFor('solo', 'ghost', [seat], data))
+    const run = data.ghosts[g.word]!
+    // Feed the ghost's own recording as the player's input, tick by tick, so both finish on the same tick.
+    let now = 0
+    let idx = 0
+    while (g.phase === 'word' && now < 60000) {
+      now += 20
+      while (idx < run.events.length && run.events[idx]!.t <= now) {
+        const ev = run.events[idx++]!
+        const base = { seat, key: 'Space', clientTs: ev.t, serverTs: ev.t, gameNow: ev.t }
+        g = morse.onInput(g, seat, ev.type === 'down' ? { ...base, type: 'down', gapMs: ev.g } : { ...base, type: 'up', durationMs: ev.d })
+      }
+      g = morse.onTick(g, now)
+    }
+    assert.equal(g.lastWordWinner, seat, `player in ${seat} wins the tie`)
+  }
+})

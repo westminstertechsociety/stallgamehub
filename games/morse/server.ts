@@ -375,13 +375,14 @@ function checkWordEnd(s: MorseState, gameNow: number): boolean {
     }
     return false
   }
-  // First lane home wins the word.
+  // First lane home wins the word. On an exact tie (both commit on the same tick) a player beats the ghost,
+  // and in versus the lower seat slot keeps the word rather than declaring nobody.
   let best: { who: Seat | 'ghost'; ms: number } | null = null
   for (const slot of SEATS) {
     const l = s.lanes[slot]
     if (l.doneMs == null) continue
     const who: Seat | 'ghost' = l.kind === 'ghost' ? 'ghost' : (l.seat as Seat)
-    if (!best || l.doneMs < best.ms) best = { who, ms: l.doneMs }
+    if (!best || l.doneMs < best.ms || (l.doneMs === best.ms && best.who === 'ghost')) best = { who, ms: l.doneMs }
   }
   if (best) {
     finishWord(s, gameNow, best.who)
