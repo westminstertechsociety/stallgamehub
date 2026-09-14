@@ -55,8 +55,8 @@ function Slots({ word, committed, tone, showLetters = true }: { word: string; co
         const filled = i < committed.length
         return (
           <span key={i} className={`slot slot-${tone}${filled ? ' slot-filled rise' : ''}`}>
-            {filled ? committed[i] : showLetters ? '' : ''}
-            <span className="slot-target">{filled ? '' : showLetters ? ch : ''}</span>
+            {filled ? committed[i] : ''}
+            <span className="slot-target">{!filled && showLetters ? ch : ''}</span>
           </span>
         )
       })}
@@ -70,7 +70,7 @@ function toneOf(l: LaneView): string {
 
 // ---------------------------------------------------------------- projector
 
-function Display({ view, names, builtAt, serverNow, reducedMotion }: GameDisplayProps<MorseDisplayView>) {
+function Display({ view, names, present, builtAt, serverNow, reducedMotion }: GameDisplayProps<MorseDisplayView>) {
   const anyHolding = view.lanes.some((l) => l.holdingSince != null)
   const frame = useFrameClock(anyHolding && !reducedMotion)
   void frame
@@ -97,10 +97,13 @@ function Display({ view, names, builtAt, serverNow, reducedMotion }: GameDisplay
         ) : (
           <>
             <div className="hero morse-target" key={view.word}>
-              {view.phase === 'between' && view.lastWordWinner !== undefined
-                ? `${winnerName(view.lastWordWinner)} takes ${view.word}`
-                : view.word}
+              {view.word}
             </div>
+            {view.phase === 'between' && (
+              <div className="morse-takes" key={`takes-${view.wordIndex}`}>
+                {view.lastWordWinner ? `${winnerName(view.lastWordWinner)} takes it` : 'Time is up'}
+              </div>
+            )}
             <div className="small tnum">
               Word {view.wordIndex + 1} of {view.totalWords}
             </div>
@@ -112,7 +115,9 @@ function Display({ view, names, builtAt, serverNow, reducedMotion }: GameDisplay
           if (l.kind === 'open') {
             return (
               <Lane key={l.slot} seat={l.slot} name="" open>
-                <p className="lead">Press space on the other laptop to join the next round.</p>
+                <p className="lead">
+                  {present[l.slot] ? 'Press space to join the next round.' : 'Sit here and press space to join the next round.'}
+                </p>
               </Lane>
             )
           }
@@ -125,10 +130,12 @@ function Display({ view, names, builtAt, serverNow, reducedMotion }: GameDisplay
               seat={l.slot}
               name={name}
               end={
-                <span className="morse-lane-end">
-                  {l.doneMs != null ? <span className="tnum">{(l.doneMs / 1000).toFixed(1)}s</span> : null}
-                  {!view.learn && <span className="morse-wins tnum">{l.wins}</span>}
-                </span>
+                view.learn ? null : (
+                  <span className="morse-lane-end">
+                    {l.doneMs != null ? <span className="tnum">{(l.doneMs / 1000).toFixed(1)}s</span> : null}
+                    <span className="morse-wins tnum">{l.wins}</span>
+                  </span>
+                )
               }
             >
               {view.learn ? (
@@ -171,7 +178,7 @@ function CheatSheet({ hint }: { hint: string | null }) {
   )
 }
 
-function Player({ view, seat, held, localNow, builtAt, serverNow }: GamePlayerProps<MorsePlayerView>) {
+function Player({ view, seat, held, builtAt, serverNow, reducedMotion }: GamePlayerProps<MorsePlayerView>) {
   const holdingSince = held.Space ?? null
   const holding = holdingSince != null
   // The local key-up time drives the "letter commits in…" ring from the player's own clock, no round trip.
@@ -183,12 +190,16 @@ function Player({ view, seat, held, localNow, builtAt, serverNow }: GamePlayerPr
   }, [holding])
 
   const t = view.timing
-  const heldMs = holdingSince != null ? localNow - holdingSince : 0
   const gapMs = t.letterGapUnits * t.unitMs
+  // Keep the frame clock running while the key is down and while a pending letter's ring is filling.
+  const ringActive = view.pending !== '' && lastUpLocal != null
+  const localNow = useFrameClock(!reducedMotion && (holding || ringActive))
+  const heldMs = holdingSince != null ? localNow - holdingSince : 0
   const sinceUp = lastUpLocal != null ? localNow - lastUpLocal : Infinity
-  const commitProgress = !holding && view.pending ? Math.min(1, sinceUp / gapMs) : 0
+  const commitProgress = !holding && view.pending ? Math.max(0, Math.min(1, sinceUp / gapMs)) : 0
   const gameNow = view.gameNow + (serverNow() - builtAt)
-  const silentFor = holding ? 0 : view.lastUpAt != null ? gameNow - view.lastUpAt : gameNow
+  const silentSince = Math.max(view.lastUpAt ?? -Infinity, view.wordStartedAt)
+  const silentFor = holding ? 0 : gameNow - silentSince
   const hint = view.learn
     ? view.learn.letter
     : silentFor >= t.wordGapUnits * t.unitMs && view.phase === 'word' && view.doneMs == null
@@ -247,7 +258,7 @@ function Player({ view, seat, held, localNow, builtAt, serverNow }: GamePlayerPr
         <p className="play-hint tnum">
           {view.learn ? `Letter ${view.learn.index + 1} of ${view.learn.count}` : `Word ${view.wordIndex + 1} of ${view.totalWords}`}
           {view.ghost ? ` · Ghost ${view.ghost.name} ${(view.ghost.ms / 1000).toFixed(1)}s` : ''}
-          {view.mode === 'versus' ? ` · ${view.wins[seat]} won` : ''}
+          {view.mode === 'versus' ? ` · Words won: ${view.wins[seat]}` : ''}
         </p>
       </div>
       <CheatSheet hint={hint} />

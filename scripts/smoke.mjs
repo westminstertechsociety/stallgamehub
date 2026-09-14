@@ -64,8 +64,21 @@ const pickOption = async (p, id) => {
 }
 
 console.log(`smoke against ${URL}`)
-const health = await (await fetch(URL + '/health')).json().catch(() => null)
+let health = null
+try {
+  health = await (await fetch(URL + '/health', { signal: AbortSignal.timeout(4000) })).json()
+} catch {
+  console.log(`  FAIL cannot reach ${URL}. Is the hub running, and is this the host's LAN address?`)
+  process.exit(1)
+}
 check(health?.ok, 'GET /health')
+const force = process.argv.includes('--force')
+if ((health?.seats?.P1 || health?.seats?.P2) && !force) {
+  console.log('  FAIL a player laptop is already connected. The smoke takes both seats and plays fake rounds;')
+  console.log('       run it before opening the kiosks, or pass --force to kick them for a minute.')
+  process.exit(1)
+}
+const before = await (await fetch(URL + '/api/leaderboard')).json().catch(() => [])
 const control = await connect('control')
 const display = await connect('display')
 const p1 = await connect('play', 'P1')
@@ -117,6 +130,15 @@ for (let i = 0; i < 3; i++) {
 check(await until(() => display.latest?.results?.entries?.length === 1, 3000), `time attack on the leaderboard: ${display.latest?.results?.entries?.[0]?.scoreText ?? '?'}`)
 control.emit('control:cmd', { cmd: 'forceAttract' })
 await sleep(300)
+if (before.length === 0) {
+  // Leave no trace: the fake scores and the fake ghost runs go, since there was nothing real to keep.
+  control.emit('control:cmd', { cmd: 'resetScores' })
+  control.emit('control:cmd', { cmd: 'resetGhosts' })
+  await sleep(500)
+  console.log('  ok   test scores and ghosts cleared again')
+} else {
+  console.log('  note the leaderboard already had entries, so the smoke\'s AAA entries and ghost runs were kept. Clear them from /control if you want.')
+}
 for (const s of [display, control, p1, p2]) s.disconnect()
 console.log(failures ? `${failures} check(s) failed` : 'all checks passed')
 process.exit(failures ? 1 : 0)

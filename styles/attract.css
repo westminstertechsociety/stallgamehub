@@ -16,13 +16,10 @@
   grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
   gap: var(--display-gutter);
   align-items: stretch;
-  /* Bleed the portrait to the screen edge through the stage padding. */
-  margin: calc(var(--display-gutter) * -0.6) 0 calc(var(--display-gutter) * -0.6) calc(var(--display-gutter) * -1);
 }
 
 .attract-noimage {
   grid-template-columns: minmax(0, 1fr);
-  margin: 0;
 }
 
 .attract-portrait {
@@ -42,12 +39,11 @@
   display: grid;
   align-content: center;
   gap: var(--space-7);
-  padding: var(--display-gutter) 0;
   min-width: 0;
 }
 
 .attract-fact {
-  font-size: clamp(40px, 4.4vw, 88px);
+  font-size: clamp(40px, min(4.4vw, 7vh), 88px);
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.005em;
@@ -56,7 +52,7 @@
 }
 
 .attract-noimage .attract-fact {
-  font-size: clamp(56px, 6vw, 120px);
+  font-size: clamp(56px, min(6vw, 9vh), 120px);
   max-width: 20ch;
 }
 
@@ -71,8 +67,6 @@
   font-size: var(--display-body);
   font-weight: 800;
   font-stretch: 118%;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
 }
 
 .attract-year {

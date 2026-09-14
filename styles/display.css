@@ -5,7 +5,8 @@
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
   padding: calc(var(--display-gutter) * 0.6) var(--display-gutter);
-  gap: var(--space-6);
+  gap: var(--space-5);
+  overflow: hidden;
 }
 
 .stage-top,
@@ -23,16 +24,30 @@
 .stage-main {
   min-height: 0;
   display: grid;
+  overflow: hidden;
 }
 
+/* One word or one number, enormous. Never a sentence. */
 .hero {
   font-size: var(--display-hero);
   font-weight: 800;
   font-stretch: 118%;
   line-height: 0.95;
   letter-spacing: -0.01em;
-  text-transform: uppercase;
   text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+
+/* A sentence headline: still huge, but sized so two lines always fit above the content. */
+.title {
+  font-size: var(--display-title);
+  font-weight: 800;
+  font-stretch: 112%;
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+  max-width: 18ch;
 }
 
 .hero-number {
@@ -60,7 +75,21 @@
 .centre {
   display: grid;
   align-content: center;
+  gap: var(--space-5);
+  min-height: 0;
+}
+
+/* Heading on top, the rest takes what is left and clips rather than spills. */
+.stack {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
   gap: var(--space-6);
+  min-height: 0;
+}
+
+.stack > .rise {
+  display: grid;
+  gap: var(--space-3);
 }
 
 /* Lanes: the one bold move. Two fixed positions (P1 top, P2 bottom) in the seat's soft tint. */
@@ -79,10 +108,12 @@
   display: grid;
   grid-template-columns: minmax(7ch, auto) minmax(0, 1fr) auto;
   align-items: center;
-  gap: var(--space-7);
-  padding: var(--space-5) var(--space-7);
+  gap: var(--space-6);
+  padding: min(var(--space-4), 5cqh) var(--space-6);
   background: var(--ground-2);
   min-height: 0;
+  overflow: hidden;
+  container-type: size;
 }
 
 .lane-P1 {
@@ -101,13 +132,13 @@
 .lane-who {
   display: grid;
   gap: var(--space-2);
-  font-size: var(--display-small);
+  font-size: clamp(20px, 18cqh, var(--display-small));
   font-weight: 700;
   align-content: center;
 }
 
 .lane-who .chip {
-  font-size: var(--display-body);
+  font-size: clamp(24px, 26cqh, var(--display-body));
   justify-self: start;
 }
 
@@ -125,10 +156,15 @@
 
 .lane-body {
   min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto auto;
+  gap: min(var(--space-3), 4cqh);
+  align-content: center;
 }
 
 .lane-number {
-  font-size: var(--display-lane);
+  font-size: min(var(--display-lane), 70cqh);
   font-weight: 800;
   font-stretch: 118%;
   line-height: 0.9;
@@ -143,7 +179,7 @@
 }
 
 .lane-end {
-  font-size: var(--display-body);
+  font-size: min(var(--display-body), 30cqh);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   text-align: right;
@@ -154,13 +190,16 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-8);
-  align-content: center;
+  align-content: start;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .board-seat {
   display: grid;
-  gap: var(--space-4);
+  gap: var(--space-3);
   align-content: start;
+  min-height: 0;
 }
 
 .board-head {
@@ -177,11 +216,14 @@
 }
 
 .option {
-  padding: var(--space-4) var(--space-6);
+  padding: var(--space-3) var(--space-5);
   font-size: var(--display-small);
   font-weight: 600;
   background: var(--ground-2);
   color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   transition:
     background var(--dur-fast) var(--ease-out),
     color var(--dur-fast) var(--ease-out);
@@ -198,9 +240,12 @@
 }
 
 .option-sub {
-  display: block;
   color: var(--muted);
   font-weight: 500;
+}
+
+.option-sub::before {
+  content: ' · ';
 }
 
 .option-ready .option-sub {
@@ -221,14 +266,17 @@
 .results {
   display: grid;
   grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-  gap: var(--space-9);
-  align-content: center;
+  gap: var(--space-8);
+  align-content: start;
   align-items: start;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .results-main {
   display: grid;
-  gap: var(--space-6);
+  gap: var(--space-5);
+  min-width: 0;
 }
 
 .results-row {
@@ -236,7 +284,7 @@
   grid-template-columns: auto minmax(0, 1fr) auto;
   gap: var(--space-5);
   align-items: center;
-  padding: var(--space-4) var(--space-5);
+  padding: var(--space-3) var(--space-5);
   font-size: var(--display-body);
   font-weight: 700;
   background: var(--ground-2);

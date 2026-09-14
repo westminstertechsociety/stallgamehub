@@ -11,6 +11,35 @@ export interface KeyCaptureOptions {
 
 const ALWAYS_SWALLOW = new Set(['Escape', 'F11', 'F5', 'Tab', 'F1', 'F3', 'F6', 'F7', 'F12', 'ContextMenu'])
 
+/**
+ * Ask the browser to keep the screen awake and to hand us Escape/F11/Tab. Both only work on secure origins
+ * (the kiosk flag --unsafely-treat-insecure-origin-as-secure makes the hub one) and only in fullscreen for
+ * keyboard lock, so every call is best-effort and silent.
+ */
+export function requestKioskLocks(): () => void {
+  let wake: { release: () => Promise<void> } | null = null
+  const nav = navigator as Navigator & {
+    wakeLock?: { request: (t: 'screen') => Promise<{ release: () => Promise<void> }> }
+    keyboard?: { lock?: (keys?: string[]) => Promise<void>; unlock?: () => void }
+  }
+  const acquire = () => {
+    nav.wakeLock?.request('screen').then((l) => (wake = l)).catch(() => undefined)
+    nav.keyboard?.lock?.(['Escape', 'F11', 'Tab', 'F5', 'AltLeft', 'AltRight', 'MetaLeft', 'MetaRight']).catch(() => undefined)
+  }
+  const onVisible = () => {
+    if (document.visibilityState === 'visible') acquire()
+  }
+  acquire()
+  document.addEventListener('visibilitychange', onVisible)
+  document.addEventListener('fullscreenchange', acquire)
+  return () => {
+    document.removeEventListener('visibilitychange', onVisible)
+    document.removeEventListener('fullscreenchange', acquire)
+    nav.keyboard?.unlock?.()
+    void wake?.release().catch(() => undefined)
+  }
+}
+
 export function attachKeyCapture(opts: KeyCaptureOptions): () => void {
   const held = new Map<string, number>()
   const lastUp = new Map<string, number>()

@@ -130,6 +130,10 @@ async function main() {
       json(res, 200, stores.leaderboard.value)
       return
     }
+    if (pathname === '/api/attract') {
+      json(res, 200, runtime ? runtime.manifest() : { cards: [] })
+      return
+    }
     if (pathname.startsWith('/attract/')) {
       serveAttract(req, res, pathname)
         .then((served) => {
@@ -155,7 +159,7 @@ async function main() {
     transports: ['websocket', 'polling'],
   })
 
-  runtime = new HubRuntime(io, content, games, stores, log)
+  runtime = new HubRuntime(io, content, games, stores, log, port)
   runtime.start()
 
   let shuttingDown = false
@@ -173,6 +177,7 @@ async function main() {
   }
   process.on('SIGINT', () => void shutdown('SIGINT'))
   process.on('SIGTERM', () => void shutdown('SIGTERM'))
+  process.on('SIGHUP', () => void shutdown('SIGHUP'))
   process.on('uncaughtException', (err) => {
     log.error(`uncaughtException: ${err.stack ?? err.message}`)
     stores.leaderboard.flushSync()

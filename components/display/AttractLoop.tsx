@@ -32,7 +32,8 @@ function useManifest(version: number): Card[] {
   const [cards, setCards] = useState<Card[]>([])
   useEffect(() => {
     let cancelled = false
-    fetch(`/attract/manifest.json?v=${version}`, { cache: 'no-store' })
+    // The hub serves the last manifest that parsed, so a typo in the file never blanks the projector.
+    fetch(`/api/attract?v=${version}`, { cache: 'no-store' })
       .then((r) => (r.ok ? (r.json() as Promise<{ cards?: Card[] }>) : Promise.reject(new Error(String(r.status)))))
       .then((m) => {
         if (cancelled) return
@@ -51,23 +52,24 @@ function useManifest(version: number): Card[] {
 
 /** Loads an image and reports whether it is usable, so a missing portrait degrades to a typographic card. */
 function useImageOk(src: string | null): boolean | null {
-  const [ok, setOk] = useState<boolean | null>(null)
+  const [state, setState] = useState<{ src: string; ok: boolean } | null>(null)
   useEffect(() => {
     if (!src) return
     let cancelled = false
     const img = new Image()
     img.onload = () => {
-      if (!cancelled) setOk(true)
+      if (!cancelled) setState({ src, ok: true })
     }
     img.onerror = () => {
-      if (!cancelled) setOk(false)
+      if (!cancelled) setState({ src, ok: false })
     }
     img.src = src
     return () => {
       cancelled = true
     }
   }, [src])
-  return src ? ok : false
+  if (!src) return false
+  return state && state.src === src ? state.ok : null
 }
 
 export function AttractLoop({ view }: { view: DisplayView }) {
@@ -91,7 +93,9 @@ export function AttractLoop({ view }: { view: DisplayView }) {
   if (slide.kind === 'wake') {
     return (
       <div className="attract attract-wake" key={`wake-${index}`}>
-        <h1 className="hero rise">Press space to play</h1>
+        <h1 className="title rise" style={{ fontSize: 'clamp(72px, min(9vw, 15vh), 200px)' }}>
+          Press space to play
+        </h1>
         <p className="lead">Sit at either laptop and press the space bar. One key is all it takes.</p>
       </div>
     )
@@ -99,7 +103,7 @@ export function AttractLoop({ view }: { view: DisplayView }) {
   if (slide.kind === 'leaderboard') {
     return (
       <div className="attract attract-board" key={`board-${index}`}>
-        <h1 className="hero rise">Fastest today</h1>
+        <h1 className="title rise">Fastest today</h1>
         <Ranking view={view} large limit={5} />
       </div>
     )

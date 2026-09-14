@@ -45,6 +45,14 @@ function HoldButton({ label, onConfirm, ms = 900 }: { label: string; onConfirm: 
   )
 }
 
+const PHASE_LABEL: Record<ControlView['phase'], string> = {
+  ATTRACT: 'Attract loop',
+  LOBBY: 'Lobby',
+  COUNTDOWN: 'Countdown',
+  PLAYING: 'Playing',
+  RESULTS: 'Results',
+}
+
 export default function ControlPage() {
   const hub = useHub<ControlView>('control')
   const { view, status, send } = hub
@@ -72,11 +80,11 @@ export default function ControlPage() {
       <section className="control-card">
         <dl className="control-status">
           <dt>Phase</dt>
-          <dd>{view.phase}</dd>
+          <dd>{PHASE_LABEL[view.phase]}</dd>
           <dt>Game</dt>
           <dd>{view.gameName}</dd>
           {SEATS.map((seat) => (
-            <span key={seat} style={{ display: 'contents' }}>
+            <div key={seat} style={{ display: 'contents' }}>
               <dt>{seat}</dt>
               <dd>
                 <span className={`control-pill ${view.seatsDetail[seat].connected ? 'control-pill-on' : 'control-pill-off'}`}>
@@ -87,7 +95,7 @@ export default function ControlPage() {
                 {view.seatsDetail[seat].rtt != null ? ` · ${view.seatsDetail[seat].rtt}ms` : ''}
                 {view.seatsDetail[seat].stuck ? ' · key stuck' : ''}
               </dd>
-            </span>
+            </div>
           ))}
           <dt>Screens</dt>
           <dd>
@@ -164,6 +172,7 @@ export default function ControlPage() {
       <section className="control-card">
         <div className="control-row">
           <HoldButton label="Clear leaderboard" onConfirm={() => cmd({ cmd: 'resetScores' })} />
+          <HoldButton label="Clear ghosts" onConfirm={() => cmd({ cmd: 'resetGhosts' })} />
           <HoldButton label="Hard reset session" onConfirm={() => cmd({ cmd: 'hardReset' })} />
         </div>
       </section>

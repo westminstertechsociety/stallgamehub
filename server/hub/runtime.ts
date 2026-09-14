@@ -73,6 +73,7 @@ export class HubRuntime {
     private readonly games: Record<string, GameModule>,
     private readonly stores: Stores,
     private readonly log: Logger,
+    private readonly listenPort: number = content.hub.port,
   ) {
     this.content = content
     this.deps = {
@@ -167,6 +168,11 @@ export class HubRuntime {
       case 'leaderboard.reset':
         this.setLeaderboard([])
         this.log.warn('leaderboard cleared by operator')
+        return
+      case 'gameData.reset':
+        this.stores.gameData.set({})
+        this.deps.gameData = {}
+        this.log.warn('game data (ghost runs) cleared by operator')
         return
       case 'gameData.set': {
         const next = { ...this.stores.gameData.value, [effect.gameId]: effect.data }
@@ -291,7 +297,8 @@ export class HubRuntime {
     if (!seat) {
       // Unpinned laptops take a free seat, but never one whose pinned player is mid-reconnect.
       const pausing = this.state.pause?.seats ?? []
-      seat = SEATS.find((s) => this.seatSockets[s] === null && !pausing.includes(s)) ?? null
+      const busy = (s: Seat) => pausing.includes(s) || this.state.seats[s].presence === 'naming'
+      seat = SEATS.find((s) => this.seatSockets[s] === null && !busy(s)) ?? null
       if (!seat) {
         this.log.warn(`play socket ${socket.id} has no seat: both taken`)
         return
@@ -344,7 +351,7 @@ export class HubRuntime {
       },
       uptimeMs: hubNow() - this.bootedAt,
       ips: lanIps(),
-      port: this.config.port,
+      port: this.listenPort,
     }
   }
 
@@ -390,6 +397,11 @@ export class HubRuntime {
     } catch (err) {
       this.log.error(`flush failed: ${(err as Error).stack ?? err}`)
     }
+  }
+
+  /** The last manifest that parsed. A bad edit keeps the projector on the previous cards. */
+  manifest() {
+    return this.content.manifest
   }
 
   health() {

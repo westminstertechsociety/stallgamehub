@@ -2,7 +2,7 @@
 // the previous file is kept as .bak, then the temp file is renamed into place. One write in flight at a
 // time; a change during a write schedules exactly one more. Boot falls back main -> .bak -> empty.
 
-import { copyFile, mkdir, open, readFile, rename, unlink } from 'node:fs/promises'
+import { copyFile, mkdir, open, readFile, readdir, rename, unlink } from 'node:fs/promises'
 import { renameSync, writeFileSync, mkdirSync } from 'node:fs'
 import path from 'node:path'
 import type { ZodType } from 'zod'
@@ -35,9 +35,14 @@ export class JsonStore<T> {
 
   async load(): Promise<void> {
     await mkdir(path.dirname(this.file), { recursive: true })
+    await this.cleanTemps()
+    // A missing main file is a deliberate reset (the README says "delete the file"): do not resurrect the backup.
+    // A present but unreadable main file is damage: fall back to the backup and keep the damaged file for forensics.
+    let mainMissing = false
     for (const candidate of [this.file, `${this.file}.bak`]) {
+      if (candidate !== this.file && mainMissing) break
       try {
-        const raw = JSON.parse(await readFile(candidate, 'utf8')) as unknown
+        const raw = JSON.parse((await readFile(candidate, 'utf8')).replace(/^\uFEFF/, '')) as unknown
         const parsed = this.schema.safeParse(raw)
         if (parsed.success) {
           this.value = parsed.data
@@ -48,13 +53,31 @@ export class JsonStore<T> {
           return
         }
         this.log.warn(`${path.basename(candidate)}: invalid contents, ${parsed.error.issues.length} issue(s)`)
+        if (candidate === this.file) this.protectBackup = true
       } catch (err) {
         const e = err as NodeJS.ErrnoException
-        if (e.code !== 'ENOENT') this.log.warn(`${path.basename(candidate)}: ${e.message}`)
+        if (e.code === 'ENOENT') {
+          if (candidate === this.file) mainMissing = true
+        } else {
+          this.log.warn(`${path.basename(candidate)}: ${e.message}`)
+          if (candidate === this.file) this.protectBackup = true
+        }
       }
     }
     this.value = this.fallback()
     this.log.info(`${path.basename(this.file)}: starting empty`)
+  }
+
+  private async cleanTemps(): Promise<void> {
+    const dir = path.dirname(this.file)
+    const base = path.basename(this.file)
+    try {
+      for (const name of await readdir(dir)) {
+        if (name.startsWith(`${base}.tmp-`)) await unlink(path.join(dir, name)).catch(() => undefined)
+      }
+    } catch {
+      // nothing to clean
+    }
   }
 
   set(next: T): void {
@@ -114,9 +137,9 @@ export class JsonStore<T> {
         await fh.close()
       }
       if (this.protectBackup) {
-        // Keep the corrupt main file for forensics and leave the good backup alone this once.
+        // Keep the damaged main file for forensics and leave the last good backup alone.
         try {
-          await copyFile(this.file, `${this.file}.corrupt`)
+          await copyFile(this.file, `${this.file}.corrupt-${Date.now()}`)
         } catch {
           // nothing to keep
         }

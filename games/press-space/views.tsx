@@ -5,7 +5,7 @@ import { Lane, Lanes } from '@/components/display/Lane'
 import { Centre } from '@/components/play/PlayFrame'
 import type { PressSpaceDisplayView, PressSpacePlayerView } from './shared'
 
-function Display({ view, names }: GameDisplayProps<PressSpaceDisplayView>) {
+function Display({ view, names, present }: GameDisplayProps<PressSpaceDisplayView>) {
   const solo = view.mode === 'solo'
   return (
     <Lanes solo={solo}>
@@ -14,7 +14,7 @@ function Display({ view, names }: GameDisplayProps<PressSpaceDisplayView>) {
         if (!playing) {
           return (
             <Lane key={seat} seat={seat} name={names[seat]} open>
-              <p className="lead">Press space on the other laptop to join the next round.</p>
+              <p className="lead">{present[seat] ? 'Press space to join the next round.' : 'Sit here and press space to join the next round.'}</p>
             </Lane>
           )
         }

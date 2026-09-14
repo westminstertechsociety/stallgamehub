@@ -120,6 +120,8 @@ export interface MorsePlayerView {
   gameNow: number
   /** gameNow of the last key-up, for the local "letter commits in…" ring. */
   lastUpAt: number | null
+  /** gameNow when the current word started: silence is measured from here until the first key-up. */
+  wordStartedAt: number
   ghost: { name: string; ms: number } | null
   learn: LearnView | null
   timing: { unitMs: number; dotMaxUnits: number; letterGapUnits: number; wordGapUnits: number }

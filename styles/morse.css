@@ -11,7 +11,7 @@
 
 .glyph {
   display: inline-block;
-  height: 0.5em;
+  height: 0.56em;
   border-radius: 999px;
   background: var(--tone, var(--ink));
   box-shadow: inset 0 0 0 0.06em var(--ink);
@@ -19,11 +19,11 @@
 }
 
 .glyph-dot {
-  width: 0.5em;
+  width: 0.56em;
 }
 
 .glyph-dash {
-  width: 1.4em;
+  width: 1.5em;
 }
 
 .glyph-live {
@@ -50,37 +50,59 @@
 .morse-display {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
-  gap: var(--space-6);
+  gap: var(--space-5);
   min-height: 0;
-  --glyph: clamp(22px, 2.4vw, 48px);
+  --glyph: var(--glyph-display);
 }
 
 .morse-word {
   display: grid;
-  gap: var(--space-2);
-  align-items: baseline;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: end;
+  gap: var(--space-2) var(--space-8);
+}
+
+.morse-word .small {
+  grid-column: 1;
 }
 
 .morse-target {
-  font-size: clamp(80px, 11vw, 220px);
+  font-size: clamp(72px, min(10vw, 17vh), 200px);
   letter-spacing: 0.06em;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+.morse-takes {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+  align-self: center;
+  font-size: var(--display-body);
+  font-weight: 700;
+  animation: rise var(--dur-base) var(--ease-out);
 }
 
 .morse-learn-letter {
-  font-size: clamp(96px, 14vw, 280px);
+  font-size: clamp(96px, min(12vw, 20vh), 240px);
+  text-transform: uppercase;
 }
 
 .morse-learn-pattern {
-  --glyph: clamp(36px, 4vw, 80px);
+  --glyph: clamp(64px, min(8vw, 13vh), 150px);
+  grid-column: 2;
+  grid-row: 1;
+  align-self: center;
+  justify-self: start;
 }
 
 .slots {
   display: flex;
   gap: 0.12em;
-  font-size: var(--display-lane);
+  font-size: min(var(--display-lane), 44cqh);
   font-weight: 800;
   font-stretch: 118%;
   line-height: 1;
+  height: 1.1em;
 }
 
 .slot {
@@ -114,13 +136,15 @@
 
 .morse-stream-row {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   gap: var(--space-6);
-  margin-top: var(--space-4);
-  min-height: 1.6em;
+  --glyph: min(var(--glyph-display), 22cqh);
+  font-size: var(--glyph);
   overflow: hidden;
 }
 
+/* The stream reads left to right. Overflow on the start side is unreachable, so with flex-end the oldest
+   groups are what gets trimmed and the newest keying is always visible. */
 .stream {
   display: flex;
   gap: var(--space-5);
@@ -134,14 +158,15 @@
 .stream-group {
   display: grid;
   justify-items: center;
-  gap: 0.2em;
+  gap: 0.15em;
   flex: none;
 }
 
 .stream-letter {
-  font-size: 0.55em;
+  font-size: min(var(--display-small), 0.8em);
   font-weight: 700;
-  min-height: 1.2em;
+  line-height: 1.1;
+  min-height: 1.1em;
   color: var(--muted);
 }
 
@@ -154,6 +179,7 @@
 }
 
 .stream-bad .stream-letter {
+  color: var(--ink);
   text-decoration: line-through;
   text-decoration-thickness: 0.12em;
 }
@@ -165,7 +191,7 @@
 }
 
 .morse-wins {
-  font-size: var(--display-lane);
+  font-size: min(var(--display-lane), 60cqh);
   font-weight: 800;
   font-stretch: 118%;
   line-height: 0.9;
@@ -176,9 +202,15 @@
 }
 
 .morse-feedback {
-  font-size: var(--display-body);
+  font-size: min(var(--display-body), 34cqh);
   font-weight: 700;
   animation: rise var(--dur-base) var(--ease-out);
+}
+
+.lane-open .lead {
+  font-size: min(var(--display-small), 40cqh);
+  max-width: none;
+  color: var(--muted);
 }
 
 .morse-feedback-bad {
@@ -203,7 +235,7 @@
 }
 
 .morse-play .slots {
-  font-size: 64px;
+  font-size: 88px;
 }
 
 .morse-learn-target {
@@ -223,9 +255,9 @@
 .morse-live {
   display: grid;
   gap: var(--space-2);
-  min-height: 120px;
+  min-height: 140px;
   align-content: center;
-  --glyph: 40px;
+  --glyph: 56px;
 }
 
 .morse-live-symbols {

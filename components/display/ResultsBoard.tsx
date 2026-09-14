@@ -12,7 +12,11 @@ export function ResultsBoard({ view }: { view: DisplayView }) {
   return (
     <div className="results">
       <div className="results-main">
-        <h1 className="hero rise">{headline}</h1>
+        <h1 className="title rise">{headline}</h1>
+        {r.naming.length > 0 && (
+          <p className="lead">{r.naming.map((s) => seatLabel(s, '')).join(' and ')}: enter your name on your laptop.</p>
+        )}
+        {r.offer && <p className="lead">{r.offer.to}: hold space to play head-to-head.</p>}
         <div style={{ display: 'grid', gap: 'var(--space-3)' }}>
           {SEATS.filter((s) => r.seats[s]).map((seat) => {
             const so = r.seats[seat]
@@ -28,10 +32,6 @@ export function ResultsBoard({ view }: { view: DisplayView }) {
             )
           })}
         </div>
-        {r.naming.length > 0 && (
-          <p className="lead">{r.naming.map((s) => seatLabel(s, '')).join(' and ')}: enter your name on your laptop.</p>
-        )}
-        {r.offer && <p className="lead">{r.offer.to}: hold space to play head-to-head.</p>}
       </div>
       <Ranking view={view} limit={5} />
     </div>

@@ -220,7 +220,10 @@ function startWord(s: MorseState, gameNow: number) {
   s.wordStartedAt = gameNow
   s.phase = 'word'
   s.lastWordWinner = null
-  if (s.learn) s.learn.attempts = 0
+  if (s.learn) {
+    s.learn.attempts = 0
+    s.learn.last = null
+  }
   for (const slot of SEATS) {
     const l = s.lanes[slot]
     resetLane(l)
@@ -617,9 +620,10 @@ export const morse: GameModule<MorseState, MorseDisplayView, MorsePlayerView, Mo
       const total = state.totalMs[seat]
       if (state.mode === 'versus') {
         const isWinner = state.winner === seat
+        const won = wonMs(seat)
         seats[seat] = {
-          score: wonMs(seat),
-          scoreText: `${state.wins[seat]}–${state.wins[otherSeat(seat)]} · ${fmtMs(wonMs(seat))}`,
+          score: won,
+          scoreText: won > 0 ? `${state.wins[seat]}–${state.wins[otherSeat(seat)]} · ${fmtMs(won)}` : `${state.wins[seat]}–${state.wins[otherSeat(seat)]}`,
           qualifies: over && isWinner && !state.forfeited && state.wins[seat] > 0,
           detail: state.results.map((r) => r.word).join(' '),
         }
@@ -738,6 +742,7 @@ export const morse: GameModule<MorseState, MorseDisplayView, MorsePlayerView, Mo
       wins: state.wins,
       gameNow,
       lastUpAt: l?.decoder.lastUpAt ?? null,
+      wordStartedAt: state.wordStartedAt,
       ghost: ghostLane?.run ? { name: ghostLane.run.name || 'Ghost', ms: ghostLane.run.ms } : null,
       learn: state.learn
         ? {

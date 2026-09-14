@@ -43,6 +43,7 @@ export type ControlCommand =
   | { cmd: 'skip' }
   | { cmd: 'endRound' }
   | { cmd: 'resetScores' }
+  | { cmd: 'resetGhosts' }
   | { cmd: 'forceAttract' }
   | { cmd: 'kick'; seat: Seat }
   | { cmd: 'mute'; muted: boolean }

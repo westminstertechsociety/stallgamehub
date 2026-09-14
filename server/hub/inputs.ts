@@ -25,6 +25,7 @@ export const controlCommandSchema = z.discriminatedUnion('cmd', [
   z.object({ cmd: z.literal('skip') }),
   z.object({ cmd: z.literal('endRound') }),
   z.object({ cmd: z.literal('resetScores') }),
+  z.object({ cmd: z.literal('resetGhosts') }),
   z.object({ cmd: z.literal('forceAttract') }),
   z.object({ cmd: z.literal('kick'), seat: z.enum(['P1', 'P2']) }),
   z.object({ cmd: z.literal('mute'), muted: z.boolean() }),

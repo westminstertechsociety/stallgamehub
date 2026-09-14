@@ -57,7 +57,8 @@ export type HubConfig = z.infer<typeof hubConfigSchema>
 
 export const attractCardSchema = z.object({
   name: z.string().min(1),
-  year: z.string().min(1),
+  // Typing 1843 without quotes is the most likely hand edit; accept it.
+  year: z.union([z.string().min(1), z.number()]).transform(String),
   fact: z.string().min(1),
   image: z.string().min(1),
   credit: z.string().optional(),
@@ -78,7 +79,8 @@ export interface ContentSnapshot {
 
 async function readJson(file: string): Promise<unknown> {
   const text = await readFile(file, 'utf8')
-  return JSON.parse(text) as unknown
+  // Windows editors like to add a byte-order mark; JSON.parse does not like it.
+  return JSON.parse(text.replace(/^\uFEFF/, '')) as unknown
 }
 
 function formatZod(err: z.ZodError): string {

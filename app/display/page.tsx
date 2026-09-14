@@ -7,6 +7,7 @@ import type { DisplayView } from '@/lib/shared/protocol'
 import { EVENTS } from '@/lib/shared/protocol'
 import { gameViews } from '@/games/registry.client'
 import { seatLabel } from '@/components/shared/SeatChip'
+import { requestKioskLocks } from '@/lib/client/keys'
 import { Banner, Stage } from '@/components/display/Stage'
 import { LobbyBoard } from '@/components/display/LobbyBoard'
 import { ResultsBoard } from '@/components/display/ResultsBoard'
@@ -15,11 +16,13 @@ import { AttractLoop } from '@/components/display/AttractLoop'
 function Playing({ view, serverNow }: { view: DisplayView; serverNow: () => number }) {
   const views = gameViews[view.gameId]
   const names = { P1: seatLabel('P1', view.seats.P1.name), P2: seatLabel('P2', view.seats.P2.name) }
+  const present = { P1: view.seats.P1.connected, P2: view.seats.P2.connected }
   if (!views || view.game == null) return <p className="lead">Loading the game.</p>
   return (
     <views.Display
       view={view.game}
       names={names}
+      present={present}
       builtAt={view.serverNow}
       serverNow={serverNow}
       reducedMotion={view.reducedMotion}
@@ -49,6 +52,8 @@ export default function DisplayPage() {
     document.documentElement.dataset.reducedMotion = String(view?.reducedMotion ?? false)
   }, [view?.highWash, view?.reducedMotion])
 
+  useEffect(() => requestKioskLocks(), [])
+
   if (!view) {
     return (
       <Stage>
@@ -72,6 +77,7 @@ export default function DisplayPage() {
     case 'ATTRACT':
       top = null
       body = <AttractLoop view={view} />
+      bottom = <span>Press space on either laptop to play</span>
       break
     case 'LOBBY':
     case 'COUNTDOWN':
@@ -97,7 +103,7 @@ export default function DisplayPage() {
       body = <ResultsBoard view={view} />
       bottom = view.results?.holdEndsAt ? (
         <>
-          <span>Press space to play again</span>
+          <span>{view.results.offer ? '' : 'Press space to play again'}</span>
           <span className="tnum">Next in {secondsLeft(view.results.holdEndsAt, now)}</span>
         </>
       ) : null

@@ -47,6 +47,8 @@ export interface CountdownState {
   variantId: string
   participants: Seat[]
   joinable: boolean
+  /** The original solo deadline, kept across a versus conversion so a flapping second seat cannot stall it. */
+  soloEndsAt?: number
 }
 
 export interface RoundState {
@@ -71,6 +73,10 @@ export interface PauseState {
 export interface NamingState {
   letters: number[]
   cursor: number
+  /** Hard cap set when name entry began. Never extended. */
+  capAt: number
+  /** Current deadline: the cap, or sooner while the seat is disconnected. */
+  deadline: number
 }
 
 export interface ResultsState {
@@ -83,7 +89,6 @@ export interface ResultsState {
   gameNow: number
   seed: number
   holdEndsAt: number | null
-  namingDeadline: number | null
   naming: Partial<Record<Seat, NamingState>>
   entries: LeaderboardEntry[]
   offer: { to: Seat; from: Seat } | null
@@ -100,6 +105,8 @@ export interface HubState {
   pause: PauseState | null
   results: ResultsState | null
   idleDeadline: number | null
+  /** Solo variant of the last solo round, the fallback when a head-to-head partner drops out of a countdown. */
+  lastSoloVariantId: string | null
   notice: { text: string; until: number } | null
   errors: number
   muted: boolean
@@ -131,6 +138,7 @@ export interface HubDeps {
 export type Effect =
   | { type: 'leaderboard.add'; entry: LeaderboardEntry }
   | { type: 'leaderboard.reset' }
+  | { type: 'gameData.reset' }
   | { type: 'gameData.set'; gameId: string; data: unknown }
   | { type: 'log'; level: 'info' | 'warn' | 'error'; msg: string }
 
@@ -165,6 +173,7 @@ export function initialState(cfg: HubConfig, gameId: string, now: number): HubSt
     pause: null,
     results: null,
     idleDeadline: null,
+    lastSoloVariantId: null,
     notice: null,
     errors: 0,
     muted: cfg.audio.muted,
@@ -291,9 +300,10 @@ function onSeatConnect(ctx: Ctx, seat: Seat) {
     }
     case 'RESULTS': {
       const r = st.results
-      if (r?.naming[seat]) {
+      const n = r?.naming[seat]
+      if (n) {
         s.presence = 'naming'
-        r.namingDeadline = ctx.now + ctx.t.namingCapMs
+        n.deadline = n.capAt
       } else if (r?.participants.includes(seat)) s.presence = 'done'
       else s.presence = 'watching'
       refreshOffer(ctx)
@@ -336,9 +346,9 @@ function onSeatDisconnect(ctx: Ctx, seat: Seat) {
     }
     case 'RESULTS': {
       const r = st.results
-      if (r?.naming[seat]) {
-        const grace = ctx.now + ctx.t.namingGraceMs
-        r.namingDeadline = r.namingDeadline == null ? grace : Math.min(r.namingDeadline, grace)
+      const n = r?.naming[seat]
+      if (n) {
+        n.deadline = Math.min(n.deadline, ctx.now + ctx.t.namingGraceMs)
       } else {
         s.presence = r?.participants.includes(seat) ? 'done' : 'absent'
       }
@@ -610,13 +620,12 @@ function onTick(ctx: Ctx) {
         toLobbyOrAttract(ctx)
         return
       }
-      if (r.namingDeadline != null && ctx.now >= r.namingDeadline) {
-        // Present players get their letters as typed; a seat that never came back is dropped, not written as AAA.
-        for (const seat of SEATS) {
-          if (!r.naming[seat]) continue
-          if (st.seats[seat].connected) submitName(ctx, seat)
-          else dropNaming(ctx, seat)
-        }
+      for (const seat of SEATS) {
+        const n = r.naming[seat]
+        if (!n || ctx.now < n.deadline) continue
+        // A present player gets the letters as typed; a seat that never came back is dropped, not written as AAA.
+        if (st.seats[seat].connected) submitName(ctx, seat)
+        else dropNaming(ctx, seat)
       }
       if (r.holdEndsAt != null && ctx.now >= r.holdEndsAt) toLobbyOrAttract(ctx)
       return
@@ -665,13 +674,17 @@ function recomputeCountdown(ctx: Ctx) {
         variantId: versus.id,
         participants: [...ready],
         joinable: false,
+        soloEndsAt: st.countdown?.mode === 'solo' ? st.countdown.endsAt : st.countdown?.soloEndsAt,
       }
     }
   } else {
     const seat = ready[0] as Seat
     const choice = st.seats[seat].choice
     const variant =
-      soloVariants.find((v) => v.id === choice) ?? soloVariants.find((v) => v.scored) ?? soloVariants[0]
+      soloVariants.find((v) => v.id === choice) ??
+      soloVariants.find((v) => v.id === st.lastSoloVariantId) ??
+      soloVariants.find((v) => v.scored) ??
+      soloVariants[0]
     if (!variant) {
       // A versus-only game with one player ready: keep the lobby open, the other seat can still join.
       st.countdown = null
@@ -683,8 +696,14 @@ function recomputeCountdown(ctx: Ctx) {
     const same =
       st.countdown && st.countdown.mode === 'solo' && st.countdown.participants[0] === seat
     if (!same) {
+      // Back from a versus conversion that fell through: resume the original solo clock, never restart it.
+      const previous = st.countdown?.soloEndsAt
+      const endsAt =
+        previous != null && st.countdown?.participants.includes(seat)
+          ? Math.max(previous, ctx.now + ctx.t.versusCountdownMs)
+          : ctx.now + ctx.t.soloCountdownMs
       st.countdown = {
-        endsAt: ctx.now + ctx.t.soloCountdownMs,
+        endsAt,
         mode: 'solo',
         variantId: variant.id,
         participants: [seat],
@@ -742,6 +761,7 @@ function startRound(ctx: Ctx) {
   st.pause = null
   st.results = null
   st.idleDeadline = null
+  if (cd.mode === 'solo') st.lastSoloVariantId = cd.variantId
   st.phase = 'PLAYING'
   ctx.touch()
   checkOver(ctx)
@@ -856,7 +876,8 @@ function enterResults(ctx: Ctx, outcome: GameOutcome) {
     const s = st.seats[seat]
     const so = outcome.seats[seat]
     if (variant?.scored && so?.qualifies && s.connected) {
-      naming[seat] = { letters: [0, 0, 0], cursor: 0 }
+      const capAt = ctx.now + ctx.t.namingCapMs
+      naming[seat] = { letters: [0, 0, 0], cursor: 0, capAt, deadline: capAt }
       s.presence = 'naming'
     } else {
       s.presence = 'done'
@@ -874,7 +895,6 @@ function enterResults(ctx: Ctx, outcome: GameOutcome) {
     gameNow: roundClock(round, ctx.now),
     seed: round.seed,
     holdEndsAt: anyNaming ? null : ctx.now + ctx.t.resultsHoldMs,
-    namingDeadline: anyNaming ? ctx.now + ctx.t.namingCapMs : null,
     naming,
     entries: [],
     offer: null,
@@ -917,7 +937,6 @@ function dropNaming(ctx: Ctx, seat: Seat) {
   st.seats[seat].presence = st.seats[seat].connected ? 'done' : 'absent'
   if (Object.keys(r.naming).length === 0) {
     r.holdEndsAt = ctx.now + ctx.t.resultsHoldMs
-    r.namingDeadline = null
     refreshOffer(ctx)
   }
   ctx.touch()
@@ -957,7 +976,6 @@ function submitName(ctx: Ctx, seat: Seat) {
   }
   if (Object.keys(r.naming).length === 0) {
     r.holdEndsAt = ctx.now + ctx.t.resultsHoldMs
-    r.namingDeadline = null
     refreshOffer(ctx)
   }
   ctx.touch()
@@ -1057,10 +1075,12 @@ function onControl(ctx: Ctx, cmd: ControlCommand) {
         return
       }
       if (st.gameId === cmd.gameId) return
-      st.gameId = cmd.gameId
-      for (const seat of SEATS) st.seats[seat].cursor = 0
+      // Leave the current phase first so pending names are written under the game they were earned in.
       if (st.phase === 'ATTRACT') resetForPhase(ctx, (s) => (s.connected ? 'idle' : 'absent'))
       else toLobbyOrAttract(ctx)
+      st.gameId = cmd.gameId
+      st.lastSoloVariantId = null
+      for (const seat of SEATS) st.seats[seat].cursor = 0
       ctx.touch()
       return
     }
@@ -1118,6 +1138,10 @@ function onControl(ctx: Ctx, cmd: ControlCommand) {
       ctx.effects.push({ type: 'leaderboard.reset' })
       ctx.notice('Leaderboard cleared.')
       return
+    case 'resetGhosts':
+      ctx.effects.push({ type: 'gameData.reset' })
+      ctx.notice('Ghost runs cleared.')
+      return
     case 'forceAttract':
       toAttract(ctx)
       return
@@ -1172,7 +1196,7 @@ function endRoundByOperator(ctx: Ctx) {
     const so = base.seats[seat]
     seats[seat] = so ? { ...so, qualifies: false } : { score: 0, scoreText: '—', qualifies: false }
   }
-  enterResults(ctx, { ...base, over: true, seats, headline: base.headline ?? 'Round ended by the operator.' })
+  enterResults(ctx, { ...base, over: true, seats, headline: 'Round ended' })
 }
 
 function kick(ctx: Ctx, seat: Seat) {
@@ -1195,12 +1219,8 @@ function kick(ctx: Ctx, seat: Seat) {
     const r = st.results
     if (r.naming[seat]) {
       delete r.naming[seat]
-      if (Object.keys(r.naming).length === 0) {
-        r.holdEndsAt = ctx.now + ctx.t.resultsHoldMs
-        r.namingDeadline = null
-      }
+      if (Object.keys(r.naming).length === 0) r.holdEndsAt = ctx.now + ctx.t.resultsHoldMs
     }
-    if (r.offer?.to === seat) r.offer = null
   }
   s.name = ''
   s.cursor = 0
@@ -1210,8 +1230,9 @@ function kick(ctx: Ctx, seat: Seat) {
   s.stuck = false
   if (!s.connected) s.presence = 'absent'
   else if (st.phase === 'PLAYING') s.presence = st.round?.participants.includes(seat) ? 'playing' : 'watching'
-  else if (st.phase === 'RESULTS') s.presence = 'done'
+  else if (st.phase === 'RESULTS') s.presence = st.results?.participants.includes(seat) ? 'done' : 'watching'
   else s.presence = 'idle'
+  if (st.phase === 'RESULTS') refreshOffer(ctx)
   ctx.notice(`${seat} was reset.`, 4000)
   ctx.touch()
 }

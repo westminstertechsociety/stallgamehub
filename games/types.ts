@@ -130,6 +130,8 @@ export type HeldKeys = Record<string, number>
 export interface GameDisplayProps<DV> {
   view: DV
   names: Record<Seat, string>
+  /** Which seats have a laptop connected, so an empty lane can say "idle" rather than "open". */
+  present: Record<Seat, boolean>
   /** Server time when this view was built; pair with serverNow() to extrapolate the round clock. */
   builtAt: number
   serverNow: () => number

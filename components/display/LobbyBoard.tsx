@@ -8,7 +8,7 @@ export function LobbyBoard({ view, now }: { view: DisplayView; now: number }) {
   const cd = view.countdown
   const bothOff = !view.seats.P1.connected && !view.seats.P2.connected
   return (
-    <div className="centre">
+    <div className="stack">
       {cd ? (
         <div className="rise" key={`cd-${cd.mode}-${cd.endsAt}`}>
           <div className="hero-number land" key={secondsLeft(cd.endsAt, now)}>
@@ -24,7 +24,7 @@ export function LobbyBoard({ view, now }: { view: DisplayView; now: number }) {
         </div>
       ) : (
         <div className="rise">
-          <h1 className="hero">{bothOff ? 'Press space to play' : 'Choose how to play'}</h1>
+          <h1 className="title">{bothOff ? 'Press space to play' : 'Choose how to play'}</h1>
           <p className="lead">Hold space to cycle. Tap space to pick.</p>
         </div>
       )}

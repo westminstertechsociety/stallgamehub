@@ -461,3 +461,57 @@ test('notices clear themselves', () => {
   sim.advance(6100)
   assert.equal(sim.state.notice, null)
 })
+
+test('each namer has their own deadline: one seat dropping never cuts the other short', () => {
+  const sim = new Sim()
+  sim.connect('P1')
+  sim.connect('P2')
+  sim.tap('P1')
+  sim.tap('P1')
+  sim.tap('P2')
+  sim.advance(config.timings.versusCountdownMs + 40)
+  for (let i = 0; i < 3; i++) sim.tap('P1')
+  assert.equal(sim.state.phase, 'RESULTS')
+  assert.equal(sim.state.seats.P1.presence, 'naming')
+  // Only the winner names in press-space versus; simulate the winner dropping and a bystander does not matter.
+  const dl = sim.state.results!.naming.P1!.deadline
+  sim.disconnect('P1')
+  assert.ok(sim.state.results!.naming.P1!.deadline < dl)
+  sim.connect('P1')
+  assert.equal(sim.state.results!.naming.P1!.deadline, sim.state.results!.naming.P1!.capAt)
+  // Flapping cannot extend past the cap.
+  sim.disconnect('P1')
+  sim.connect('P1')
+  assert.equal(sim.state.results!.naming.P1!.deadline, dl)
+})
+
+test('switching game during name entry writes the score under the game it was earned in', () => {
+  const sim = new Sim()
+  sim.deps.games.other = { ...(pressSpace as unknown as GameModule), id: 'other', name: 'Other' }
+  sim.connect('P1')
+  sim.tap('P1')
+  sim.tap('P1')
+  sim.advance(config.timings.soloCountdownMs + 40)
+  for (let i = 0; i < 3; i++) sim.tap('P1')
+  assert.equal(sim.state.seats.P1.presence, 'naming')
+  sim.send({ type: 'control', cmd: { cmd: 'selectGame', gameId: 'other' } })
+  const add = sim.effects.find((e) => e.type === 'leaderboard.add')
+  assert.ok(add && add.type === 'leaderboard.add')
+  assert.equal(add.entry.gameId, 'press-space')
+  assert.equal(sim.state.gameId, 'other')
+})
+
+test('a second seat readying and un-readying cannot restart the solo countdown', () => {
+  const sim = new Sim()
+  sim.connect('P1')
+  sim.connect('P2')
+  sim.tap('P1')
+  sim.tap('P1')
+  const soloEndsAt = sim.state.countdown!.endsAt
+  sim.advance(2000)
+  sim.tap('P2') // converts to versus
+  assert.equal(sim.state.countdown?.mode, 'versus')
+  sim.hold('P2', config.timings.acceptHoldMs + 100) // P2 changes their mind
+  assert.equal(sim.state.countdown?.mode, 'solo')
+  assert.ok(sim.state.countdown!.endsAt <= soloEndsAt + 1, 'the original solo clock resumes, it is not restarted')
+})

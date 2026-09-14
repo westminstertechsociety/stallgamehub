@@ -177,8 +177,12 @@ export function buildPlayerView(
   const gameState = st.round?.gameState ?? st.results?.gameState
   const r = st.results
   const naming = r?.naming[seat]
+  const t = deps.config.timings
+  const longHold =
+    (inLobby && s.presence === 'ready') || (st.phase === 'RESULTS' && r?.offer?.to === seat)
   return {
     ...base,
+    holdMs: longHold ? t.acceptHoldMs : t.holdMs,
     seat,
     presence: s.presence,
     name: s.name,
@@ -197,11 +201,11 @@ export function buildPlayerView(
             ? {
                 letters: naming.letters.map((i) => 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[i] ?? 'A'),
                 cursor: naming.cursor,
-                deadline: r.namingDeadline,
+                deadline: naming.deadline,
               }
             : null,
           offer: r.offer ? (r.offer.to === seat ? 'toYou' : 'pending') : null,
-          canRestart: r.holdEndsAt != null && r.offer?.to !== seat,
+          canRestart: r.holdEndsAt != null && !r.offer && now >= r.restartAfter,
           holdEndsAt: r.holdEndsAt,
         }
       : null,

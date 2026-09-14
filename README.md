@@ -18,12 +18,15 @@ Everything runs on the host. No internet is needed at the fair.
 ## Before the fair (needs internet once)
 
 ```bash
+npm install -g pnpm   # once, if pnpm is not installed
 pnpm install
 pnpm build
 pnpm test
 ```
 
 Node 22 or newer. After `pnpm build` nothing is fetched from the network again: fonts, scripts and content are all in the repo.
+
+Windows: PowerShell blocks scripts by default, so run the `.ps1` scripts as `powershell -ExecutionPolicy Bypass -File .\scripts\run-forever.ps1`. The first time the hub starts, Windows asks whether to allow Node through the firewall: allow it on private and public networks, or the player laptops and the phone will not reach the host. If the stall Wi-Fi shows as "Public", either allow Node on public networks or mark the network as private.
 
 ## Find the host IP
 
@@ -46,9 +49,11 @@ pnpm start
 or, for the whole day, the supervisor loop that restarts the hub within a second if it ever exits:
 
 ```bash
-./scripts/run-forever.sh          # Linux, macOS
-.\scripts\run-forever.ps1         # Windows PowerShell
+./scripts/run-forever.sh                                            # Linux, macOS
+powershell -ExecutionPolicy Bypass -File .\scripts\run-forever.ps1  # Windows
 ```
+
+If the hub keeps failing the loop backs off up to 30 s between attempts and says so; the reason is in `logs/hub.log`.
 
 The server binds to `0.0.0.0:3000`. Change the port in `config/hub.json` (needs a restart).
 
@@ -62,7 +67,7 @@ Chrome or Edge, one locked-down window per screen, reopened if closed:
 ./scripts/kiosk.sh play P2 http://HOST-IP:3000             # right laptop
 ```
 
-Windows: `.\scripts\kiosk.ps1 display`, `.\scripts\kiosk.ps1 play P1 http://HOST-IP:3000`.
+Windows: `powershell -ExecutionPolicy Bypass -File .\scripts\kiosk.ps1 display` and `... kiosk.ps1 play P1 http://HOST-IP:3000`. If the hub runs on another port, pass its origin: `./scripts/kiosk.sh display http://localhost:3010`.
 
 The flags the scripts use, if you prefer to launch by hand:
 
@@ -73,7 +78,7 @@ The flags the scripts use, if you prefer to launch by hand:
 --unsafely-treat-insecure-origin-as-secure=http://HOST-IP:3000
 ```
 
-The last flag matters: the hub runs on plain http, and Chrome only allows keyboard lock and screen wake lock on "secure" origins. The flag whitelists the host for this profile only.
+The last flag matters: the hub runs on plain http, and Chrome only allows keyboard lock and screen wake lock on "secure" origins. The flag whitelists the host for this profile only; the pages then ask for both (wake lock keeps the screen on, keyboard lock captures Escape, F11 and Tab while fullscreen). Chrome ignores flags it does not know, so the list works across versions.
 
 What the browser cannot swallow: Alt+F4, Alt+Tab, the Windows key, Cmd+Space, Ctrl+Alt+Del. The kiosk script reopens the page in a second if someone closes it, and the page reclaims its seat on reload. On Windows, turn off Sticky Keys and Filter Keys shortcuts (Settings, Accessibility, Keyboard) so five taps of Shift do not pop a dialog. On a Mac, disable the Spotlight shortcut (System Settings, Keyboard, Keyboard Shortcuts, Spotlight).
 
@@ -85,11 +90,11 @@ Windows: `powercfg /change standby-timeout-ac 0` and `powercfg /change monitor-t
 
 Linux: `systemd-inhibit --what=idle:sleep:handle-lid-switch sleep infinity` in a terminal, or the desktop's power settings.
 
-Plug every laptop in. Forget every other Wi-Fi network on the three laptops and the phone so nothing roams off the stall access point when it notices there is no internet.
+Plug every laptop in. Forget every other Wi-Fi network on the three laptops and the phone so nothing roams off the stall access point when it notices there is no internet. On the phone also turn mobile data off while you use `/control`, otherwise the phone may quietly route around the "no internet" Wi-Fi and lose the hub.
 
 ## Control panel
 
-`/control` on your phone: pick the game, start, skip, end round, force attract mode, reset a stuck seat, mute, high contrast, reload content, clear the leaderboard and hard reset (the last two need a press-and-hold). It shows which laptops are connected, their latency, the content status and the last error count.
+`/control` on your phone: pick the game, start, skip, end round, force attract mode, reset a stuck seat, mute, high contrast, reload content, clear the leaderboard, clear the ghosts and hard reset (the last three need a press-and-hold). It shows which laptops are connected, their latency, the content status and the last error count.
 
 On the projector, `Ctrl+Alt+Shift+R` also hard-resets the session.
 
@@ -103,7 +108,7 @@ No code. Save the file, then press "Reload content" on `/control`.
 - `config/morse.json`: Morse timings and the word list (see below).
 - `public/attract/manifest.json`: the pioneers. Each card has `name`, `year`, `fact` (keep it under 25 words), `image` and an optional `credit`. Drop images into `public/attract/images/` and point the card at them; jpg, png, webp and svg all work. A missing image shows a typographic card instead of breaking the loop. The nine placeholder portraits are grey initials until you replace them.
 
-Reloaded game timings apply from the next round, never mid-round. Adding a new game or changing code needs `pnpm build` and a restart.
+Reloaded game timings apply from the next round, never mid-round. A manifest with a typo is ignored and the projector keeps the previous cards; `/control` shows the error. Content edits never need a build. Only code changes do: stop the hub first (`pnpm build` while the hub is running will crash it), build, start again.
 
 ## Playtesting the Morse timings
 
@@ -138,7 +143,7 @@ To seed ghosts, play a few Time attack rounds yourself before the fair. The fast
 
 ## Leaderboard and data
 
-`data/leaderboard.json`, `data/game-data.json` (ghost runs) and `data/session.json` survive restarts. Every write goes to a temp file, is synced, then renamed into place, with the previous version kept as `.bak`. "Clear leaderboard" on `/control` empties the leaderboard only; delete `data/game-data.json` while the hub is stopped to clear the ghosts. `http://HOST-IP:3000/api/leaderboard` returns the whole leaderboard as JSON if you want to show it elsewhere.
+`data/leaderboard.json`, `data/game-data.json` (ghost runs) and `data/session.json` survive restarts. Every write goes to a temp file, is synced, then renamed into place, with the previous version kept as `.bak`. If a file is ever damaged the backup is loaded and the damaged copy is kept as `.corrupt-<time>`. "Clear leaderboard" and "Clear ghosts" on `/control` reset them; deleting a file while the hub is stopped also resets it (a missing file is treated as deliberate, so the backup is not restored). `http://HOST-IP:3000/api/leaderboard` returns the whole leaderboard as JSON if you want to show it elsewhere.
 
 ## Pre-fair checklist
 
@@ -148,7 +153,7 @@ To seed ghosts, play a few Time attack rounds yourself before the fair. The fast
 4. Projector: `/display` in kiosk mode. Check the attract loop cycles and the type is readable from the back of the hall. If the projector washes out, turn on "High contrast" on `/control`.
 5. Each player laptop: `/play?seat=P1` and `?seat=P2` in kiosk mode. The seat chip on screen matches the laptop's position. Press space: a beep and the projector waking are the sign the whole chain works. Volume up.
 6. Phone: `/control` shows both seats connected with a latency under about 50 ms.
-7. `node scripts/smoke.mjs http://HOST-IP:3000` from any laptop passes (it plays a full round on its own; do it before people arrive).
+7. `node scripts/smoke.mjs http://HOST-IP:3000` passes (run it from the host before opening the player kiosks: it takes both seats, plays fake rounds on its own and cleans up after itself when the leaderboard was empty).
 8. Play one Learn round, one Time attack and one head-to-head yourself. Enter names. Check the leaderboard card in the attract loop.
 9. Close a player laptop's lid mid-round and open it again: the projector should say who is reconnecting, then resume.
 10. Know the recovery moves: "Reset P1/P2" on `/control` for a confused seat, "Hard reset" for a confused session, the kiosk scripts reopen a closed browser, the supervisor loop restarts a crashed hub. Logs are in `logs/hub.log`.

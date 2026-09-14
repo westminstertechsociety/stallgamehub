@@ -4,7 +4,8 @@ import { Suspense, useCallback, useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useHub } from '@/lib/client/useHub'
 import { useServerClock, secondsLeft } from '@/lib/client/useServerClock'
-import { attachKeyCapture } from '@/lib/client/keys'
+import { useFrameClock } from '@/lib/client/useFrameClock'
+import { attachKeyCapture, requestKioskLocks } from '@/lib/client/keys'
 import { beepStart, beepStop, blip, unlockAudio } from '@/lib/client/audio'
 import { EVENTS, type ClientInput, type PlayerView } from '@/lib/shared/protocol'
 import { gameViews } from '@/games/registry.client'
@@ -17,22 +18,6 @@ import { HoldRing } from '@/components/play/HoldRing'
 function pinnedSeat(raw: string | null): Seat | null {
   const v = (raw ?? '').toUpperCase()
   return v === 'P1' || v === 'P2' ? v : null
-}
-
-/** performance.now() that ticks every frame while a key is held, so local feedback is smooth. */
-function useLocalClock(active: boolean): number {
-  const [t, setT] = useState(() => (typeof performance !== 'undefined' ? performance.now() : 0))
-  useEffect(() => {
-    if (!active) return
-    let raf = 0
-    const loop = () => {
-      setT(performance.now())
-      raf = requestAnimationFrame(loop)
-    }
-    raf = requestAnimationFrame(loop)
-    return () => cancelAnimationFrame(raf)
-  }, [active])
-  return t
 }
 
 /** The superseded overlay must be dismissable from the keyboard too: kiosk laptops may have no mouse to hand. */
@@ -63,7 +48,7 @@ function PlayInner() {
     statusRef.current = status
   }, [view, status])
   const spaceSince = held.Space ?? null
-  const localNow = useLocalClock(spaceSince != null)
+  const localNow = useFrameClock(spaceSince != null && !(view?.reducedMotion ?? false))
   const now = useServerClock(hub.serverNow, 4)
 
   const onInput = useCallback(
@@ -89,6 +74,8 @@ function PlayInner() {
       onHeldChange: setHeld,
     })
   }, [onInput])
+
+  useEffect(() => requestKioskLocks(), [])
 
   // After any reconnect, tell the server no keys are held so nothing stays stuck.
   useEffect(() => {
@@ -178,7 +165,12 @@ function PlayInner() {
             <p className="play-sub">
               {cd.mode === 'versus' ? 'Get ready.' : cd.joinable ? 'A second player can still join.' : 'Get ready.'}
             </p>
-            {lobby?.ready && <p className="play-hint">Hold space to change your mind.</p>}
+            {lobby?.ready && (
+              <>
+                <HoldRing heldSince={spaceSince} localNow={localNow} ms={view.holdMs} />
+                <p className="play-hint">Hold space for a second to change your mind.</p>
+              </>
+            )}
           </Centre>
         )
       } else {
@@ -187,7 +179,7 @@ function PlayInner() {
             <p className="play-lead">{cd ? 'Join in?' : 'How do you want to play?'}</p>
             {lobby && <OptionPicker options={lobby.options} cursor={lobby.cursor} ready={lobby.ready} />}
             <HoldRing heldSince={spaceSince} localNow={localNow} ms={view.holdMs} />
-            <p className="play-hint">{lobby?.ready ? 'Hold space to change your mind.' : 'Hold space to cycle. Tap space to pick.'}</p>
+            <p className="play-hint">{lobby?.ready ? 'Hold space for a second to change your mind.' : 'Hold space to cycle. Tap space to pick.'}</p>
           </Centre>
         )
       }
@@ -231,7 +223,7 @@ function PlayInner() {
         main = (
           <Centre>
             <p className="play-lead">Play head-to-head?</p>
-            <HoldRing heldSince={spaceSince} localNow={localNow} ms={1000} />
+            <HoldRing heldSince={spaceSince} localNow={localNow} ms={view.holdMs} />
             <p className="play-sub">Hold space for a second to start.</p>
           </Centre>
         )

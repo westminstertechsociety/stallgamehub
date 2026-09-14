@@ -18,6 +18,7 @@
   --p2-soft: #fadbc4;
   --signal: #2b3d55;
   --white: #ffffff;
+  --glyph-display: clamp(40px, min(3.6vw, 6vh), 72px);
 
   --font-sans: var(--font-archivo, 'Archivo'), 'Helvetica Neue', Arial, sans-serif;
 
@@ -40,11 +41,13 @@
   --dur-slow: 480ms;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 
-  /* Projector. A 10-metre document: sizes track the viewport width. */
-  --display-hero: clamp(96px, 15vw, 300px);
-  --display-lane: clamp(80px, 12vw, 240px);
-  --display-body: clamp(32px, 3.2vw, 64px);
-  --display-small: clamp(22px, 2.1vw, 42px);
+  /* Projector. A 10-metre document. Sizes track the viewport but never outgrow its height:
+     a 1280x720 projector is the worst case and everything below is sized to fit it. */
+  --display-hero: clamp(96px, min(15vw, 24vh), 300px);
+  --display-title: clamp(56px, min(6.5vw, 10vh), 130px);
+  --display-lane: clamp(72px, min(11vw, 16vh), 220px);
+  --display-body: clamp(30px, min(3.2vw, 5vh), 64px);
+  --display-small: clamp(22px, min(2.1vw, 3.6vh), 42px);
   --display-gutter: clamp(32px, 5vw, 96px);
 
   /* Player laptop. Read at 50cm. */
@@ -60,9 +63,13 @@
 :root[data-high-wash='true'] {
   --ground: #f7f8fa;
   --ground-2: #e6eaf0;
+  --ground-3: #bcc6d2;
+  --line: #aab5c3;
   --ink: #0e1830;
   --signal: #1c2a44;
   --muted: #3b4757;
+  --p1-soft: #b5cff0;
+  --p2-soft: #f6c8a4;
 }
 
 :root[data-reduced-motion='true'] {
