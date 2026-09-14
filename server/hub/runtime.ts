@@ -5,7 +5,7 @@ import { z } from 'zod'
 import type { Server, Socket } from 'socket.io'
 import { SEATS, type GameModule, type LeaderboardEntry, type Seat } from '@/games/types'
 import { EVENTS, type HandshakeAuth, type Role } from '@/lib/shared/protocol'
-import { startTicker } from './clock'
+import { hubNow, startTicker } from './clock'
 import type { ContentSnapshot } from './content'
 import { loadContent } from './content'
 import { TokenBucket, clientInputSchema, controlCommandSchema, handshakeAuthSchema, pingSchema } from './inputs'
@@ -65,7 +65,7 @@ export class HubRuntime {
   private lastFlush = 0
   private stopTick: (() => void) | null = null
   private stopFlush: (() => void) | null = null
-  private readonly bootedAt = Date.now()
+  private readonly bootedAt = hubNow()
 
   constructor(
     private readonly io: Server,
@@ -86,7 +86,7 @@ export class HubRuntime {
     }
     const snap = stores.session.value
     const gameId = games[snap.gameId] ? snap.gameId : content.hub.defaultGame
-    const now = Date.now()
+    const now = hubNow()
     this.state = initialState(content.hub, games[gameId] ? gameId : (Object.keys(games)[0] as string), now)
     this.state.muted = snap.muted
     this.state.highWash = snap.highWash
@@ -129,7 +129,7 @@ export class HubRuntime {
   }
 
   dispatch(ev: HubEvent) {
-    const now = Date.now()
+    const now = hubNow()
     const result = reduce(this.state, ev, now, this.deps)
     const prev = this.state
     this.state = result.state
@@ -216,12 +216,14 @@ export class HubRuntime {
     this.sendSnapshot(socket)
 
     socket.on(EVENTS.ping, (raw: unknown) => {
+      if (!data.bucket.take()) return
       const parsed = pingSchema.safeParse(raw)
       if (!parsed.success) return
-      socket.emit(EVENTS.pong, { t: parsed.data.t, serverTs: Date.now() })
+      socket.emit(EVENTS.pong, { t: parsed.data.t, serverTs: hubNow() })
     })
 
     socket.on('hub:rtt', (raw: unknown) => {
+      if (!data.bucket.take()) return
       if (typeof raw === 'number' && Number.isFinite(raw)) data.rtt = raw
     })
 
@@ -233,11 +235,12 @@ export class HubRuntime {
       if (this.seatSockets[data.seat] !== socket.id) return
       this.dispatch({
         type: 'input',
-        input: { ...parsed.data, seat: data.seat, serverTs: Date.now() },
+        input: { ...parsed.data, seat: data.seat, serverTs: hubNow() },
       })
     })
 
     socket.on(EVENTS.sync, () => {
+      if (!data.bucket.take()) return
       if (data.role === 'play' && data.seat && this.seatSockets[data.seat] === socket.id) {
         this.dispatch({ type: 'seat.sync', seat: data.seat })
         this.sendSnapshot(socket)
@@ -266,16 +269,29 @@ export class HubRuntime {
         if (this.seatSockets[data.seat] !== socket.id) return
         this.seatSockets[data.seat] = null
         this.dispatch({ type: 'seat.disconnect', seat: data.seat })
+        this.seatWaiting()
       }
       this.dirty = true
     })
+  }
+
+  /** A bare /play that arrived while both seats were taken gets the first seat that frees up. */
+  private seatWaiting() {
+    for (const s of this.io.sockets.sockets.values()) {
+      const d = s.data as SocketData
+      if (d.role !== 'play' || d.seat || d.auth.seat) continue
+      this.assignSeat(s)
+      if (d.seat) this.sendSnapshot(s)
+    }
   }
 
   private assignSeat(socket: Socket) {
     const data = socket.data as SocketData
     let seat: Seat | null = data.auth.seat ?? null
     if (!seat) {
-      seat = SEATS.find((s) => this.seatSockets[s] === null) ?? null
+      // Unpinned laptops take a free seat, but never one whose pinned player is mid-reconnect.
+      const pausing = this.state.pause?.seats ?? []
+      seat = SEATS.find((s) => this.seatSockets[s] === null && !pausing.includes(s)) ?? null
       if (!seat) {
         this.log.warn(`play socket ${socket.id} has no seat: both taken`)
         return
@@ -326,7 +342,7 @@ export class HubRuntime {
         error: this.content.errors.length ? this.content.errors.join(' | ') : null,
         loadedAt: this.content.loadedAt,
       },
-      uptimeMs: Date.now() - this.bootedAt,
+      uptimeMs: hubNow() - this.bootedAt,
       ips: lanIps(),
       port: this.config.port,
     }
@@ -335,7 +351,7 @@ export class HubRuntime {
   /** Full, non-volatile view for a socket that just connected or asked to resync. */
   private sendSnapshot(socket: Socket) {
     const data = socket.data as SocketData
-    const now = Date.now()
+    const now = hubNow()
     try {
       if (data.role === 'display') socket.emit(EVENTS.displayView, buildDisplayView(this.state, this.deps, now, this.extras()))
       else if (data.role === 'play') socket.emit(EVENTS.playerView, buildPlayerView(this.state, data.seat, this.deps, now, this.extras()))
@@ -346,21 +362,25 @@ export class HubRuntime {
   }
 
   private flush(now: number) {
-    // Control gets a refresh at least once a second so RTT and socket counts stay live.
+    // Change-driven sends are volatile (latest wins, never queued for a stalled client). Once a second every
+    // screen also gets a reliable snapshot, so a dropped volatile packet can never leave a screen stale.
     const periodic = now - this.lastFlush >= 1000
     if (!this.dirty && !periodic) return
     const wasDirty = this.dirty
     this.dirty = false
-    this.lastFlush = now
+    if (periodic) this.lastFlush = now
     try {
-      if (wasDirty) {
+      if (wasDirty || periodic) {
         const display = buildDisplayView(this.state, this.deps, now, this.extras())
-        this.io.to('display').volatile.emit(EVENTS.displayView, display)
+        const room = this.io.to('display')
+        ;(periodic ? room : room.volatile).emit(EVENTS.displayView, display)
         for (const s of this.io.sockets.sockets.values()) {
           const d = s.data as SocketData
           if (d.role !== 'play') continue
           const seat = d.seat && this.seatSockets[d.seat] === s.id ? d.seat : null
-          s.volatile.emit(EVENTS.playerView, buildPlayerView(this.state, seat, this.deps, now, this.extras()))
+          const view = buildPlayerView(this.state, seat, this.deps, now, this.extras())
+          if (periodic) s.emit(EVENTS.playerView, view)
+          else s.volatile.emit(EVENTS.playerView, view)
         }
       }
       if (this.io.sockets.adapter.rooms.get('control')?.size) {
@@ -378,7 +398,7 @@ export class HubRuntime {
       phase: this.state.phase,
       gameId: this.state.gameId,
       seats: { P1: this.state.seats.P1.connected, P2: this.state.seats.P2.connected },
-      uptimeMs: Date.now() - this.bootedAt,
+      uptimeMs: hubNow() - this.bootedAt,
       errors: this.state.errors,
       content: this.content.errors,
     }

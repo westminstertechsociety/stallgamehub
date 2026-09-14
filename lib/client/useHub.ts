@@ -39,6 +39,7 @@ export function useHub<V extends { seq: number }>(role: Role, seat: Seat | null 
     const socket = io({
       path: '/socket.io',
       transports: ['websocket', 'polling'],
+      tryAllTransports: true,
       reconnectionDelay: 250,
       reconnectionDelayMax: 2000,
       timeout: 5000,

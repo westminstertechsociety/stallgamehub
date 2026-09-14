@@ -42,9 +42,11 @@ function PlayInner() {
   const { view, status, send, superseded, reconnect } = hub
   const [held, setHeld] = useState<HeldKeys>({})
   const viewRef = useRef<PlayerView | null>(null)
+  const statusRef = useRef(status)
   useEffect(() => {
     viewRef.current = view
-  }, [view])
+    statusRef.current = status
+  }, [view, status])
   const spaceSince = held.Space ?? null
   const localNow = useLocalClock(spaceSince != null)
   const now = useServerClock(hub.serverNow, 4)
@@ -53,7 +55,7 @@ function PlayInner() {
     (input: ClientInput) => {
       send(EVENTS.input, input)
       const v = viewRef.current
-      if (!v || v.muted || !v.seat) return
+      if (!v || v.muted || !v.seat || statusRef.current !== 'connected') return
       const hz = v.seat === 'P1' ? v.audio.p1Hz : v.audio.p2Hz
       if (input.type === 'down') beepStart(hz)
       else beepStop()
