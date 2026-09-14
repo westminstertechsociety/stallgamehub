@@ -1,38 +1,48 @@
 'use client'
 import type { GameDisplayProps, GamePlayerProps, GameViews } from '@/games/types'
+import { SEATS } from '@/games/types'
+import { Lane, Lanes } from '@/components/display/Lane'
+import { Centre } from '@/components/play/PlayFrame'
 import type { PressSpaceDisplayView, PressSpacePlayerView } from './shared'
 
 function Display({ view, names }: GameDisplayProps<PressSpaceDisplayView>) {
+  const solo = view.mode === 'solo'
   return (
-    <div className="lanes">
-      {view.participants.map((seat) => (
-        <section key={seat} className={`lane lane-${seat}`} aria-label={`${seat} lane`}>
-          <header className="lane-head">
-            <span className="seat-chip">{seat}</span>
-            <span className="lane-name">{names[seat] || (seat === 'P1' ? 'Player 1' : 'Player 2')}</span>
-          </header>
-          <div className="display-number">
-            {view.counts[seat]}
-            <span className="display-number-of">/{view.target}</span>
-          </div>
-          {view.finishedMs[seat] != null && (
-            <p className="display-body">{(view.finishedMs[seat] / 1000).toFixed(2)}s</p>
-          )}
-        </section>
-      ))}
-    </div>
+    <Lanes solo={solo}>
+      {SEATS.map((seat) => {
+        const playing = view.participants.includes(seat)
+        if (!playing) {
+          return (
+            <Lane key={seat} seat={seat} name={names[seat]} open>
+              <p className="lead">Press space on the other laptop to join the next round.</p>
+            </Lane>
+          )
+        }
+        const ms = view.finishedMs[seat]
+        return (
+          <Lane key={seat} seat={seat} name={names[seat]} end={ms != null ? `${(ms / 1000).toFixed(2)}s` : ''}>
+            <div className="lane-number land" key={view.counts[seat]}>
+              {view.counts[seat]}
+              <small>/{view.target}</small>
+            </div>
+          </Lane>
+        )
+      })}
+    </Lanes>
   )
 }
 
 function Player({ view }: GamePlayerProps<PressSpacePlayerView>) {
   return (
-    <div className="play-game">
+    <Centre>
       <p className="play-lead">{view.over ? 'Done' : 'Press space'}</p>
-      <div className="play-number">{view.count}</div>
+      <div className="play-number land" key={view.count}>
+        {view.count}
+      </div>
       <p className="play-sub">
         {view.finishedMs != null ? `${(view.finishedMs / 1000).toFixed(2)}s` : `${view.remaining} to go`}
       </p>
-    </div>
+    </Centre>
   )
 }
 

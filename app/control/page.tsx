@@ -50,8 +50,10 @@ export default function ControlPage() {
   const cmd = (c: ControlCommand) => send(EVENTS.control, c)
 
   useEffect(() => {
-    document.body.classList.add('control-body')
-    return () => document.body.classList.remove('control-body')
+    document.body.dataset.scroll = 'true'
+    return () => {
+      delete document.body.dataset.scroll
+    }
   }, [])
 
   if (!view) {
@@ -166,15 +168,17 @@ export default function ControlPage() {
       </section>
 
       <section className="control-card">
-        <strong>Leaderboard</strong>
+        <h2>Leaderboard</h2>
         {view.leaderboard.length === 0 && <span className="play-hint">Empty.</span>}
-        {view.leaderboard.map((e) => (
-          <div key={e.id} className="control-status" style={{ gridTemplateColumns: '5ch 1fr auto' }}>
-            <dd>{e.name}</dd>
-            <dd style={{ color: 'var(--muted)', fontWeight: 500 }}>{e.variantId}</dd>
-            <dd>{e.scoreText}</dd>
-          </div>
-        ))}
+        <div className="control-lb">
+          {view.leaderboard.map((e) => (
+            <span key={e.id} style={{ display: 'contents' }}>
+              <span>{e.name}</span>
+              <span>{view.variants.find((v) => v.id === e.variantId)?.label ?? e.variantId}</span>
+              <span>{e.scoreText}</span>
+            </span>
+          ))}
+        </div>
       </section>
     </main>
   )

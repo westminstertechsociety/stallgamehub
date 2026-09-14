@@ -1,10 +1,13 @@
-/* Design tokens. Colour is the "Cold Paper" palette: cool paper ground, navy ink, blue and vermilion seats.
+/* Design tokens.
+   Colour: "Cold Paper". A cool paper ground (chroma ~0, slightly blue of neutral: not cream), navy ink,
+   and the Okabe-Ito blue / vermilion pair retuned so the seats differ in luminance as well as hue.
    Seat identity is never colour alone: lanes have fixed positions and text labels. */
 :root {
   color-scheme: light;
 
   --ground: #f1f3f6;
   --ground-2: #e2e7ed;
+  --ground-3: #d3dae3;
   --line: #c4ccd6;
   --ink: #16233a;
   --muted: #4a586c;
@@ -35,36 +38,41 @@
   --dur-fast: 120ms;
   --dur-base: 240ms;
   --dur-slow: 480ms;
-  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 
-  /* Projector type scale: everything that matters is enormous. */
-  --display-hero: clamp(96px, 18vw, 320px);
-  --display-lane: clamp(72px, 11vw, 192px);
-  --display-body: clamp(32px, 3.6vw, 64px);
-  --display-small: clamp(24px, 2.4vw, 40px);
+  /* Projector. A 10-metre document: sizes track the viewport width. */
+  --display-hero: clamp(96px, 15vw, 300px);
+  --display-lane: clamp(80px, 12vw, 240px);
+  --display-body: clamp(32px, 3.2vw, 64px);
+  --display-small: clamp(22px, 2.1vw, 42px);
+  --display-gutter: clamp(32px, 5vw, 96px);
 
-  /* Player screens: read at 50cm. */
+  /* Player laptop. Read at 50cm. */
   --play-heading: 32px;
-  --play-body: 20px;
-  --play-number: 96px;
+  --play-body: 22px;
+  --play-small: 17px;
+  --play-number: 112px;
+
+  --z-banner: 10;
+  --z-overlay: 20;
 }
 
 :root[data-high-wash='true'] {
   --ground: #f7f8fa;
+  --ground-2: #e6eaf0;
   --ink: #0e1830;
   --signal: #1c2a44;
+  --muted: #3b4757;
 }
 
-:root[data-reduced-motion='true'],
-:root[data-reduced-motion='true'] * {
+:root[data-reduced-motion='true'] {
   --dur-fast: 0ms;
   --dur-base: 0ms;
   --dur-slow: 0ms;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :root,
-  :root * {
+  :root {
     --dur-fast: 0ms;
     --dur-base: 0ms;
     --dur-slow: 0ms;
