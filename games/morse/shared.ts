@@ -90,6 +90,7 @@ export interface MorseDisplayView {
   learn: LearnView | null
   timeLimitAt: number
   unitMs: number
+  dotMaxUnits: number
 }
 
 export interface LearnView {
@@ -121,7 +122,7 @@ export interface MorsePlayerView {
   lastUpAt: number | null
   ghost: { name: string; ms: number } | null
   learn: LearnView | null
-  timing: { unitMs: number; dotMaxUnits: number; letterGapUnits: number }
+  timing: { unitMs: number; dotMaxUnits: number; letterGapUnits: number; wordGapUnits: number }
   totalMs: number
 }
 

@@ -121,7 +121,7 @@ export interface GameModule<S = unknown, DV = unknown, PV = unknown, C = unknown
   /** What one seat sees. Private per seat: P1's view can differ from P2's. */
   playerView(state: S, seat: Seat, gameNow: number): PV
   /** A player entered their name after the round: attach it to anything the game persisted (ghost runs). */
-  onName?(data: unknown, info: { seat: Seat; name: string; at: number }): unknown
+  onName?(data: unknown, info: { seat: Seat; name: string; at: number; seed: number }): unknown
 }
 
 /** Keys currently held on this laptop: code -> performance.now() when pressed. Used for local prediction. */

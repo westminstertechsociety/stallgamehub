@@ -16,7 +16,8 @@
     "acceptHoldMs": 1000,
     "stuckKeyMs": 5000,
     "resultsMinMs": 3000,
-    "namingGraceMs": 10000
+    "namingGraceMs": 10000,
+    "playingIdleMs": 90000
   },
   "attract": {
     "cardMs": 12000

@@ -144,7 +144,9 @@ function Display({ view, names, builtAt, serverNow, reducedMotion }: GameDisplay
               )}
               <div className="morse-stream-row">
                 <Stream groups={l.stream} tone={tone} />
-                {heldMs != null && <HoldBar heldMs={heldMs} unitMs={view.unitMs} dotMaxUnits={1} tone={tone} />}
+                {heldMs != null && (
+                  <HoldBar heldMs={heldMs} unitMs={view.unitMs} dotMaxUnits={view.dotMaxUnits} tone={tone} />
+                )}
               </div>
             </Lane>
           )
@@ -187,7 +189,11 @@ function Player({ view, seat, held, localNow, builtAt, serverNow }: GamePlayerPr
   const commitProgress = !holding && view.pending ? Math.min(1, sinceUp / gapMs) : 0
   const gameNow = view.gameNow + (serverNow() - builtAt)
   const silentFor = holding ? 0 : view.lastUpAt != null ? gameNow - view.lastUpAt : gameNow
-  const hint = view.learn ? view.learn.letter : silentFor >= 7 * t.unitMs && view.phase === 'word' && view.doneMs == null ? (view.word[view.committed.length] ?? null) : null
+  const hint = view.learn
+    ? view.learn.letter
+    : silentFor >= t.wordGapUnits * t.unitMs && view.phase === 'word' && view.doneMs == null
+      ? (view.word[view.committed.length] ?? null)
+      : null
   const tone = seat
 
   let status: React.ReactNode

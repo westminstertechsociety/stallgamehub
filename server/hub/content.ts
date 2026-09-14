@@ -33,6 +33,7 @@ export const hubConfigSchema = z.object({
     stuckKeyMs: z.number().min(2000).default(5000),
     resultsMinMs: z.number().min(0).default(3000),
     namingGraceMs: z.number().min(1000).default(10000),
+    playingIdleMs: z.number().min(10000).default(90000),
     })
     .prefault({}),
   attract: z.object({ cardMs: z.number().min(3000).default(12000) }).prefault({}),

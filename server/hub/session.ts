@@ -53,6 +53,7 @@ export interface RoundState {
   mode: Mode
   variantId: string
   participants: Seat[]
+  seed: number
   startedAt: number
   pausedAt: number | null
   pausedTotal: number
@@ -80,6 +81,7 @@ export interface ResultsState {
   gameState: unknown
   /** Round clock at the moment the round ended, so results views can render the final frame. */
   gameNow: number
+  seed: number
   holdEndsAt: number | null
   namingDeadline: number | null
   naming: Partial<Record<Seat, NamingState>>
@@ -587,6 +589,13 @@ function onTick(ctx: Ctx) {
         }
         return
       }
+      // Nobody has touched a key for a long time: the players walked away. Free the projector.
+      const lastTouch = Math.max(round.startedAt, ...round.participants.map((p) => st.seats[p].lastInputAt))
+      if (ctx.now - lastTouch >= ctx.t.playingIdleMs) {
+        ctx.notice('Round abandoned. Nobody was playing.', 5000)
+        toLobbyOrAttract(ctx)
+        return
+      }
       const next = ctx.game.onTick(round.gameState, roundClock(round, ctx.now))
       if (next !== round.gameState) {
         round.gameState = next
@@ -700,6 +709,7 @@ function startRound(ctx: Ctx) {
   const game = ctx.game
   const names: Partial<Record<Seat, string>> = {}
   for (const seat of cd.participants) if (st.seats[seat].name) names[seat] = st.seats[seat].name
+  const seed = Math.floor(ctx.deps.random() * 2 ** 31)
   const gameState = game.init({
     mode: cd.mode,
     variantId: cd.variantId,
@@ -708,12 +718,13 @@ function startRound(ctx: Ctx) {
     config: ctx.deps.gameConfigs[game.id] ?? game.defaultConfig,
     data: ctx.deps.gameData[game.id],
     leaderboard: ctx.deps.leaderboard.filter((e) => e.gameId === game.id),
-    seed: Math.floor(ctx.deps.random() * 2 ** 31),
+    seed,
   })
   st.round = {
     mode: cd.mode,
     variantId: cd.variantId,
     participants: [...cd.participants],
+    seed,
     startedAt: ctx.now,
     pausedAt: null,
     pausedTotal: 0,
@@ -861,6 +872,7 @@ function enterResults(ctx: Ctx, outcome: GameOutcome) {
     participants: [...round.participants],
     gameState: round.gameState,
     gameNow: roundClock(round, ctx.now),
+    seed: round.seed,
     holdEndsAt: anyNaming ? null : ctx.now + ctx.t.resultsHoldMs,
     namingDeadline: anyNaming ? ctx.now + ctx.t.namingCapMs : null,
     naming,
@@ -939,7 +951,7 @@ function submitName(ctx: Ctx, seat: Seat) {
     ctx.effects.push({ type: 'leaderboard.add', entry })
     const game = ctx.game
     if (game.onName) {
-      const data = game.onName(ctx.deps.gameData[game.id], { seat, name, at: ctx.now })
+      const data = game.onName(ctx.deps.gameData[game.id], { seat, name, at: ctx.now, seed: r.seed })
       if (data !== undefined) ctx.effects.push({ type: 'gameData.set', gameId: game.id, data })
     }
   }
@@ -1010,6 +1022,7 @@ function resetForPhase(ctx: Ctx, presence: (s: SeatState) => Presence) {
 export function toLobby(ctx: Ctx) {
   const st = ctx.state
   resetForPhase(ctx, (s) => (s.connected ? 'idle' : 'absent'))
+  for (const seat of SEATS) st.seats[seat].name = ''
   st.phase = 'LOBBY'
   st.idleDeadline = ctx.now + ctx.t.idleToAttractMs
   ctx.touch()

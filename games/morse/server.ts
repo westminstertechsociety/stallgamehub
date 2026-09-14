@@ -73,8 +73,10 @@ export interface GhostRun {
   events: RunEvent[]
   name: string
   at: number
-  /** Seat whose name is still pending (set at results, cleared by onName). */
-  pending?: Seat
+  /** The timing the run was keyed under: replaying it with different thresholds would garble it. */
+  timing?: DecoderTiming
+  /** Name still to come from that round's name entry (seat + round seed); cleared by onName. */
+  pending?: { seat: Seat; seed: number }
 }
 
 export interface MorseData {
@@ -99,7 +101,9 @@ interface Lane {
 interface LearnState {
   queue: string[]
   index: number
+  /** Letters keyed right at the first attempt. */
   correct: number
+  /** Attempts at the current letter. */
   attempts: number
   last: LearnView['last']
 }
@@ -134,6 +138,7 @@ export interface MorseState {
   data: MorseData
   newRuns: boolean
   names: Partial<Record<Seat, string>>
+  seed: number
 }
 
 function fmtMs(ms: number): string {
@@ -215,6 +220,7 @@ function startWord(s: MorseState, gameNow: number) {
   s.wordStartedAt = gameNow
   s.phase = 'word'
   s.lastWordWinner = null
+  if (s.learn) s.learn.attempts = 0
   for (const slot of SEATS) {
     const l = s.lanes[slot]
     resetLane(l)
@@ -256,7 +262,7 @@ function applyEvents(s: MorseState, l: Lane, events: DecoderEvent[], gameNow: nu
       s.learn.attempts += 1
       s.learn.last = { letter: expected, got: ev.letter, ok, at: gameNow }
       if (ok) {
-        s.learn.correct += 1
+        if (s.learn.attempts === 1) s.learn.correct += 1
         l.committed = expected
         l.doneMs = gameNow - s.wordStartedAt
       } else {
@@ -309,9 +315,11 @@ function rememberRun(s: MorseState, l: Lane, at: number) {
     ms: l.doneMs,
     events: l.recording.slice(0, 2000),
     name: s.names[l.seat] ?? '',
-    at,
-    pending: l.seat,
+    at: Date.now(),
+    timing: { ...s.timing },
+    pending: s.names[l.seat] ? undefined : { seat: l.seat, seed: s.seed },
   }
+  void at
   s.newRuns = true
 }
 
@@ -334,10 +342,6 @@ function advance(s: MorseState, gameNow: number) {
     const [a, b] = SEATS
     if (s.wins[a] >= need) s.winner = a
     else if (s.wins[b] >= need) s.winner = b
-  } else if (s.variantId === 'ghost') {
-    const seat = s.participants[0] as Seat
-    if (s.wins[seat] >= need) s.winner = seat
-    else if (s.ghostWins >= need) s.winner = 'ghost'
   }
   if (s.winner || s.wordIndex + 1 >= s.words.length) {
     s.phase = 'over'
@@ -398,18 +402,27 @@ function checkWordEnd(s: MorseState, gameNow: number): boolean {
 function replayGhost(s: MorseState, l: Lane, gameNow: number): boolean {
   if (!l.run || l.doneMs != null) return false
   const elapsed = gameNow - s.wordStartedAt
+  const timing = l.run.timing ?? s.timing
   let changed = false
   while (l.cursor < l.run.events.length) {
     const ev = l.run.events[l.cursor] as RunEvent
     if (ev.t > elapsed) break
     l.cursor += 1
     const t = s.wordStartedAt + ev.t
-    const r = ev.type === 'down' ? onDown(l.decoder, s.timing, t, ev.g) : onUp(l.decoder, s.timing, t, ev.d)
+    const r = ev.type === 'down' ? onDown(l.decoder, timing, t, ev.g) : onUp(l.decoder, timing, t, ev.d)
     l.decoder = r.state
     applyEvents(s, l, r.events, t)
     changed = true
   }
-  if (l.doneMs == null && elapsed >= l.run.ms) {
+  if (l.doneMs == null) {
+    const r = decoderTick(l.decoder, timing, gameNow, TICK_SLACK_MS)
+    if (r.events.length) {
+      l.decoder = r.state
+      applyEvents(s, l, r.events, gameNow)
+      changed = true
+    }
+  }
+  if (l.doneMs == null && elapsed >= l.run.ms + TICK_SLACK_MS) {
     // The recording ends with the finishing letter; guard against a run whose replay drifted.
     l.committed = s.word
     l.doneMs = l.run.ms
@@ -509,6 +522,7 @@ export const morse: GameModule<MorseState, MorseDisplayView, MorsePlayerView, Mo
       data,
       newRuns: false,
       names: { ...ctx.names },
+      seed: ctx.seed,
     }
     startWord(s, 0)
     return s
@@ -650,7 +664,8 @@ export const morse: GameModule<MorseState, MorseDisplayView, MorsePlayerView, Mo
     const d = dataOf(data)
     let changed = false
     for (const run of Object.values(d.ghosts)) {
-      if (run.pending === info.seat && !run.name) {
+      if (!run.pending) continue
+      if (run.pending.seat === info.seat && run.pending.seed === info.seed) {
         run.name = info.name
         delete run.pending
         changed = true
@@ -701,6 +716,7 @@ export const morse: GameModule<MorseState, MorseDisplayView, MorsePlayerView, Mo
         : null,
       timeLimitAt: state.wordStartedAt + state.cfg.wordTimeLimitMs,
       unitMs: state.cfg.unitMs,
+      dotMaxUnits: state.cfg.dotMaxUnits,
     }
   },
 
@@ -737,6 +753,7 @@ export const morse: GameModule<MorseState, MorseDisplayView, MorsePlayerView, Mo
         unitMs: state.cfg.unitMs,
         dotMaxUnits: state.cfg.dotMaxUnits,
         letterGapUnits: state.timing.letterGapUnits,
+        wordGapUnits: state.cfg.wordGapUnits,
       },
       totalMs: state.totalMs[seat],
     }

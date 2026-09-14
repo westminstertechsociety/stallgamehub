@@ -426,6 +426,33 @@ test('an operator skip during name entry keeps the score with the letters typed 
   assert.equal(sim.state.phase, 'LOBBY')
 })
 
+test('a round nobody is playing is abandoned so the projector frees up', () => {
+  const deps = makeDeps()
+  deps.gameConfigs['press-space'] = { target: 3, timeLimitMs: 600_000 }
+  const sim = new Sim(deps)
+  sim.connect('P1')
+  sim.tap('P1')
+  sim.tap('P1')
+  sim.advance(config.timings.soloCountdownMs + 40)
+  assert.equal(sim.state.phase, 'PLAYING')
+  sim.advance(config.timings.playingIdleMs + 40)
+  assert.equal(sim.state.phase, 'LOBBY')
+})
+
+test('names do not carry over to the next lobby', () => {
+  const sim = new Sim()
+  sim.connect('P1')
+  sim.tap('P1')
+  sim.tap('P1')
+  sim.advance(config.timings.soloCountdownMs + 40)
+  for (let i = 0; i < 3; i++) sim.tap('P1')
+  for (let i = 0; i < 3; i++) sim.hold('P1')
+  assert.equal(sim.state.seats.P1.name, 'AAA')
+  sim.advance(config.timings.resultsHoldMs + 40)
+  assert.equal(sim.state.phase, 'LOBBY')
+  assert.equal(sim.state.seats.P1.name, '')
+})
+
 test('notices clear themselves', () => {
   const sim = new Sim()
   sim.connect('P1')

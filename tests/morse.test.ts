@@ -78,8 +78,8 @@ test('correctPrefix counts letters in position', () => {
 
 const cfg = morseConfigSchema.parse({ words: ['SOS', 'HELLO', 'CODE', 'BYTE'], bestOf: 3, betweenWordsMs: 1000 })
 
-function ctxFor(mode: 'solo' | 'versus', variantId: string, participants: Seat[], data: unknown = {}): GameContext<typeof cfg> {
-  return { mode, variantId, participants, names: {}, config: cfg, data, leaderboard: [], seed: 7 }
+function ctxFor(mode: 'solo' | 'versus', variantId: string, participants: Seat[], data: unknown = {}, seed = 7): GameContext<typeof cfg> {
+  return { mode, variantId, participants, names: {}, config: cfg, data, leaderboard: [], seed }
 }
 
 /** Keys one letter for a seat starting at `t`; returns the time after the letter gap. */
@@ -176,14 +176,14 @@ test('ghost race replays the recorded run and the ghost can win a word', () => {
   assert.equal(g.lanes.P1.kind, 'ghost')
   assert.ok(g.lanes.P1.run, 'ghost lane loaded a run for the first word')
   let now = 0
-  for (let i = 0; i < 200; i++) {
+  for (let i = 0; i < 600; i++) {
     now += 100
     g = morse.onTick(g, now)
     if (g.phase === 'over') break
   }
   assert.equal(g.phase, 'over')
   assert.equal(g.winner, 'ghost')
-  assert.equal(g.ghostWins, 2)
+  assert.equal(g.ghostWins, 3, 'every word is played, the ghost takes them all')
   const out = morse.outcome(g)
   assert.match(out.headline ?? '', /ghost wins/i)
 })
@@ -197,11 +197,72 @@ test('onName attaches the player name to their pending ghost runs', () => {
     s = morse.onTick(s, t)
   }
   const data = morse.outcome(s).data
-  const named = morse.onName?.(data, { seat: 'P1', name: 'ZED', at: 1 }) as { ghosts: Record<string, { name: string; pending?: Seat }> }
+  // A name from a different round (other seed) must not attach to these runs.
+  assert.equal(morse.onName?.(data, { seat: 'P1', name: 'BAD', at: 1, seed: 99 }), undefined)
+  const named = morse.onName?.(data, { seat: 'P1', name: 'ZED', at: 1, seed: 7 }) as { ghosts: Record<string, { name: string; pending?: unknown }> }
   for (const run of Object.values(named.ghosts)) {
     assert.equal(run.name, 'ZED')
     assert.equal(run.pending, undefined)
   }
+})
+
+test('ghost race plays every word; beating the ghost in all three qualifies for the leaderboard', () => {
+  // A slow ghost: recorded with generous gaps.
+  let s = morse.init(ctxFor('solo', 'timeattack', ['P1']))
+  let t = 100
+  for (let i = 0; i < 3; i++) {
+    ;({ state: s, t } = keyWord(s, 'P1', s.word, t + 4000))
+    t += 1100
+    s = morse.onTick(s, t)
+  }
+  const data = morse.outcome(s).data
+  let g = morse.init(ctxFor('solo', 'ghost', ['P2'], data, 11))
+  t = 100
+  for (let i = 0; i < 3; i++) {
+    ;({ state: g, t } = keyWord(g, 'P2', g.word, t))
+    assert.equal(g.lastWordWinner, 'P2', `word ${i + 1} won by the player`)
+    t += 1100
+    g = morse.onTick(g, t)
+  }
+  assert.equal(g.phase, 'over')
+  assert.equal(g.results.length, 3, 'all three words were played')
+  assert.equal(g.winner, 'P2')
+  const out = morse.outcome(g)
+  assert.equal(out.seats.P2?.qualifies, true)
+  assert.match(out.headline ?? '', /beat the ghost 3–0/)
+})
+
+test('a ghost recorded under other timings replays with its own timings', () => {
+  let s = morse.init(ctxFor('solo', 'timeattack', ['P1']))
+  let t = 100
+  for (let i = 0; i < 3; i++) {
+    ;({ state: s, t } = keyWord(s, 'P1', s.word, t))
+    t += 1100
+    s = morse.onTick(s, t)
+  }
+  const data = morse.outcome(s).data as { ghosts: Record<string, { timing?: { unitMs: number } }> }
+  for (const run of Object.values(data.ghosts)) assert.equal(run.timing?.unitMs, 200)
+  // Retune: a 90ms press would now be a dash if the current timing were used.
+  const retuned = { ...cfg, unitMs: 80, dotMaxUnits: 1 }
+  const ctx = { ...ctxFor('solo', 'ghost', ['P2'], data), config: retuned }
+  let g = morse.init(ctx)
+  let now = 0
+  for (let i = 0; i < 300 && g.phase !== 'over'; i++) {
+    now += 100
+    g = morse.onTick(g, now)
+  }
+  assert.equal(g.phase, 'over')
+  assert.equal(g.ghostWins, 3, 'the ghost still keys every word correctly')
+})
+
+test('learn headline counts letters right at the first attempt', () => {
+  let s = morse.init(ctxFor('solo', 'learn', ['P1']))
+  let r = keyLetter(s, 'P1', 'T', 100) // wrong (E expected)
+  r = keyLetter(r.state, 'P1', 'E', r.t) // right on the second try
+  s = morse.onTick(r.state, r.t + 1100)
+  assert.equal(s.learn?.correct, 0)
+  r = keyLetter(s, 'P1', 'T', r.t + 1200) // T expected now, right first time
+  assert.equal(r.state.learn?.correct, 1)
 })
 
 test('learn mode: one letter at a time with immediate feedback, never scored', () => {
