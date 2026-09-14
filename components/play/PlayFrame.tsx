@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import type { Seat } from '@/games/types'
 import { SeatChip, seatLabel } from '@/components/shared/SeatChip'
+import { Logo } from '@/components/shared/Logo'
 
 export function PlayFrame({
   seat,
@@ -22,7 +23,9 @@ export function PlayFrame({
           <SeatChip seat={seat} />
           <span>{seatLabel(seat, name)}</span>
         </div>
-        <span>{gameName}</span>
+        <span>
+          <Logo /> <span style={{ marginLeft: 8 }}>{gameName}</span>
+        </span>
         <span className="play-top-link" data-ok={String(linkOk)}>
           {linkOk ? 'Connected' : 'Reconnecting'}
         </span>

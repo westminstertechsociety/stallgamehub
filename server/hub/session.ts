@@ -493,7 +493,12 @@ function onGesture(ctx: Ctx, s: SeatState, g: Gesture) {
     if (options.length === 0) return
     if (g === 'tap') {
       if (s.presence === 'idle') {
-        const opt = options[Math.min(s.cursor, options.length - 1)]
+        // Quick start: a tap confirms the seat. Alone you play the configured solo variant; two confirmed
+        // seats race. The option picker only applies when quick start is off.
+        const quick = ctx.deps.config.lobby.quickStart
+        const opt = quick
+          ? (options.find((o) => o.id === ctx.deps.config.lobby.soloVariant) ?? options[0])
+          : options[Math.min(s.cursor, options.length - 1)]
         if (!opt) return
         s.choice = opt.id
         s.presence = 'ready'
@@ -509,7 +514,7 @@ function onGesture(ctx: Ctx, s: SeatState, g: Gesture) {
       ctx.touch()
       return
     }
-    if ((g === 'hold' || g === 'repeat') && s.presence === 'idle') {
+    if ((g === 'hold' || g === 'repeat') && s.presence === 'idle' && !ctx.deps.config.lobby.quickStart) {
       s.cursor = (s.cursor + 1) % options.length
       ctx.touch()
     }

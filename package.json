@@ -16,10 +16,16 @@
     "test": "node --import tsx --test \"tests/**/*.test.ts\"",
     "format": "prettier --write .",
     "fonts": "node scripts/vendor-fonts.mjs",
-    "smoke": "node scripts/smoke.mjs"
+    "smoke": "node scripts/smoke.mjs",
+    "voice": "node scripts/render-voice.mjs",
+    "portraits": "node scripts/fetch-portraits.mjs",
+    "icons": "node scripts/vendor-icons.mjs"
   },
   "dependencies": {
     "@fontsource-variable/archivo": "5.3.0",
+    "@fontsource-variable/momo-trust-sans": "5.3.0",
+    "@fontsource/jersey-10": "5.3.0",
+    "@hackernoon/pixel-icon-library": "1.1.0",
     "next": "16.3.5",
     "react": "19.3.0",
     "react-dom": "19.3.0",
@@ -35,6 +41,7 @@
     "eslint": "9.39.5",
     "eslint-config-next": "16.3.5",
     "eslint-config-prettier": "10.1.8",
+    "kokoro-js": "1.2.1",
     "prettier": "3.9.6",
     "typescript": "5.9.3"
   }

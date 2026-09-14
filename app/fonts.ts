@@ -1,14 +1,23 @@
 import localFont from 'next/font/local'
 
-// One family, one file: Archivo variable with weight 100–900 and width 62–125%.
-// font-stretch must be declared or browsers clamp the width axis to 100%.
-export const archivo = localFont({
-  src: '../public/fonts/archivo-latin-wdth-normal.woff2',
-  weight: '100 900',
+// Two families, both self-hosted from public/fonts (OFL):
+// Jersey 10 for the big pixel type (words, headlines, names), Momo Trust Sans for everything else.
+export const jersey = localFont({
+  src: '../public/fonts/jersey-10-latin-400-normal.woff2',
+  weight: '400',
   style: 'normal',
   display: 'block',
   preload: true,
-  variable: '--font-archivo',
-  declarations: [{ prop: 'font-stretch', value: '62% 125%' }],
+  variable: '--font-jersey',
+  adjustFontFallback: false,
+})
+
+export const momo = localFont({
+  src: '../public/fonts/momo-trust-sans-latin-wght-normal.woff2',
+  weight: '200 800',
+  style: 'normal',
+  display: 'block',
+  preload: true,
+  variable: '--font-momo',
   adjustFontFallback: 'Arial',
 })

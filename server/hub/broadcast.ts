@@ -127,6 +127,8 @@ export function buildDisplayView(st: HubState, deps: HubDeps, now: number, extra
     ...common(st, deps, game, now, extras),
     lobby: inLobby
       ? {
+          quick: deps.config.lobby.quickStart,
+          soloLabel: variantLabel(game, deps.config.lobby.soloVariant),
           options,
           cursors: { P1: st.seats.P1.cursor, P2: st.seats.P2.cursor },
           ready: { P1: st.seats.P1.choice, P2: st.seats.P2.choice },
@@ -187,7 +189,16 @@ export function buildPlayerView(
     presence: s.presence,
     name: s.name,
     other: seatSummary(other),
-    lobby: inLobby ? { options, cursor: s.cursor, ready: s.choice, otherReady: other.choice } : null,
+    lobby: inLobby
+      ? {
+          quick: deps.config.lobby.quickStart,
+          soloLabel: variantLabel(game, deps.config.lobby.soloVariant),
+          options,
+          cursor: s.cursor,
+          ready: s.choice,
+          otherReady: other.choice,
+        }
+      : null,
     game:
       participant && gameState !== undefined
         ? safeView('player', () => game.playerView(gameState, seat, gameNowOf(st, now)))

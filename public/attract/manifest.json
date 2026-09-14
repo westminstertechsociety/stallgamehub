@@ -1,58 +1,94 @@
 {
   "cards": [
     {
+      "id": "ada-lovelace",
       "name": "Ada Lovelace",
       "year": "1843",
-      "fact": "Wrote the first published algorithm for a machine, a century before any computer existed.",
-      "image": "/attract/images/ada-lovelace.svg"
+      "wiki": "Ada_Lovelace",
+      "headline": "Ada Lovelace wrote the first program, a century before any computer existed.",
+      "speak": "Ada Lovelace, eighteen forty-three. She wrote the first published algorithm for a machine that had not even been built yet: Charles Babbage's Analytical Engine. A century before anyone had a computer to run it on, she was already working out what one could do. Quite the head start.",
+      "image": "/attract/images/ada-lovelace.png",
+      "credit": "Wikimedia Commons, File:Ada_Lovelace_daguerreotype_by_Antoine_Claudet_1843_-_cropped.png"
     },
     {
+      "id": "alan-turing",
       "name": "Alan Turing",
       "year": "1936",
-      "fact": "Described a universal machine on paper. Every computer since is one of them.",
-      "image": "/attract/images/alan-turing.svg"
+      "wiki": "Alan_Turing",
+      "headline": "Alan Turing described the universal machine. Every computer since is one.",
+      "speak": "Alan Turing, nineteen thirty-six. He described a universal machine on paper: a device that could compute anything computable. Every laptop, phone and console since is one of those. He also helped break Enigma at Bletchley Park, which is exactly the sort of thing a Tech Society would bring up.",
+      "image": "/attract/images/alan-turing.jpg",
+      "credit": "Wikimedia Commons, File:Alan_turing_header.jpg"
     },
     {
+      "id": "grace-hopper",
       "name": "Grace Hopper",
       "year": "1952",
-      "fact": "Built the first compiler, so programs could be written in words instead of numbers.",
-      "image": "/attract/images/grace-hopper.svg"
+      "wiki": "Grace_Hopper",
+      "headline": "Grace Hopper built the first compiler so programs could be written in words.",
+      "speak": "Grace Hopper, nineteen fifty-two. A US Navy rear admiral who built the first compiler, so people could write programs in words instead of raw numbers. She also popularised the word bug, after an actual moth was found inside a relay. Yes, really.",
+      "image": "/attract/images/grace-hopper.jpg",
+      "credit": "Wikimedia Commons, File:Commodore_Grace_M._Hopper,_USN_(covered)_head_and_shoulders_crop.jpg"
     },
     {
+      "id": "katherine-johnson",
       "name": "Katherine Johnson",
       "year": "1962",
-      "fact": "Checked the orbit for John Glenn's flight by hand. He would not launch until she had.",
-      "image": "/attract/images/katherine-johnson.svg"
+      "wiki": "Katherine_Johnson",
+      "headline": "Katherine Johnson checked the orbit for John Glenn's spaceflight by hand.",
+      "speak": "Katherine Johnson, nineteen sixty-two. A NASA mathematician who calculated spaceflight trajectories by hand. When John Glenn was about to orbit the Earth, he asked for her to check the computer's numbers before he would launch. The computer was right. So was she.",
+      "image": "/attract/images/katherine-johnson.jpg",
+      "credit": "Wikimedia Commons, File:Katherine_Johnson_1983.jpg"
     },
     {
+      "id": "claude-shannon",
       "name": "Claude Shannon",
       "year": "1948",
-      "fact": "Showed that all information can be measured in bits. He named the unit too.",
-      "image": "/attract/images/claude-shannon.svg"
+      "wiki": "Claude_Shannon",
+      "headline": "Claude Shannon showed all information can be measured in bits.",
+      "speak": "Claude Shannon, nineteen forty-eight. He showed that every kind of information, text, sound, pictures, can be measured in one unit: the bit. He named it, too. He also built a juggling machine and a mechanical mouse that solved mazes, because founding information theory apparently left him with spare time.",
+      "image": "/attract/images/claude-shannon.jpg",
+      "credit": "Wikimedia Commons, File:C.E._Shannon._Tekniska_museet_43069_(2x3_crop).jpg"
     },
     {
+      "id": "hedy-lamarr",
       "name": "Hedy Lamarr",
       "year": "1942",
-      "fact": "Co-invented frequency hopping, the idea behind Wi-Fi, Bluetooth and GPS.",
-      "image": "/attract/images/hedy-lamarr.svg"
+      "wiki": "Hedy_Lamarr",
+      "headline": "Hedy Lamarr co-invented frequency hopping, the idea behind Wi-Fi and Bluetooth.",
+      "speak": "Hedy Lamarr, nineteen forty-two. A Hollywood film star who, between films, co-invented frequency hopping: switching radio channels rapidly so a signal cannot be jammed. The same idea sits inside Wi-Fi, Bluetooth and GPS. The laptops on this stall are using it right now.",
+      "image": "/attract/images/hedy-lamarr.jpg",
+      "credit": "Wikimedia Commons, File:Hedy_Lamarr_Publicity_Photo_for_The_Heavenly_Body_1944.jpg"
     },
     {
+      "id": "margaret-hamilton",
       "name": "Margaret Hamilton",
       "year": "1969",
-      "fact": "Led the Apollo flight software. Her error handling kept the Moon landing on track.",
-      "image": "/attract/images/margaret-hamilton.svg"
+      "wiki": "Margaret_Hamilton_(software_engineer)",
+      "headline": "Margaret Hamilton led the Apollo flight software that kept the Moon landing on track.",
+      "speak": "Margaret Hamilton, nineteen sixty-nine. She led the team that wrote the Apollo flight software. Minutes before the Moon landing the computer was flooded with alarms, and her error handling kept the important jobs running. She is also the reason we say software engineering. She coined it.",
+      "image": "/attract/images/margaret-hamilton.jpg",
+      "credit": "Wikimedia Commons, File:Margaret_Hamilton_1995.jpg"
     },
     {
+      "id": "tim-berners-lee",
       "name": "Tim Berners-Lee",
       "year": "1989",
-      "fact": "Proposed the World Wide Web at CERN, then gave it to everyone for free.",
-      "image": "/attract/images/tim-berners-lee.svg"
+      "wiki": "Tim_Berners-Lee",
+      "headline": "Tim Berners-Lee proposed the World Wide Web at CERN and gave it away for free.",
+      "speak": "Tim Berners-Lee, nineteen eighty-nine. He proposed the World Wide Web while working at CERN, then gave it away for free so anyone could build on it. His manager's note on the proposal read: vague, but exciting. It turned out to be both.",
+      "image": "/attract/images/tim-berners-lee.jpg",
+      "credit": "Wikimedia Commons, File:Tim_Berners-Lee_at_the_2025_Web_Summit_(Cropped).jpg"
     },
     {
+      "id": "radia-perlman",
       "name": "Radia Perlman",
       "year": "1985",
-      "fact": "Invented the spanning tree protocol that stops networks looping. She wrote it as a poem.",
-      "image": "/attract/images/radia-perlman.svg"
+      "wiki": "Radia_Perlman",
+      "headline": "Radia Perlman invented the spanning tree protocol that stops networks looping.",
+      "speak": "Radia Perlman, nineteen eighty-five. She invented the spanning tree protocol, which stops networks tying themselves in knots. Without it, the access point you are connected to would be shouting at itself in a loop. She wrote the algorithm as a poem. Engineers still recite it.",
+      "image": "/attract/images/radia-perlman.jpg",
+      "credit": "Wikimedia Commons, File:Radia_Perlman_2009.jpg"
     }
   ]
 }

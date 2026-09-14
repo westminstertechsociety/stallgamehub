@@ -1,6 +1,6 @@
 # Tech Society game hub
 
-An offline game hub for the stall. One laptop is the host: it runs this server and drives the projector. Two laptops are the players: they open the host's address in a browser and play with the space bar. Your phone is the control panel.
+An offline game hub for the stall. One laptop is the host: it runs this server and drives the projector. Two laptops are the players: they open the host's address in a browser and play with the space bar. Your phone is the control panel. A narrator (rendered offline with Kokoro, British voice) reads the pioneer captions on the projector and talks to the players during rounds.
 
 Everything runs on the host. No internet is needed at the fair.
 
@@ -92,6 +92,24 @@ Linux: `systemd-inhibit --what=idle:sleep:handle-lid-switch sleep infinity` in a
 
 Plug every laptop in. Forget every other Wi-Fi network on the three laptops and the phone so nothing roams off the stall access point when it notices there is no internet. On the phone also turn mobile data off while you use `/control`, otherwise the phone may quietly route around the "no internet" Wi-Fi and lose the hub.
 
+## How a round starts
+
+Press space on a laptop to wake the projector, then press space again to confirm the seat. Eight seconds later the round starts: one confirmed seat plays **Learn** (one letter at a time, narrated), two confirmed seats play **head-to-head**. A second player confirming during the countdown turns a solo start into a race. This is `lobby.quickStart` in `config/hub.json`; set `soloVariant` to `timeattack` or `ghost` to change what a lone player gets, or set `quickStart` to `false` to bring back the on-screen picker.
+
+## The narrator
+
+`config/narration.json` holds every line the projector says, grouped by moment (`lobby.wake`, `countdown.versus`, `trivia`, `wrong`, `results.learn` and so on; several variants per key rotate). Pioneer bios come from `speak` in `public/attract/manifest.json`. After editing either file, with internet available once:
+
+```bash
+pnpm voice        # renders changed lines with Kokoro into public/voice (MP3 if ffmpeg is installed)
+```
+
+The first run downloads the Kokoro model (about 90 MB) into the Hugging Face cache; later runs are offline. The voice is `bf_emma`; `bf_isabella`, `bf_alice` and `bf_lily` are the other British options. Clips play from the host laptop's speakers through the projector page, so plug the host into the hall speakers if you have them. The kiosk launch flag lets audio start without a click; on a plain Chrome window click the projector page once when it asks. "Mute" on `/control` silences the narrator and the key beeps together. If a clip is missing the browser's own British voice reads the line instead.
+
+## Portraits
+
+`pnpm portraits` downloads a portrait for every card in the manifest that names a Wikipedia page (`wiki`) and fills in the Commons credit. The nine are committed already; to swap one, change `wiki` (or point `image` at your own file) and rerun. Each card's `headline` is the sentence on screen and `speak` is what the narrator reads.
+
 ## Control panel
 
 `/control` on your phone: pick the game, start, skip, end round, force attract mode, reset a stuck seat, mute, high contrast, reload content, clear the leaderboard, clear the ghosts and hard reset (the last three need a press-and-hold). It shows which laptops are connected, their latency, the content status and the last error count.
@@ -106,7 +124,8 @@ No code. Save the file, then press "Reload content" on `/control`.
 
 - `config/hub.json`: phase timings (solo countdown, results hold, idle time to attract, pause grace), hold lengths, attract card time, reduced-motion flag, beep pitches, high-contrast flag, leaderboard sizes. Port and host need a restart.
 - `config/morse.json`: Morse timings and the word list (see below).
-- `public/attract/manifest.json`: the pioneers. Each card has `name`, `year`, `fact` (keep it under 25 words), `image` and an optional `credit`. Drop images into `public/attract/images/` and point the card at them; jpg, png, webp and svg all work. A missing image shows a typographic card instead of breaking the loop. The nine placeholder portraits are grey initials until you replace them.
+- `public/attract/manifest.json`: the pioneers. Each card has `name`, `year`, `headline` (the on-screen sentence, name included, keep it under 20 words), `speak` (the narration), `image`, `wiki` and `credit`. A missing image shows a typographic card instead of breaking the loop. A card stays up for as long as its narration runs.
+- `config/narration.json`: everything the narrator says. Rerun `pnpm voice` after editing.
 
 Reloaded game timings apply from the next round, never mid-round. A manifest with a typo is ignored and the projector keeps the previous cards; `/control` shows the error. Content edits never need a build. Only code changes do: stop the hub first (`pnpm build` while the hub is running will crash it), build, start again.
 

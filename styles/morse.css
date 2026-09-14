@@ -1,4 +1,4 @@
-/* Morse glyphs: dots are discs, dashes are bars; seat fill with an ink stroke so contrast is ink-vs-ground. */
+/* Morse glyphs: dots are discs, dashes are bars, filled in the seat colour with a white edge. */
 
 .glyphs {
   display: inline-flex;
@@ -14,7 +14,6 @@
   height: 0.56em;
   border-radius: 999px;
   background: var(--tone, var(--ink));
-  box-shadow: inset 0 0 0 0.06em var(--ink);
   flex: none;
 }
 
@@ -26,10 +25,6 @@
   width: 1.5em;
 }
 
-.glyph-live {
-  transition: none;
-}
-
 .glyphs-P1 {
   --tone: var(--p1);
 }
@@ -39,7 +34,7 @@
 }
 
 .glyphs-ghost {
-  --tone: var(--ground-3);
+  --tone: var(--muted);
 }
 
 .glyphs-ink {
@@ -49,109 +44,58 @@
 /* Projector */
 .morse-display {
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
-  gap: var(--space-5);
+  grid-template-rows: auto auto minmax(0, 1fr);
+  justify-items: center;
+  align-content: start;
+  gap: 1.5vh;
   min-height: 0;
+  width: 100%;
   --glyph: var(--glyph-display);
 }
 
-.morse-word {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  align-items: end;
-  gap: var(--space-2) var(--space-8);
+.morse-display .word {
+  font-size: clamp(110px, min(14vw, 22vh), 280px);
 }
 
-.morse-word .small {
-  grid-column: 1;
+.morse-learn {
+  display: flex;
+  align-items: center;
+  gap: 3vw;
 }
 
-.morse-target {
-  font-size: clamp(72px, min(10vw, 17vh), 200px);
-  letter-spacing: 0.06em;
-  white-space: nowrap;
-  text-transform: uppercase;
-}
-
-.morse-takes {
-  grid-column: 2;
-  grid-row: 1 / span 2;
-  align-self: center;
-  font-size: var(--display-body);
-  font-weight: 700;
-  animation: rise var(--dur-base) var(--ease-out);
-}
-
-.morse-learn-letter {
-  font-size: clamp(96px, min(12vw, 20vh), 240px);
-  text-transform: uppercase;
+.morse-learn .word {
+  font-size: clamp(140px, min(16vw, 28vh), 340px);
 }
 
 .morse-learn-pattern {
-  --glyph: clamp(64px, min(8vw, 13vh), 150px);
-  grid-column: 2;
-  grid-row: 1;
-  align-self: center;
-  justify-self: start;
+  --glyph: clamp(56px, min(6vw, 10vh), 120px);
 }
 
-.slots {
+.morse-takes {
+  font-size: var(--display-body);
+  font-weight: 500;
+  animation: rise var(--dur-base) var(--ease-out);
+}
+
+.player-stream {
   display: flex;
-  gap: 0.12em;
-  font-size: min(var(--display-lane), 44cqh);
-  font-weight: 800;
-  font-stretch: 118%;
-  line-height: 1;
-  height: 1.1em;
-}
-
-.slot {
-  position: relative;
-  width: 0.95em;
-  height: 1.1em;
-  display: grid;
-  place-items: center;
-  background: var(--ground);
-  color: var(--ink);
-  box-shadow: inset 0 0 0 0.04em var(--ground-3);
-}
-
-.slot-filled {
-  background: var(--ink);
-  color: var(--ground);
-  box-shadow: none;
-}
-
-.slot-target {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  color: var(--ground-3);
-}
-
-.slot-ghost.slot-filled {
-  background: var(--muted);
-}
-
-.morse-stream-row {
-  display: flex;
+  justify-content: center;
   align-items: flex-end;
-  gap: var(--space-6);
-  --glyph: min(var(--glyph-display), 22cqh);
-  font-size: var(--glyph);
+  gap: var(--space-4);
+  height: 2em;
+  font-size: min(var(--glyph), 4.5vh);
   overflow: hidden;
+  width: 100%;
 }
 
-/* The stream reads left to right. Overflow on the start side is unreachable, so with flex-end the oldest
-   groups are what gets trimmed and the newest keying is always visible. */
+/* Oldest groups are trimmed on the left; newest keying is always visible. */
 .stream {
   display: flex;
-  gap: var(--space-5);
+  gap: var(--space-4);
   align-items: flex-end;
   overflow: hidden;
   justify-content: flex-end;
-  flex: 1 1 auto;
+  flex: 0 1 auto;
   min-width: 0;
 }
 
@@ -163,10 +107,10 @@
 }
 
 .stream-letter {
-  font-size: min(var(--display-small), 0.8em);
-  font-weight: 700;
-  line-height: 1.1;
-  min-height: 1.1em;
+  font-family: var(--font-pixel);
+  font-size: min(var(--display-small), 0.9em);
+  line-height: 1;
+  min-height: 1em;
   color: var(--muted);
 }
 
@@ -175,7 +119,8 @@
 }
 
 .stream-bad .glyph {
-  background: var(--ground);
+  background: transparent;
+  box-shadow: inset 0 0 0 0.08em var(--tone);
 }
 
 .stream-bad .stream-letter {
@@ -184,33 +129,10 @@
   text-decoration-thickness: 0.12em;
 }
 
-.morse-lane-end {
-  display: grid;
-  justify-items: end;
-  gap: var(--space-2);
-}
-
-.morse-wins {
-  font-size: min(var(--display-lane), 60cqh);
-  font-weight: 800;
-  font-stretch: 118%;
-  line-height: 0.9;
-}
-
-.morse-learn-lane {
-  min-height: 1.2em;
-}
-
 .morse-feedback {
-  font-size: min(var(--display-body), 34cqh);
-  font-weight: 700;
+  font-size: var(--display-body);
+  font-weight: 500;
   animation: rise var(--dur-base) var(--ease-out);
-}
-
-.lane-open .lead {
-  font-size: min(var(--display-small), 40cqh);
-  max-width: none;
-  color: var(--muted);
 }
 
 .morse-feedback-bad {
@@ -234,8 +156,16 @@
   min-width: 0;
 }
 
-.morse-play .slots {
-  font-size: 88px;
+.play-word {
+  font-family: var(--font-pixel);
+  font-size: 96px;
+  line-height: 0.95;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.play-word .todo {
+  color: var(--ground-3);
 }
 
 .morse-learn-target {
@@ -246,10 +176,9 @@
 }
 
 .morse-learn-big {
-  font-size: 112px;
-  font-weight: 800;
-  font-stretch: 118%;
-  line-height: 1;
+  font-family: var(--font-pixel);
+  font-size: 140px;
+  line-height: 0.9;
 }
 
 .morse-live {
@@ -280,7 +209,7 @@
   gap: var(--space-3);
   font-size: var(--play-small);
   color: var(--muted);
-  font-weight: 600;
+  font-weight: 500;
   min-height: 24px;
 }
 
@@ -316,9 +245,8 @@
   gap: var(--space-1) var(--space-4);
   align-content: start;
   padding: var(--space-4);
-  background: var(--ground);
+  background: var(--ground-2);
   --glyph: 16px;
-  font-stretch: 88%;
   overflow: hidden;
 }
 
@@ -329,22 +257,23 @@
   gap: var(--space-2);
   padding: 2px var(--space-2);
   font-size: var(--play-body);
-  font-weight: 700;
+  font-weight: 600;
   border-radius: var(--radius-ui);
 }
 
 .cheat-cell-hint {
   background: var(--ink);
-  color: var(--ground);
+  color: var(--black);
 }
 
 .cheat-cell-hint .glyph {
-  background: var(--ground);
-  box-shadow: none;
+  background: var(--black);
 }
 
 .cheat-letter {
-  font-variant-numeric: tabular-nums;
+  font-family: var(--font-pixel);
+  font-size: 1.4em;
+  line-height: 1;
 }
 
 @media (max-width: 900px) {

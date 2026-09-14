@@ -1,21 +1,26 @@
-/* Attract loop: a museum caption, not a screensaver. Hard cuts between cards; only the text rises in. */
+/* Attract loop: a museum caption on a dark wall. Portrait left, pixel headline right, the narrator reads the
+   longer story. Motion answers the narration starting: the portrait settles in, the words arrive in order,
+   and the portrait drifts very slowly for as long as the card is up. */
 
 .attract {
   display: grid;
   min-height: 0;
   height: 100%;
+  width: 100%;
 }
 
 .attract-wake,
 .attract-board {
   align-content: center;
-  gap: var(--space-6);
+  justify-items: center;
+  gap: 3vh;
 }
 
 .attract-pioneer {
-  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
-  gap: var(--display-gutter);
-  align-items: stretch;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: clamp(32px, 4vw, 80px);
+  align-items: center;
+  text-align: left;
 }
 
 .attract-noimage {
@@ -23,9 +28,12 @@
 }
 
 .attract-portrait {
-  min-height: 0;
+  width: min(38vw, 62vh);
+  aspect-ratio: 1;
+  justify-self: end;
   overflow: hidden;
   background: var(--ground-2);
+  animation: settle var(--dur-scene) var(--ease-out) both;
 }
 
 .attract-portrait img {
@@ -33,50 +41,102 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  animation: drift var(--drift, 20s) linear both;
 }
 
 .attract-text {
   display: grid;
   align-content: center;
-  gap: var(--space-7);
+  justify-items: start;
+  gap: 3vh;
   min-width: 0;
 }
 
-.attract-fact {
-  font-size: clamp(40px, min(4.4vw, 7vh), 88px);
-  font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: -0.005em;
-  max-width: 18ch;
-  text-wrap: balance;
+.attract-text .logo {
+  font-size: clamp(24px, 3.2vh, 44px);
 }
 
-.attract-noimage .attract-fact {
-  font-size: clamp(56px, min(6vw, 9vh), 120px);
-  max-width: 20ch;
+.attract-headline {
+  font-family: var(--font-pixel);
+  font-size: clamp(56px, min(5.6vw, 9.6vh), 124px);
+  line-height: 1.12;
+  max-width: 16ch;
+  text-wrap: pretty;
 }
 
-.attract-who {
+.attract-noimage .attract-headline {
+  font-size: clamp(64px, min(6.4vw, 11vh), 140px);
+  max-width: 22ch;
+  text-align: center;
+  justify-self: center;
+}
+
+.attract-headline .w {
+  display: inline-block;
+  animation: word-in var(--dur-slow) var(--ease-out) both;
+  animation-delay: calc(var(--i) * 70ms);
+}
+
+.attract-meta {
   display: flex;
+  gap: var(--space-5);
   align-items: baseline;
-  gap: var(--space-6);
-  flex-wrap: wrap;
-}
-
-.attract-name {
-  font-size: var(--display-body);
-  font-weight: 800;
-  font-stretch: 118%;
-}
-
-.attract-year {
-  font-size: var(--display-body);
-  font-weight: 600;
-  color: var(--muted);
-}
-
-.attract-credit {
   font-size: var(--display-small);
   color: var(--muted);
   font-weight: 500;
+}
+
+.attract-credit {
+  font-size: clamp(13px, 1.5vh, 18px);
+  color: var(--muted);
+  opacity: 0.7;
+  max-width: 48ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@keyframes settle {
+  from {
+    opacity: 0;
+    transform: translateY(1.5vh);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes drift {
+  from {
+    transform: scale(1) translateY(0);
+  }
+  to {
+    transform: scale(1.07) translateY(-1.5%);
+  }
+}
+
+@keyframes word-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.25em);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+:root[data-reduced-motion='true'] .attract-portrait img,
+:root[data-reduced-motion='true'] .attract-headline .w,
+:root[data-reduced-motion='true'] .attract-portrait {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .attract-portrait img,
+  .attract-headline .w,
+  .attract-portrait {
+    animation: none;
+  }
 }

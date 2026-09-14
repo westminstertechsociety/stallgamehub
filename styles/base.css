@@ -9,12 +9,24 @@ body {
   margin: 0;
   padding: 0;
   height: 100%;
-  background: var(--ground);
+  background: var(--black);
   color: var(--ink);
   font-family: var(--font-sans);
   font-synthesis: none;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+/* The stage gradient: black for the top three fifths, then falling into the society purple. */
+body {
+  background: linear-gradient(180deg, var(--black) 0%, var(--black) 56%, var(--purple) 100%) fixed;
+}
+
+.pixel {
+  font-family: var(--font-pixel);
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 0.9;
 }
 
 body {
@@ -51,19 +63,18 @@ a {
   font-feature-settings: 'tnum';
 }
 
-/* Seat chip: solid seat colour, white label. The one place the strong seat colour carries text. */
+/* Seat chip: pixel type in the seat colour. */
 .chip {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.08em 0.45em;
-  color: var(--white);
-  background: var(--signal);
-  font-weight: 800;
-  font-stretch: 118%;
-  line-height: 1.1;
+  padding: 0.05em 0.35em;
+  color: var(--black);
+  background: var(--white);
+  font-family: var(--font-pixel);
+  font-weight: 400;
+  line-height: 1;
   letter-spacing: 0.02em;
-  border-radius: var(--radius-display);
   white-space: nowrap;
 }
 
@@ -72,12 +83,29 @@ a {
 }
 
 .chip-P2 {
-  background: var(--p2-deep);
+  background: var(--p2);
 }
 
 .chip-off {
   background: var(--ground-3);
   color: var(--muted);
+}
+
+/* Society wordmark and pixel icons take the current text colour. */
+.logo {
+  display: inline-block;
+  height: 1em;
+  width: auto;
+  vertical-align: middle;
+}
+
+.picon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.12em;
+  fill: currentColor;
+  shape-rendering: crispEdges;
 }
 
 @keyframes land {
@@ -121,9 +149,9 @@ a {
 }
 
 .landing h1 {
-  font-size: 40px;
-  font-weight: 800;
-  font-stretch: 118%;
+  font-size: 56px;
+  font-family: var(--font-pixel);
+  font-weight: 400;
 }
 
 .landing ul {
@@ -143,7 +171,7 @@ a {
 .landing code {
   font-family: ui-monospace, Menlo, Consolas, monospace;
   font-size: 0.9em;
-  background: var(--white);
+  background: var(--ground-3);
   padding: 2px 6px;
   border-radius: 4px;
 }

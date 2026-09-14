@@ -1,339 +1,259 @@
-/* Projector. Everything sized to be read from ten metres. Structure by surface and spacing, not lines. */
+/* Projector. Black falling into purple, white type, everything centred. The Tech Society wordmark sits
+   at the top of every screen; the big pixel word is the one bold move. Sized to fit 1280x720. */
 
 .stage {
   height: 100vh;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
-  padding: calc(var(--display-gutter) * 0.6) var(--display-gutter);
-  gap: var(--space-5);
+  justify-items: center;
+  text-align: center;
+  padding: 4vh var(--display-gutter) 3vh;
+  gap: 2vh;
   overflow: hidden;
 }
 
-.stage-top,
-.stage-bottom {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: var(--space-6);
-  font-size: var(--display-small);
-  font-weight: 600;
-  color: var(--muted);
-  min-height: 1.3em;
+.stage-top {
+  display: grid;
+  justify-items: center;
+  gap: 1.6vh;
+  color: var(--ink);
+}
+
+.stage-top .logo {
+  font-size: clamp(28px, 3.6vh, 48px);
 }
 
 .stage-main {
   min-height: 0;
+  width: 100%;
   display: grid;
   overflow: hidden;
 }
 
-/* One word or one number, enormous. Never a sentence. */
-.hero {
-  font-size: var(--display-hero);
-  font-weight: 800;
-  font-stretch: 118%;
-  line-height: 0.95;
-  letter-spacing: -0.01em;
-  text-wrap: balance;
-  overflow-wrap: anywhere;
+.stage-bottom {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-6);
+  font-size: var(--display-small);
+  font-weight: 500;
+  color: var(--muted);
+  min-height: 1.3em;
 }
 
-/* A sentence headline: still huge, but sized so two lines always fit above the content. */
-.title {
-  font-size: var(--display-title);
-  font-weight: 800;
-  font-stretch: 112%;
-  line-height: 1.02;
-  letter-spacing: -0.01em;
+/* Copy under the wordmark: Momo, medium weight, one line. */
+.headline {
+  font-size: clamp(26px, min(2.3vw, 4.2vh), 46px);
+  font-weight: 500;
+  line-height: 1.2;
+  max-width: 60ch;
   text-wrap: balance;
-  overflow-wrap: anywhere;
-  max-width: 18ch;
+}
+
+/* The word. Pixel type, enormous. */
+.word {
+  font-family: var(--font-pixel);
+  font-size: var(--display-hero);
+  line-height: 0.9;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.title {
+  font-family: var(--font-pixel);
+  font-size: var(--display-title);
+  line-height: 1;
+  text-wrap: balance;
+  max-width: 22ch;
 }
 
 .hero-number {
+  font-family: var(--font-pixel);
   font-size: var(--display-hero);
-  font-weight: 800;
-  font-stretch: 118%;
   line-height: 0.9;
   font-variant-numeric: tabular-nums;
 }
 
 .lead {
   font-size: var(--display-body);
-  font-weight: 600;
-  line-height: 1.15;
-  max-width: 26ch;
+  font-weight: 500;
+  line-height: 1.2;
+  max-width: 30ch;
   text-wrap: pretty;
 }
 
 .small {
   font-size: var(--display-small);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--muted);
 }
 
 .centre {
   display: grid;
   align-content: center;
-  gap: var(--space-5);
+  justify-items: center;
+  gap: 3vh;
   min-height: 0;
 }
 
-/* Heading on top, the rest takes what is left and clips rather than spills. */
 .stack {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
-  gap: var(--space-6);
+  justify-items: center;
+  gap: 3vh;
   min-height: 0;
 }
 
-.stack > .rise {
-  display: grid;
-  gap: var(--space-3);
-}
-
-/* Lanes: the one bold move. Two fixed positions (P1 top, P2 bottom) in the seat's soft tint. */
-.lanes {
-  display: grid;
-  grid-template-rows: 1fr 1fr;
-  gap: var(--space-5);
+/* Players row: one column per seat, fixed order P1 then P2, icon above the label as in the mock. */
+.players {
+  display: flex;
+  justify-content: center;
+  align-items: start;
+  gap: clamp(48px, 8vw, 160px);
   min-height: 0;
-}
-
-.lanes-solo {
-  grid-template-rows: 2fr 1fr;
-}
-
-.lane {
-  display: grid;
-  grid-template-columns: minmax(7ch, auto) minmax(0, 1fr) auto;
-  align-items: center;
-  gap: var(--space-6);
-  padding: min(var(--space-4), 5cqh) var(--space-6);
-  background: var(--ground-2);
-  min-height: 0;
+  width: 100%;
   overflow: hidden;
-  container-type: size;
 }
 
-.lane-P1 {
-  background: var(--p1-soft);
+.player {
+  display: grid;
+  justify-items: center;
+  gap: 1.2vh;
+  min-width: 14ch;
+  max-width: 44vw;
+  min-height: 0;
 }
 
-.lane-P2 {
-  background: var(--p2-soft);
+.player-icon {
+  font-size: clamp(44px, min(4.2vw, 7.5vh), 84px);
+  line-height: 1;
+  color: var(--ink);
 }
 
-.lane-open {
-  background: var(--ground-2);
+.player-P1 .player-icon {
+  color: var(--p1);
+}
+
+.player-P2 .player-icon {
+  color: var(--p2);
+}
+
+.player-icon-ghost,
+.player-off .player-icon {
   color: var(--muted);
 }
 
-.lane-who {
-  display: grid;
-  gap: var(--space-2);
-  font-size: clamp(20px, 18cqh, var(--display-small));
-  font-weight: 700;
-  align-content: center;
-}
-
-.lane-who .chip {
-  font-size: clamp(24px, 26cqh, var(--display-body));
-  justify-self: start;
-}
-
-.lane-name {
-  color: var(--ink);
+.player-label {
+  font-size: clamp(26px, min(2.4vw, 4.4vh), 48px);
+  font-weight: 500;
+  line-height: 1.1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 12ch;
+  max-width: 100%;
 }
 
-.lane-open .lane-name {
+.player-off .player-label {
   color: var(--muted);
 }
 
-.lane-body {
-  min-width: 0;
-  min-height: 0;
-  display: grid;
-  grid-template-rows: auto auto;
-  gap: min(var(--space-3), 4cqh);
-  align-content: center;
-}
-
-.lane-number {
-  font-size: min(var(--display-lane), 70cqh);
-  font-weight: 800;
-  font-stretch: 118%;
-  line-height: 0.9;
-  font-variant-numeric: tabular-nums;
-}
-
-.lane-number small {
-  font-size: 0.35em;
+.player-sub {
+  font-size: var(--display-small);
   color: var(--muted);
-  font-weight: 600;
-  margin-left: 0.2em;
+  font-weight: 500;
+  max-width: 26ch;
+  text-wrap: balance;
 }
 
-.lane-end {
-  font-size: min(var(--display-body), 30cqh);
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  text-align: right;
+.player-letters {
+  font-family: var(--font-pixel);
+  font-size: min(var(--display-lane), 13vh);
+  line-height: 0.95;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
-/* Lobby: two columns, one per seat. */
-.board {
+.player-letters .todo {
+  color: var(--ground-3);
+}
+
+/* Lobby options, only when quick start is switched off in hub.json. */
+.option-list {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-8);
-  align-content: start;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.board-seat {
-  display: grid;
-  gap: var(--space-3);
-  align-content: start;
-  min-height: 0;
-}
-
-.board-head {
-  display: flex;
-  align-items: center;
-  gap: var(--space-4);
-  font-size: var(--display-small);
-  font-weight: 700;
-  min-height: 1.6em;
-}
-
-.board-head .chip {
-  font-size: var(--display-small);
+  gap: var(--space-2);
+  width: min(100%, 22ch);
 }
 
 .option {
-  padding: var(--space-3) var(--space-5);
+  padding: var(--space-2) var(--space-4);
   font-size: var(--display-small);
-  font-weight: 600;
+  font-weight: 500;
   background: var(--ground-2);
-  color: var(--ink);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  transition:
-    background var(--dur-fast) var(--ease-out),
-    color var(--dur-fast) var(--ease-out);
 }
 
 .option-current {
-  background: var(--white);
-  box-shadow: inset 0 0 0 4px var(--ink);
+  box-shadow: inset 0 0 0 3px var(--ink);
 }
 
 .option-ready {
   background: var(--ink);
-  color: var(--ground);
-}
-
-.option-sub {
-  color: var(--muted);
-  font-weight: 500;
-}
-
-.option-sub::before {
-  content: ' · ';
-}
-
-.option-ready .option-sub {
-  color: var(--ground-2);
-}
-
-.board-open {
-  padding: var(--space-6);
-  background: var(--ground-2);
-  color: var(--muted);
-  font-size: var(--display-small);
-  font-weight: 600;
-  display: grid;
-  gap: var(--space-3);
+  color: var(--black);
 }
 
 /* Results */
 .results {
   display: grid;
-  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-  gap: var(--space-8);
-  align-content: start;
-  align-items: start;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  justify-items: center;
+  gap: 3vh;
+  min-height: 0;
+  width: 100%;
+}
+
+.results-score {
+  font-family: var(--font-pixel);
+  font-size: clamp(48px, min(5vw, 9vh), 110px);
+  line-height: 1;
+}
+
+/* Leaderboard, compact, centred. */
+.ranking {
+  display: grid;
+  gap: 1.5vh;
+  justify-items: center;
   min-height: 0;
   overflow: hidden;
 }
 
-.results-main {
-  display: grid;
-  gap: var(--space-5);
-  min-width: 0;
-}
-
-.results-row {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  gap: var(--space-5);
-  align-items: center;
-  padding: var(--space-3) var(--space-5);
-  font-size: var(--display-body);
-  font-weight: 700;
-  background: var(--ground-2);
-}
-
-.results-row .chip {
-  font-size: var(--display-small);
-}
-
-.results-row-P1 {
-  background: var(--p1-soft);
-}
-
-.results-row-P2 {
-  background: var(--p2-soft);
-}
-
-.results-row-winner {
-  box-shadow: inset 0 0 0 4px var(--ink);
-}
-
-/* Leaderboard */
-.ranking {
-  display: grid;
-  gap: var(--space-5);
-  align-content: start;
-}
-
 .ranking-group {
   display: grid;
-  gap: var(--space-2);
+  gap: 0.6vh;
+  justify-items: stretch;
+  min-width: 26ch;
 }
 
 .ranking-title {
   font-size: var(--display-small);
   color: var(--muted);
-  font-weight: 600;
-  padding-bottom: var(--space-2);
+  font-weight: 500;
+  text-align: center;
+  padding-bottom: 0.4vh;
 }
 
 .ranking-row {
   display: grid;
-  grid-template-columns: 1.6ch 4ch minmax(0, 1fr);
+  grid-template-columns: 2ch 5ch minmax(0, 1fr);
   gap: var(--space-5);
   font-size: var(--display-small);
-  font-weight: 700;
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
-  padding: var(--space-2) 0;
-  border-top: 2px solid var(--ground-3);
+  padding: 0.4vh 0;
+  border-top: 1px solid var(--line);
+  text-align: left;
 }
 
 .ranking-row-large {
@@ -342,7 +262,12 @@
 
 .ranking-rank {
   color: var(--muted);
-  font-weight: 600;
+}
+
+.ranking-name {
+  font-family: var(--font-pixel);
+  font-size: 1.25em;
+  line-height: 0.9;
 }
 
 .ranking-score {
@@ -352,7 +277,7 @@
 .ranking-empty {
   font-size: var(--display-small);
   color: var(--muted);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 /* Full-width banner along the bottom edge for reconnects and notices. */
@@ -360,12 +285,17 @@
   position: fixed;
   inset: auto 0 0 0;
   z-index: var(--z-banner);
-  padding: var(--space-5) var(--display-gutter);
+  padding: var(--space-4) var(--display-gutter);
   background: var(--ink);
-  color: var(--ground);
+  color: var(--black);
   font-size: var(--display-small);
-  font-weight: 700;
+  font-weight: 600;
   display: flex;
   justify-content: space-between;
   gap: var(--space-6);
+}
+
+.banner-quiet {
+  background: var(--purple);
+  color: var(--ink);
 }

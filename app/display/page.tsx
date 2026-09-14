@@ -9,6 +9,8 @@ import { gameViews } from '@/games/registry.client'
 import { seatLabel } from '@/components/shared/SeatChip'
 import { requestKioskLocks } from '@/lib/client/keys'
 import { Banner, Stage } from '@/components/display/Stage'
+import { useNarrator } from '@/lib/client/useNarrator'
+import { unlockVoice } from '@/lib/client/voice'
 import { LobbyBoard } from '@/components/display/LobbyBoard'
 import { ResultsBoard } from '@/components/display/ResultsBoard'
 import { AttractLoop } from '@/components/display/AttractLoop'
@@ -34,6 +36,7 @@ export default function DisplayPage() {
   const hub = useHub<DisplayView>('display')
   const { view, status, send } = hub
   const now = useServerClock(hub.serverNow)
+  const narrator = useNarrator(view)
 
   // Operator chord: Ctrl+Alt+Shift+R hard-resets the session (not Ctrl+Shift+R, which is browser reload).
   useEffect(() => {
@@ -64,42 +67,34 @@ export default function DisplayPage() {
     )
   }
 
-  const modeLabel =
-    view.phase === 'PLAYING' || view.phase === 'RESULTS'
-      ? view.results?.variantLabel ?? (view.countdown?.variantLabel || '')
-      : ''
 
-  let top: React.ReactNode = <span>{view.gameName}</span>
+  const modeLabel = view.results?.variantLabel ?? view.countdown?.variantLabel ?? ''
+  const learn = view.phase === 'PLAYING' && Boolean((view.game as { learn?: unknown } | null)?.learn)
+
+  let headline: React.ReactNode = null
   let bottom: React.ReactNode = null
   let body: React.ReactNode
 
   switch (view.phase) {
     case 'ATTRACT':
-      top = null
       body = <AttractLoop view={view} />
       bottom = <span>Press space on either laptop to play</span>
       break
     case 'LOBBY':
     case 'COUNTDOWN':
+      headline = view.countdown ? (view.countdown.mode === 'versus' ? 'Head-to-head' : 'Playing solo') : 'Confirm your seat with the space bar'
       body = <LobbyBoard view={view} now={now} />
-      bottom = view.notice ? <span>{view.notice}</span> : null
+      bottom = view.notice ? <span>{view.notice}</span> : <span>{view.gameName}</span>
       break
     case 'PLAYING':
-      top = (
-        <>
-          <span>{view.gameName}</span>
-          {modeLabel && <span>{modeLabel}</span>}
-        </>
-      )
+      headline = learn
+        ? 'Key this letter: short press for a dot, long press for a dash'
+        : 'Type the following word in morse code as fast as you can'
       body = <Playing view={view} serverNow={hub.serverNow} />
+      bottom = <span>{modeLabel || view.gameName}</span>
       break
     case 'RESULTS':
-      top = (
-        <>
-          <span>{view.gameName}</span>
-          {modeLabel && <span>{modeLabel}</span>}
-        </>
-      )
+      headline = modeLabel || view.gameName
       body = <ResultsBoard view={view} />
       bottom = view.results?.holdEndsAt ? (
         <>
@@ -111,11 +106,14 @@ export default function DisplayPage() {
   }
 
   return (
-    <>
-      <Stage top={top} bottom={bottom}>
+    <div onClick={unlockVoice}>
+      <Stage headline={headline} bottom={bottom} logo={view.phase !== 'ATTRACT'}>
         {body}
       </Stage>
       {status !== 'connected' && <Banner>Projector lost the host. Reconnecting.</Banner>}
+      {status === 'connected' && narrator.blocked && !view.muted && (
+        <Banner quiet>Click anywhere on this screen once to switch the narrator on.</Banner>
+      )}
       {status === 'connected' && view.pause && (
         <Banner right={view.pause.resumeAt ? '' : `${secondsLeft(view.pause.graceEndsAt, now)}`}>
           {view.pause.resumeAt
@@ -123,6 +121,6 @@ export default function DisplayPage() {
             : `${view.pause.seats.map((s) => seatLabel(s, view.seats[s].name)).join(' and ')} reconnecting. Hold on.`}
         </Banner>
       )}
-    </>
+    </div>
   )
 }

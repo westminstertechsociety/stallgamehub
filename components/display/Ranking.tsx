@@ -11,13 +11,11 @@ export function Ranking({ view, large = false, limit }: { view: DisplayView; lar
     <div className="ranking">
       {groups.map(({ v, rows }) => (
         <div key={v.id} className="ranking-group">
-          <div className="ranking-title">
-            {view.gameName} · {v.label}
-          </div>
+          <div className="ranking-title">{v.label}</div>
           {rows.map((e, i) => (
             <div key={e.id} className={`ranking-row${large ? ' ranking-row-large' : ''}`}>
               <span className="ranking-rank">{i + 1}</span>
-              <span>{e.name}</span>
+              <span className="ranking-name">{e.name}</span>
               <span className="ranking-score">{e.scoreText}</span>
             </div>
           ))}

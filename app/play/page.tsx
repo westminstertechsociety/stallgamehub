@@ -160,7 +160,7 @@ function PlayInner() {
       if (cd && cd.participants.includes(mySeat)) {
         main = (
           <Centre>
-            <p className="play-lead">{cd.mode === 'versus' ? 'Head-to-head' : 'Playing solo'}</p>
+            <p className="play-lead">{cd.mode === 'versus' ? 'Head-to-head' : `Playing solo: ${cd.variantLabel.toLowerCase()}`}</p>
             <div className="play-number tnum">{secondsLeft(cd.endsAt, now)}</div>
             <p className="play-sub">
               {cd.mode === 'versus' ? 'Get ready.' : cd.joinable ? 'A second player can still join.' : 'Get ready.'}

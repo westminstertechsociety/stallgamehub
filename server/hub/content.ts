@@ -37,6 +37,13 @@ export const hubConfigSchema = z.object({
     })
     .prefault({}),
   attract: z.object({ cardMs: z.number().min(3000).default(12000) }).prefault({}),
+  lobby: z
+    .object({
+      /** true: a tap of space confirms the seat; two confirmed seats race, one plays soloVariant. false: the option picker. */
+      quickStart: z.boolean().default(true),
+      soloVariant: z.string().default('learn'),
+    })
+    .prefault({}),
   motion: z.object({ reduced: z.boolean().default(false) }).prefault({}),
   audio: z
     .object({
@@ -55,14 +62,27 @@ export const hubConfigSchema = z.object({
 })
 export type HubConfig = z.infer<typeof hubConfigSchema>
 
-export const attractCardSchema = z.object({
-  name: z.string().min(1),
-  // Typing 1843 without quotes is the most likely hand edit; accept it.
-  year: z.union([z.string().min(1), z.number()]).transform(String),
-  fact: z.string().min(1),
-  image: z.string().min(1),
-  credit: z.string().optional(),
-})
+export const attractCardSchema = z
+  .object({
+    id: z.string().min(1).optional(),
+    name: z.string().min(1),
+    // Typing 1843 without quotes is the most likely hand edit; accept it.
+    year: z.union([z.string().min(1), z.number()]).transform(String),
+    /** One pixel-type sentence for the projector, name included: "Ada Lovelace wrote the first program ..." */
+    headline: z.string().min(1).optional(),
+    /** Older name for headline. */
+    fact: z.string().min(1).optional(),
+    /** What the narrator says. Longer than the headline; a museum caption read aloud. */
+    speak: z.string().optional(),
+    wiki: z.string().optional(),
+    image: z.string().min(1),
+    credit: z.string().optional(),
+  })
+  .transform((c) => ({
+    ...c,
+    id: c.id ?? c.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+    headline: c.headline ?? c.fact ?? c.name,
+  }))
 export const attractManifestSchema = z.object({
   cards: z.array(attractCardSchema),
 })

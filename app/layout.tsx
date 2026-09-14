@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { archivo } from './fonts'
+import { jersey, momo } from './fonts'
 import '@/styles/globals.css'
 
 export const metadata: Metadata = {
@@ -16,7 +16,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={archivo.variable}>
+    <html lang="en" className={`${jersey.variable} ${momo.variable}`}>
       <body>{children}</body>
     </html>
   )

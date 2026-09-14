@@ -1,6 +1,7 @@
 import { SEATS } from '@/games/types'
 import type { DisplayView } from '@/lib/shared/protocol'
-import { SeatChip, seatLabel } from '@/components/shared/SeatChip'
+import { seatLabel } from '@/components/shared/SeatChip'
+import { Player, Players } from './Players'
 import { Ranking } from './Ranking'
 
 export function ResultsBoard({ view }: { view: DisplayView }) {
@@ -9,31 +10,35 @@ export function ResultsBoard({ view }: { view: DisplayView }) {
   const winnerName = r.winner ? seatLabel(r.winner, view.seats[r.winner].name) : null
   const headline =
     r.mode === 'versus' ? (winnerName ? `${winnerName} wins` : r.headline || 'Draw') : r.headline || 'Done'
+  const note =
+    r.naming.length > 0
+      ? `${r.naming.map((s) => seatLabel(s, '')).join(' and ')}: enter your name on your laptop.`
+      : r.offer
+        ? `${seatLabel(r.offer.to, '')}: hold space to play head-to-head.`
+        : null
   return (
     <div className="results">
-      <div className="results-main">
-        <h1 className="title rise">{headline}</h1>
-        {r.naming.length > 0 && (
-          <p className="lead">{r.naming.map((s) => seatLabel(s, '')).join(' and ')}: enter your name on your laptop.</p>
-        )}
-        {r.offer && <p className="lead">{r.offer.to}: hold space to play head-to-head.</p>}
-        <div style={{ display: 'grid', gap: 'var(--space-3)' }}>
-          {SEATS.filter((s) => r.seats[s]).map((seat) => {
-            const so = r.seats[seat]
-            return (
-              <div
-                key={seat}
-                className={`results-row results-row-${seat}${r.winner === seat ? ' results-row-winner' : ''}`}
-              >
-                <SeatChip seat={seat} />
-                <span className="lane-name">{so?.name || seatLabel(seat, view.seats[seat].name)}</span>
-                <span className="tnum">{so?.scoreText}</span>
-              </div>
-            )
-          })}
-        </div>
+      <h1 className="title rise">{headline}</h1>
+      <Players>
+        {SEATS.filter((s) => r.seats[s]).map((seat) => {
+          const so = r.seats[seat]
+          const won = r.winner === seat
+          return (
+            <Player
+              key={seat}
+              seat={seat}
+              icon={won ? 'trophy' : r.naming.includes(seat) ? 'pencil' : 'check'}
+              label={so?.name || seatLabel(seat, view.seats[seat].name)}
+            >
+              <div className="results-score tnum">{so?.scoreText}</div>
+            </Player>
+          )
+        })}
+      </Players>
+      <div className="centre">
+        {note && <p className="lead">{note}</p>}
+        <Ranking view={view} limit={5} />
       </div>
-      <Ranking view={view} limit={5} />
     </div>
   )
 }

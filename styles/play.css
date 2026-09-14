@@ -1,10 +1,9 @@
-/* Player laptop. Quiet, legible at 50cm, glanced at while the eyes are on the projector. */
+/* Player laptop. Same dark stage, read at 50cm while the eyes are on the projector. */
 
 .play {
   height: 100vh;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
-  background: var(--ground-2);
   user-select: none;
   -webkit-user-select: none;
   touch-action: none;
@@ -17,9 +16,9 @@
   justify-content: space-between;
   gap: var(--space-4);
   padding: var(--space-3) var(--space-5);
-  background: var(--ground);
+  border-bottom: 1px solid var(--line);
   font-size: var(--play-small);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--muted);
 }
 
@@ -29,11 +28,16 @@
   gap: var(--space-3);
   color: var(--ink);
   font-size: var(--play-body);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .play-top .chip {
   font-size: var(--play-heading);
+}
+
+.play-top .logo {
+  font-size: 22px;
+  color: var(--ink);
 }
 
 .play-top-link {
@@ -70,14 +74,20 @@
 
 .play-lead {
   font-size: var(--play-heading);
-  font-weight: 700;
+  font-weight: 600;
+  text-wrap: balance;
+}
+
+.play-big {
+  font-family: var(--font-pixel);
+  font-size: 72px;
+  line-height: 0.95;
   text-wrap: balance;
 }
 
 .play-number {
+  font-family: var(--font-pixel);
   font-size: var(--play-number);
-  font-weight: 800;
-  font-stretch: 118%;
   line-height: 0.95;
   font-variant-numeric: tabular-nums;
 }
@@ -95,6 +105,16 @@
   font-weight: 500;
 }
 
+.play-status {
+  display: flex;
+  gap: var(--space-8);
+  justify-content: center;
+}
+
+.play-status .picon {
+  font-size: 56px;
+}
+
 .picker {
   display: grid;
   gap: var(--space-2);
@@ -104,19 +124,18 @@
 
 .picker-option {
   padding: var(--space-3) var(--space-4);
-  background: var(--ground);
+  background: var(--ground-2);
   font-weight: 600;
   transition: background var(--dur-fast) var(--ease-out);
 }
 
 .picker-option-current {
-  background: var(--white);
   box-shadow: inset 0 0 0 3px var(--ink);
 }
 
 .picker-option-ready {
   background: var(--ink);
-  color: var(--ground);
+  color: var(--black);
 }
 
 .picker-blurb {
@@ -128,7 +147,7 @@
 }
 
 .picker-option-ready .picker-blurb {
-  color: var(--ground-2);
+  color: var(--purple);
 }
 
 .name-entry {
@@ -139,9 +158,8 @@
 
 .name-slot {
   width: 1.1em;
+  font-family: var(--font-pixel);
   font-size: var(--play-number);
-  font-weight: 800;
-  font-stretch: 118%;
   line-height: 1.05;
   text-align: center;
   border-bottom: 8px solid var(--line);
@@ -158,13 +176,11 @@
   color: var(--ink);
 }
 
-/* Hold progress ring: local feedback that a hold is registering. */
 .hold-ring {
   width: 56px;
   height: 56px;
   border-radius: 50%;
   background: conic-gradient(var(--ink) calc(var(--p, 0) * 1turn), var(--ground-3) 0);
-  transition: none;
 }
 
 .overlay {
@@ -176,10 +192,10 @@
   text-align: center;
   gap: var(--space-4);
   padding: var(--space-6);
-  background: var(--ink);
-  color: var(--ground);
+  background: var(--black);
+  color: var(--ink);
   font-size: var(--play-heading);
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .overlay p {
@@ -190,25 +206,20 @@
 .overlay-sub {
   font-size: var(--play-body);
   font-weight: 500;
-  color: var(--ground-2);
+  color: var(--muted);
 }
 
 .overlay button {
   font-size: var(--play-body);
   font-weight: 600;
   padding: var(--space-3) var(--space-5);
-  border: 2px solid var(--ground);
+  border: 2px solid var(--ink);
   background: transparent;
-  color: var(--ground);
+  color: var(--ink);
   border-radius: var(--radius-ui);
   justify-self: center;
 }
 
 .overlay-quiet {
-  background: var(--ground-2);
-  color: var(--ink);
-}
-
-.overlay-quiet .overlay-sub {
-  color: var(--muted);
+  background: rgba(0, 0, 0, 0.82);
 }

@@ -1,5 +1,9 @@
 allowBuilds:
   esbuild: true
   unrs-resolver: true
+  onnxruntime-node: true
+  protobufjs: true
+  # sharp is only pulled in by the TTS renderer's dependencies and is never used; do not build it.
+  sharp: false
 minimumReleaseAgeExclude:
   - zod@4.6.5

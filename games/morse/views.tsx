@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import type { GameDisplayProps, GamePlayerProps, GameViews, Seat } from '@/games/types'
-import { Lane, Lanes } from '@/components/display/Lane'
+import { Player as PlayerCol, Players } from '@/components/display/Players'
 import { useFrameClock } from '@/lib/client/useFrameClock'
 import { LETTERS, MORSE, type LaneView, type MorseDisplayView, type MorsePlayerView, type StreamGroup } from './shared'
 
@@ -48,18 +48,12 @@ function HoldBar({ heldMs, unitMs, dotMaxUnits, tone }: { heldMs: number; unitMs
   )
 }
 
-function Slots({ word, committed, tone, showLetters = true }: { word: string; committed: string; tone: string; showLetters?: boolean }) {
+function Slots({ word, committed, className = 'player-letters' }: { word: string; committed: string; className?: string }) {
+  const rest = word.slice(committed.length)
   return (
-    <div className="slots" aria-label={`${committed.length} of ${word.length} letters`}>
-      {word.split('').map((ch, i) => {
-        const filled = i < committed.length
-        return (
-          <span key={i} className={`slot slot-${tone}${filled ? ' slot-filled rise' : ''}`}>
-            {filled ? committed[i] : ''}
-            <span className="slot-target">{!filled && showLetters ? ch : ''}</span>
-          </span>
-        )
-      })}
+    <div className={className} aria-label={`${committed.length} of ${word.length} letters`}>
+      {committed}
+      <span className="todo">{'_'.repeat(rest.length)}</span>
     </div>
   )
 }
@@ -75,90 +69,88 @@ function Display({ view, names, present, builtAt, serverNow, reducedMotion }: Ga
   const frame = useFrameClock(anyHolding && !reducedMotion)
   void frame
   const gameNow = view.gameNow + (serverNow() - builtAt)
-  const solo = view.mode === 'solo'
   const winnerName = (who: Seat | 'ghost' | null) =>
     who === 'ghost' ? 'The ghost' : who ? names[who] : 'Nobody'
 
   return (
     <div className="morse-display">
-      <div className="morse-word">
-        {view.learn ? (
-          <>
-            <div className="hero morse-learn-letter" key={view.learn.letter}>
-              {view.learn.letter}
-            </div>
-            <div className="morse-learn-pattern">
-              <Glyphs symbols={view.learn.pattern} tone="ink" />
-            </div>
-            <div className="small tnum">
-              Letter {view.learn.index + 1} of {view.learn.count}
-            </div>
-          </>
+      {view.learn ? (
+        <div className="morse-learn">
+          <div className="word" key={view.learn.letter}>
+            {view.learn.letter}
+          </div>
+          <div className="morse-learn-pattern">
+            <Glyphs symbols={view.learn.pattern} tone="ink" />
+          </div>
+        </div>
+      ) : (
+        <div className="word" key={view.word}>
+          {view.word}
+        </div>
+      )}
+      <div className="small tnum">
+        {view.phase === 'between' && !view.learn ? (
+          <span className="morse-takes" key={`takes-${view.wordIndex}`}>
+            {view.lastWordWinner ? `${winnerName(view.lastWordWinner)} takes it` : 'Time is up'}
+          </span>
+        ) : view.learn ? (
+          `Letter ${view.learn.index + 1} of ${view.learn.count}`
         ) : (
-          <>
-            <div className="hero morse-target" key={view.word}>
-              {view.word}
-            </div>
-            {view.phase === 'between' && (
-              <div className="morse-takes" key={`takes-${view.wordIndex}`}>
-                {view.lastWordWinner ? `${winnerName(view.lastWordWinner)} takes it` : 'Time is up'}
-              </div>
-            )}
-            <div className="small tnum">
-              Word {view.wordIndex + 1} of {view.totalWords}
-            </div>
-          </>
+          `Word ${view.wordIndex + 1} of ${view.totalWords}`
         )}
       </div>
-      <Lanes solo={solo && !view.lanes.some((l) => l.kind === 'ghost')}>
+      <Players>
         {view.lanes.map((l) => {
           if (l.kind === 'open') {
             return (
-              <Lane key={l.slot} seat={l.slot} name="" open>
-                <p className="lead">
-                  {present[l.slot] ? 'Press space to join the next round.' : 'Sit here and press space to join the next round.'}
-                </p>
-              </Lane>
+              <PlayerCol
+                key={l.slot}
+                seat={l.slot}
+                icon="user"
+                label={present[l.slot] ? names[l.slot] : 'Seat open'}
+                off
+                sub={present[l.slot] ? 'Press space to join the next round.' : 'Sit here and press space to join the next round.'}
+              />
             )
           }
           const tone = toneOf(l)
           const heldMs = l.holdingSince != null ? Math.max(0, gameNow - l.holdingSince) : null
           const name = l.kind === 'ghost' ? l.name : names[l.seat as Seat]
+          const done = l.doneMs != null
+          const icon = l.kind === 'ghost' ? 'clock' : done ? 'check' : 'pencil'
+          const feedback = view.learn?.last
           return (
-            <Lane
+            <PlayerCol
               key={l.slot}
               seat={l.slot}
-              name={name}
-              end={
-                view.learn ? null : (
-                  <span className="morse-lane-end">
-                    {l.doneMs != null ? <span className="tnum">{(l.doneMs / 1000).toFixed(1)}s</span> : null}
-                    <span className="morse-wins tnum">{l.wins}</span>
+              icon={icon}
+              label={name}
+              ghost={l.kind === 'ghost'}
+              sub={
+                view.learn && feedback ? (
+                  <span className={`morse-feedback ${feedback.ok ? 'morse-feedback-ok' : 'morse-feedback-bad'}`} key={feedback.at}>
+                    {feedback.ok ? `${feedback.letter}. Yes.` : `That was ${feedback.got}.`}
                   </span>
-                )
+                ) : !view.learn ? (
+                  <span className="tnum">
+                    {done ? `${(l.doneMs! / 1000).toFixed(1)}s` : ''}
+                    {done && l.wins ? ' · ' : ''}
+                    {l.wins ? `${l.wins} won` : ''}
+                  </span>
+                ) : undefined
               }
             >
-              {view.learn ? (
-                <div className="morse-learn-lane">
-                  {view.learn.last && (
-                    <div className={`morse-feedback ${view.learn.last.ok ? 'morse-feedback-ok' : 'morse-feedback-bad'}`} key={view.learn.last.at}>
-                      {view.learn.last.ok ? `${view.learn.last.letter}. Yes.` : `That was ${view.learn.last.got}.`}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <Slots word={view.word} committed={l.committed} tone={tone} showLetters={false} />
-              )}
-              <div className="morse-stream-row">
+              {!view.learn && <Slots word={view.word} committed={l.committed} />}
+              <div className="player-stream">
                 <Stream groups={l.stream} tone={tone} />
                 {heldMs != null && (
                   <HoldBar heldMs={heldMs} unitMs={view.unitMs} dotMaxUnits={view.dotMaxUnits} tone={tone} />
                 )}
               </div>
-            </Lane>
+            </PlayerCol>
           )
         })}
-      </Lanes>
+      </Players>
     </div>
   )
 }
@@ -240,7 +232,7 @@ function Player({ view, seat, held, builtAt, serverNow, reducedMotion }: GamePla
             <Glyphs symbols={view.learn.pattern} tone="ink" />
           </div>
         ) : (
-          <Slots word={view.word} committed={view.committed} tone={tone} showLetters={false} />
+          <Slots word={view.word} committed={view.committed} className="play-word" />
         )}
         <div className="morse-live">
           <div className="morse-live-symbols">

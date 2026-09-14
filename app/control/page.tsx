@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useHub } from '@/lib/client/useHub'
 import { EVENTS, type ControlCommand, type ControlView } from '@/lib/shared/protocol'
 import { SEATS } from '@/games/types'
+import { Logo } from '@/components/shared/Logo'
 
 function HoldButton({ label, onConfirm, ms = 900 }: { label: string; onConfirm: () => void; ms?: number }) {
   const [progress, setProgress] = useState(0)
@@ -76,7 +77,10 @@ export default function ControlPage() {
 
   return (
     <main className="control">
-      <h1>Control</h1>
+      <h1>
+        <span>Control</span>
+        <Logo />
+      </h1>
       <section className="control-card">
         <dl className="control-status">
           <dt>Phase</dt>
@@ -154,7 +158,7 @@ export default function ControlPage() {
             className={`control-btn${view.muted ? ' control-btn-active' : ''}`}
             onClick={() => cmd({ cmd: 'mute', muted: !view.muted })}
           >
-            {view.muted ? 'Unmute' : 'Mute'}
+            {view.muted ? 'Unmute narrator and beeps' : 'Mute narrator and beeps'}
           </button>
           <button
             type="button"

@@ -1,0 +1,333 @@
+{
+  "voice": "bf_emma",
+  "renderedAt": "2026-09-14T23:50:47.641Z",
+  "clips": {
+    "attract.welcome": [
+      {
+        "file": "attract.welcome-0-8af4e4c091.mp3",
+        "seconds": 6,
+        "text": "Welcome to the Tech Society stall. Sit at either laptop and press the space bar to play."
+      },
+      {
+        "file": "attract.welcome-1-82fbba7ded.mp3",
+        "seconds": 6.6,
+        "text": "This is a Morse code race. One key, two players, one projector. Press space on a laptop to begin."
+      }
+    ],
+    "lobby.wake": [
+      {
+        "file": "lobby.wake-0-dcdbcd6501.mp3",
+        "seconds": 4.6,
+        "text": "Someone is here. Press space when you are ready and we will start in a moment."
+      },
+      {
+        "file": "lobby.wake-1-2ee536d55a.mp3",
+        "seconds": 6.2,
+        "text": "Hello. Press space to confirm your seat. If a friend sits at the other laptop, it becomes a race."
+      }
+    ],
+    "countdown.solo": [
+      {
+        "file": "countdown.solo-0-fc55f0fa55.mp3",
+        "seconds": 5.7,
+        "text": "Starting solo. A second player can still join on the other laptop. No pressure."
+      },
+      {
+        "file": "countdown.solo-1-4bba69a3ba.mp3",
+        "seconds": 6.6,
+        "text": "Just you for now. We will start with a lesson. Anyone who joins the other seat turns this into a race."
+      }
+    ],
+    "countdown.versus": [
+      {
+        "file": "countdown.versus-0-91250d9569.mp3",
+        "seconds": 4.7,
+        "text": "Two players. Head-to-head it is. Same word, first to key it wins."
+      },
+      {
+        "file": "countdown.versus-1-bebdeee03b.mp3",
+        "seconds": 5.9,
+        "text": "Two of you. Excellent. Same word on the projector, first one to key it in Morse takes it."
+      }
+    ],
+    "learn.start": [
+      {
+        "file": "learn.start-0-06bedc55c7.mp3",
+        "seconds": 8,
+        "text": "Learn mode. One letter at a time. A short press is a dot, a long press is a dash. The projector is patient, take your time."
+      },
+      {
+        "file": "learn.start-1-3127b649d6.mp3",
+        "seconds": 8.2,
+        "text": "Let us learn some Morse. Short press for a dot, long press for a dash, then pause to finish the letter. The cheat sheet is on your screen."
+      }
+    ],
+    "versus.start": [
+      {
+        "file": "versus.start-0-44e0372ae5.mp3",
+        "seconds": 6.7,
+        "text": "Key the word on the projector using only the space bar. Short press, dot. Long press, dash. Go."
+      },
+      {
+        "file": "versus.start-1-00c07e623b.mp3",
+        "seconds": 7.1,
+        "text": "The word is on the projector. Dots are short presses, dashes are long ones. First to finish wins the word."
+      }
+    ],
+    "word.next": [
+      {
+        "file": "word.next-0-a755bd0d5c.mp3",
+        "seconds": 1.7,
+        "text": "Next word."
+      },
+      {
+        "file": "word.next-1-5f72206fc5.mp3",
+        "seconds": 1.8,
+        "text": "And the next one."
+      },
+      {
+        "file": "word.next-2-b1f1b4ed48.mp3",
+        "seconds": 2.4,
+        "text": "Keep going, one more word."
+      }
+    ],
+    "won.P1": [
+      {
+        "file": "won.P1-0-0c1c178f3f.mp3",
+        "seconds": 2.2,
+        "text": "Player one takes it."
+      },
+      {
+        "file": "won.P1-1-8adc96c62b.mp3",
+        "seconds": 2.5,
+        "text": "That one goes to player one."
+      }
+    ],
+    "won.P2": [
+      {
+        "file": "won.P2-0-6350c02350.mp3",
+        "seconds": 2.2,
+        "text": "Player two takes it."
+      },
+      {
+        "file": "won.P2-1-485081e8a3.mp3",
+        "seconds": 2.5,
+        "text": "That one goes to player two."
+      }
+    ],
+    "won.ghost": [
+      {
+        "file": "won.ghost-0-9a7fe57662.mp3",
+        "seconds": 3.6,
+        "text": "The ghost takes it. It has had a lot of practice."
+      },
+      {
+        "file": "won.ghost-1-95639c46af.mp3",
+        "seconds": 4,
+        "text": "The ghost wins that word. Ghosts do not get nervous."
+      }
+    ],
+    "wrong": [
+      {
+        "file": "wrong-0-5a209778df.mp3",
+        "seconds": 2.4,
+        "text": "Not quite. Have another go."
+      },
+      {
+        "file": "wrong-1-38fa9bddef.mp3",
+        "seconds": 3.5,
+        "text": "Close, but that was a different letter. Try again."
+      },
+      {
+        "file": "wrong-2-b3eb62e325.mp3",
+        "seconds": 4.1,
+        "text": "That was not the letter we needed. The cheat sheet is right there."
+      }
+    ],
+    "hotjoin": [
+      {
+        "file": "hotjoin-0-9bb70b4b67.mp3",
+        "seconds": 5.4,
+        "text": "A second player has appeared. Hold space on the other laptop to play head-to-head."
+      },
+      {
+        "file": "hotjoin-1-b87adbf39b.mp3",
+        "seconds": 4.2,
+        "text": "Someone new at the other seat. Hold space to challenge them."
+      }
+    ],
+    "results.solo": [
+      {
+        "file": "results.solo-0-e9d72cad69.mp3",
+        "seconds": 6.6,
+        "text": "Round over. Enter three letters for the leaderboard: tap space to change a letter, hold to confirm it."
+      },
+      {
+        "file": "results.solo-1-b704818921.mp3",
+        "seconds": 5.3,
+        "text": "Done. Put your initials on the board: tap space to pick a letter, hold to lock it in."
+      }
+    ],
+    "results.versus": [
+      {
+        "file": "results.versus-0-793b87bb25.mp3",
+        "seconds": 5.2,
+        "text": "Match over. Winner, enter your initials. Runner up, there is always a rematch."
+      },
+      {
+        "file": "results.versus-1-1837197ea0.mp3",
+        "seconds": 4.3,
+        "text": "That is the match. Winner, three letters for the leaderboard please."
+      }
+    ],
+    "results.learn": [
+      {
+        "file": "results.learn-0-92c8a62bec.mp3",
+        "seconds": 4.8,
+        "text": "That is the end of the lesson. Fancy a race? Press space to play again."
+      },
+      {
+        "file": "results.learn-1-8e3567bc66.mp3",
+        "seconds": 5.9,
+        "text": "Lesson complete. You now know more Morse than most people in this hall. Press space to play again."
+      }
+    ],
+    "trivia": [
+      {
+        "file": "trivia-0-9e843ae0ca.mp3",
+        "seconds": 5.9,
+        "text": "Did you know that Morse code is still widely used today? It might be why we are making you do this."
+      },
+      {
+        "file": "trivia-1-838b4e38b7.mp3",
+        "seconds": 9.9,
+        "text": "Morse code was designed so the most common letters are the shortest. E is a single dot. Samuel Morse counted the letters in a printer's type case to work that out."
+      },
+      {
+        "file": "trivia-2-db18cb66e5.mp3",
+        "seconds": 9.9,
+        "text": "SOS was chosen as the distress signal because it is easy to key and hard to mistake: three dots, three dashes, three dots. It does not stand for anything."
+      },
+      {
+        "file": "trivia-3-fb4c6067ad.mp3",
+        "seconds": 7.5,
+        "text": "Pilots still identify radio beacons by Morse. Some aircraft cockpits play it to them, whether they like it or not."
+      },
+      {
+        "file": "trivia-4-ee49c3b226.mp3",
+        "seconds": 9.3,
+        "text": "The last commercial Morse message in the United States was sent in nineteen ninety-nine. It read: what hath God wrought. The same as the very first one."
+      },
+      {
+        "file": "trivia-5-b1449b5981.mp3",
+        "seconds": 5.9,
+        "text": "A trained operator can send around forty words a minute. You are doing fine. Probably."
+      },
+      {
+        "file": "trivia-6-11ba4e0af1.mp3",
+        "seconds": 8.1,
+        "text": "Morse code is not a binary code. Dots, dashes and three lengths of silence. It is closer to a five symbol alphabet."
+      },
+      {
+        "file": "trivia-7-d0f8dc9993.mp3",
+        "seconds": 10,
+        "text": "Amateur radio operators still hold Morse contests. The record for receiving is over seventy words a minute. Nobody at this stall is expected to match it."
+      },
+      {
+        "file": "trivia-8-c1538db35f.mp3",
+        "seconds": 8.3,
+        "text": "Before Morse, long distance messages moved at the speed of a horse. After it, at the speed of light down a wire. That is quite the upgrade."
+      },
+      {
+        "file": "trivia-9-78f4185e3f.mp3",
+        "seconds": 6.9,
+        "text": "The space bar you are hammering has one job today. Please be gentle with it. It has a long afternoon ahead."
+      },
+      {
+        "file": "trivia-10-b455b282d5.mp3",
+        "seconds": 7.1,
+        "text": "In the film Interstellar, the whole plot turns on Morse code sent through a wristwatch. Do not try that with the laptops."
+      },
+      {
+        "file": "trivia-11-5bab298bab.mp3",
+        "seconds": 7.9,
+        "text": "Blink patterns in Morse have been used by prisoners of war to send messages on camera. Yours only needs to reach the projector."
+      }
+    ],
+    "idle": [
+      {
+        "file": "idle-0-163518236a.mp3",
+        "seconds": 4.1,
+        "text": "Still there? The projector will go back to its exhibit in a moment."
+      },
+      {
+        "file": "idle-1-e7a046831d.mp3",
+        "seconds": 5.9,
+        "text": "If nobody presses anything, I will go back to talking about famous computer scientists."
+      }
+    ],
+    "pioneer.ada-lovelace": [
+      {
+        "file": "pioneer.ada-lovelace-0-efe38c59d0.mp3",
+        "seconds": 16.2,
+        "text": "Ada Lovelace, eighteen forty-three. She wrote the first published algorithm for a machine that had not even been built yet: Charles Babbage's Analytical Engine. A century before anyone had a computer to run it on, she was already working out what one could do. Quite the head start."
+      }
+    ],
+    "pioneer.alan-turing": [
+      {
+        "file": "pioneer.alan-turing-0-018b9bb0ea.mp3",
+        "seconds": 18,
+        "text": "Alan Turing, nineteen thirty-six. He described a universal machine on paper: a device that could compute anything computable. Every laptop, phone and console since is one of those. He also helped break Enigma at Bletchley Park, which is exactly the sort of thing a Tech Society would bring up."
+      }
+    ],
+    "pioneer.grace-hopper": [
+      {
+        "file": "pioneer.grace-hopper-0-4d0aa2aa62.mp3",
+        "seconds": 15.6,
+        "text": "Grace Hopper, nineteen fifty-two. A US Navy rear admiral who built the first compiler, so people could write programs in words instead of raw numbers. She also popularised the word bug, after an actual moth was found inside a relay. Yes, really."
+      }
+    ],
+    "pioneer.katherine-johnson": [
+      {
+        "file": "pioneer.katherine-johnson-0-05313f054d.mp3",
+        "seconds": 15.5,
+        "text": "Katherine Johnson, nineteen sixty-two. A NASA mathematician who calculated spaceflight trajectories by hand. When John Glenn was about to orbit the Earth, he asked for her to check the computer's numbers before he would launch. The computer was right. So was she."
+      }
+    ],
+    "pioneer.claude-shannon": [
+      {
+        "file": "pioneer.claude-shannon-0-8de9511f3d.mp3",
+        "seconds": 17.9,
+        "text": "Claude Shannon, nineteen forty-eight. He showed that every kind of information, text, sound, pictures, can be measured in one unit: the bit. He named it, too. He also built a juggling machine and a mechanical mouse that solved mazes, because founding information theory apparently left him with spare time."
+      }
+    ],
+    "pioneer.hedy-lamarr": [
+      {
+        "file": "pioneer.hedy-lamarr-0-30962092a8.mp3",
+        "seconds": 17.1,
+        "text": "Hedy Lamarr, nineteen forty-two. A Hollywood film star who, between films, co-invented frequency hopping: switching radio channels rapidly so a signal cannot be jammed. The same idea sits inside Wi-Fi, Bluetooth and GPS. The laptops on this stall are using it right now."
+      }
+    ],
+    "pioneer.margaret-hamilton": [
+      {
+        "file": "pioneer.margaret-hamilton-0-003470e031.mp3",
+        "seconds": 16.8,
+        "text": "Margaret Hamilton, nineteen sixty-nine. She led the team that wrote the Apollo flight software. Minutes before the Moon landing the computer was flooded with alarms, and her error handling kept the important jobs running. She is also the reason we say software engineering. She coined it."
+      }
+    ],
+    "pioneer.tim-berners-lee": [
+      {
+        "file": "pioneer.tim-berners-lee-0-43905e631b.mp3",
+        "seconds": 14.5,
+        "text": "Tim Berners-Lee, nineteen eighty-nine. He proposed the World Wide Web while working at CERN, then gave it away for free so anyone could build on it. His manager's note on the proposal read: vague, but exciting. It turned out to be both."
+      }
+    ],
+    "pioneer.radia-perlman": [
+      {
+        "file": "pioneer.radia-perlman-0-a8a4dc3961.mp3",
+        "seconds": 16.2,
+        "text": "Radia Perlman, nineteen eighty-five. She invented the spanning tree protocol, which stops networks tying themselves in knots. Without it, the access point you are connected to would be shouting at itself in a loop. She wrote the algorithm as a poem. Engineers still recite it."
+      }
+    ]
+  }
+}

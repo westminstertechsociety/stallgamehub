@@ -22,6 +22,10 @@
   "attract": {
     "cardMs": 12000
   },
+  "lobby": {
+    "quickStart": true,
+    "soloVariant": "learn"
+  },
   "motion": {
     "reduced": false
   },

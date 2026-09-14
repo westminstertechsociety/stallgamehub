@@ -1,26 +1,28 @@
-/* Design tokens.
-   Colour: "Cold Paper". A cool paper ground (chroma ~0, slightly blue of neutral: not cream), navy ink,
-   and the Okabe-Ito blue / vermilion pair retuned so the seats differ in luminance as well as hue.
-   Seat identity is never colour alone: lanes have fixed positions and text labels. */
+/* Design tokens. Dark stage: black at the top falling to Tech Society purple at the foot of the screen.
+   White type. Jersey 10 (pixel) for words and headlines, Momo Trust Sans for everything else.
+   Seat identity is never colour alone: lanes have fixed positions, icons and text labels. */
 :root {
-  color-scheme: light;
+  color-scheme: dark;
 
-  --ground: #f1f3f6;
-  --ground-2: #e2e7ed;
-  --ground-3: #d3dae3;
-  --line: #c4ccd6;
-  --ink: #16233a;
-  --muted: #4a586c;
-  --p1: #0b5aa0;
-  --p1-soft: #cfe0f5;
-  --p2: #d55e00;
-  --p2-deep: #b84d00;
-  --p2-soft: #fadbc4;
-  --signal: #2b3d55;
+  --purple: #583066;
+  --black: #000000;
+  --ground: #000000;
+  --ground-2: rgba(255, 255, 255, 0.07);
+  --ground-3: rgba(255, 255, 255, 0.16);
+  --line: rgba(255, 255, 255, 0.22);
+  --ink: #ffffff;
+  --muted: #c9b8d6;
+  --p1: #7fb6ff;
+  --p1-soft: rgba(127, 182, 255, 0.18);
+  --p2: #ffb15c;
+  --p2-deep: #ffb15c;
+  --p2-soft: rgba(255, 177, 92, 0.18);
+  --signal: #ffffff;
   --white: #ffffff;
   --glyph-display: clamp(40px, min(3.6vw, 6vh), 72px);
 
-  --font-sans: var(--font-archivo, 'Archivo'), 'Helvetica Neue', Arial, sans-serif;
+  --font-sans: var(--font-momo, 'Momo Trust Sans'), 'Helvetica Neue', Arial, sans-serif;
+  --font-pixel: var(--font-jersey, 'Jersey 10'), var(--font-momo, 'Momo Trust Sans'), monospace;
 
   --space-1: 4px;
   --space-2: 8px;
@@ -39,15 +41,16 @@
   --dur-fast: 120ms;
   --dur-base: 240ms;
   --dur-slow: 480ms;
+  --dur-scene: 900ms;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 
-  /* Projector. A 10-metre document. Sizes track the viewport but never outgrow its height:
-     a 1280x720 projector is the worst case and everything below is sized to fit it. */
-  --display-hero: clamp(96px, min(15vw, 24vh), 300px);
-  --display-title: clamp(56px, min(6.5vw, 10vh), 130px);
-  --display-lane: clamp(72px, min(11vw, 16vh), 220px);
-  --display-body: clamp(30px, min(3.2vw, 5vh), 64px);
-  --display-small: clamp(22px, min(2.1vw, 3.6vh), 42px);
+  /* Projector. A 10-metre document; nothing outgrows a 1280x720 projector. Pixel type is set in
+     multiples of its 10px grid where it can be, so the pixels stay crisp. */
+  --display-hero: clamp(120px, min(16vw, 26vh), 320px);
+  --display-title: clamp(64px, min(6.5vw, 11vh), 140px);
+  --display-lane: clamp(72px, min(10vw, 16vh), 200px);
+  --display-body: clamp(30px, min(3vw, 5vh), 60px);
+  --display-small: clamp(22px, min(2vw, 3.6vh), 40px);
   --display-gutter: clamp(32px, 5vw, 96px);
 
   /* Player laptop. Read at 50cm. */
@@ -61,21 +64,20 @@
 }
 
 :root[data-high-wash='true'] {
-  --ground: #f7f8fa;
-  --ground-2: #e6eaf0;
-  --ground-3: #bcc6d2;
-  --line: #aab5c3;
-  --ink: #0e1830;
-  --signal: #1c2a44;
-  --muted: #3b4757;
-  --p1-soft: #b5cff0;
-  --p2-soft: #f6c8a4;
+  --muted: #e2d6ea;
+  --ground-2: rgba(255, 255, 255, 0.12);
+  --ground-3: rgba(255, 255, 255, 0.26);
+  --line: rgba(255, 255, 255, 0.4);
+  --p1: #a9d0ff;
+  --p2: #ffc98a;
+  --p2-deep: #ffc98a;
 }
 
 :root[data-reduced-motion='true'] {
   --dur-fast: 0ms;
   --dur-base: 0ms;
   --dur-slow: 0ms;
+  --dur-scene: 0ms;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -83,5 +85,6 @@
     --dur-fast: 0ms;
     --dur-base: 0ms;
     --dur-slow: 0ms;
+    --dur-scene: 0ms;
   }
 }

@@ -19,6 +19,8 @@ const config = hubConfigSchema.parse({
   motion: {},
   audio: {},
   leaderboard: {},
+  // Most tests exercise the option picker; quick start has its own test below.
+  lobby: { quickStart: false, soloVariant: 'solo' },
 })
 
 function makeDeps(): HubDeps {
@@ -514,4 +516,24 @@ test('a second seat readying and un-readying cannot restart the solo countdown',
   sim.hold('P2', config.timings.acceptHoldMs + 100) // P2 changes their mind
   assert.equal(sim.state.countdown?.mode, 'solo')
   assert.ok(sim.state.countdown!.endsAt <= soloEndsAt + 1, 'the original solo clock resumes, it is not restarted')
+})
+
+test('quick start: one tap confirms, alone plays the configured solo variant, two confirmed seats race', () => {
+  const deps = makeDeps()
+  deps.config = { ...config, lobby: { quickStart: true, soloVariant: 'solo' } }
+  const sim = new Sim(deps)
+  sim.connect('P1')
+  sim.connect('P2')
+  sim.tap('P1') // wake
+  sim.hold('P1') // holding does not cycle anything in quick start
+  assert.equal(sim.state.seats.P1.cursor, 0)
+  sim.tap('P1')
+  assert.equal(sim.state.phase, 'COUNTDOWN')
+  assert.equal(sim.state.countdown?.mode, 'solo')
+  assert.equal(sim.state.countdown?.variantId, 'solo')
+  sim.tap('P2')
+  assert.equal(sim.state.countdown?.mode, 'versus')
+  sim.advance(config.timings.versusCountdownMs + 40)
+  assert.equal(sim.state.phase, 'PLAYING')
+  assert.equal(sim.state.round?.mode, 'versus')
 })

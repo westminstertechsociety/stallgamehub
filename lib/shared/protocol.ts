@@ -122,6 +122,9 @@ interface CommonView {
 
 export interface DisplayView extends CommonView {
   lobby: {
+    /** Quick start: tap to confirm, two confirmed seats race, one plays solo. */
+    quick: boolean
+    soloLabel: string
     options: LobbyOption[]
     cursors: Record<Seat, number>
     ready: Record<Seat, string | null>
@@ -139,6 +142,8 @@ export interface PlayerView extends CommonView {
   name: string
   other: SeatSummary | null
   lobby: {
+    quick: boolean
+    soloLabel: string
     options: LobbyOption[]
     cursor: number
     ready: string | null
