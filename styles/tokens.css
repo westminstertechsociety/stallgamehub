@@ -1,0 +1,72 @@
+/* Design tokens. Colour is the "Cold Paper" palette: cool paper ground, navy ink, blue and vermilion seats.
+   Seat identity is never colour alone: lanes have fixed positions and text labels. */
+:root {
+  color-scheme: light;
+
+  --ground: #f1f3f6;
+  --ground-2: #e2e7ed;
+  --line: #c4ccd6;
+  --ink: #16233a;
+  --muted: #4a586c;
+  --p1: #0b5aa0;
+  --p1-soft: #cfe0f5;
+  --p2: #d55e00;
+  --p2-deep: #b84d00;
+  --p2-soft: #fadbc4;
+  --signal: #2b3d55;
+  --white: #ffffff;
+
+  --font-sans: var(--font-archivo, 'Archivo'), 'Helvetica Neue', Arial, sans-serif;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --space-10: 128px;
+
+  --radius-display: 0;
+  --radius-ui: 6px;
+
+  --dur-fast: 120ms;
+  --dur-base: 240ms;
+  --dur-slow: 480ms;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* Projector type scale: everything that matters is enormous. */
+  --display-hero: clamp(96px, 18vw, 320px);
+  --display-lane: clamp(72px, 11vw, 192px);
+  --display-body: clamp(32px, 3.6vw, 64px);
+  --display-small: clamp(24px, 2.4vw, 40px);
+
+  /* Player screens: read at 50cm. */
+  --play-heading: 32px;
+  --play-body: 20px;
+  --play-number: 96px;
+}
+
+:root[data-high-wash='true'] {
+  --ground: #f7f8fa;
+  --ink: #0e1830;
+  --signal: #1c2a44;
+}
+
+:root[data-reduced-motion='true'],
+:root[data-reduced-motion='true'] * {
+  --dur-fast: 0ms;
+  --dur-base: 0ms;
+  --dur-slow: 0ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root,
+  :root * {
+    --dur-fast: 0ms;
+    --dur-base: 0ms;
+    --dur-slow: 0ms;
+  }
+}

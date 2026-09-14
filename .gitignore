@@ -1,0 +1,17 @@
+node_modules/
+.next/
+dist/
+out/
+*.tsbuildinfo
+next-env.d.ts
+.DS_Store
+npm-debug.log*
+pnpm-debug.log*
+logs/
+data/*.json
+data/*.bak
+data/*.tmp-*
+data/games/
+!data/seed/
+!data/seed/*.json
+.env*

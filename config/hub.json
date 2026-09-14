@@ -1,0 +1,35 @@
+{
+  "port": 3000,
+  "host": "0.0.0.0",
+  "defaultGame": "press-space",
+  "timings": {
+    "soloCountdownMs": 8000,
+    "versusCountdownMs": 3000,
+    "resultsHoldMs": 12000,
+    "idleToAttractMs": 45000,
+    "namingCapMs": 60000,
+    "pauseGraceVersusMs": 15000,
+    "pauseGraceSoloMs": 30000,
+    "resumeBeatMs": 1000,
+    "holdMs": 600,
+    "cycleRepeatMs": 700,
+    "acceptHoldMs": 1000,
+    "stuckKeyMs": 5000
+  },
+  "attract": {
+    "cardMs": 12000
+  },
+  "motion": {
+    "reduced": false
+  },
+  "audio": {
+    "muted": false,
+    "p1Hz": 660,
+    "p2Hz": 440
+  },
+  "highWash": false,
+  "leaderboard": {
+    "keepPerVariant": 50,
+    "showTop": 8
+  }
+}
