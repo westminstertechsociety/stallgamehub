@@ -17,7 +17,8 @@ export const hubConfigSchema = z.object({
   port: z.number().int().min(1).max(65535).default(3000),
   host: z.string().default('0.0.0.0'),
   defaultGame: z.string(),
-  timings: z.object({
+  timings: z
+    .object({
     soloCountdownMs: z.number().min(1000).default(8000),
     versusCountdownMs: z.number().min(500).default(3000),
     resultsHoldMs: z.number().min(2000).default(12000),
@@ -30,19 +31,26 @@ export const hubConfigSchema = z.object({
     cycleRepeatMs: z.number().min(200).default(700),
     acceptHoldMs: z.number().min(300).default(1000),
     stuckKeyMs: z.number().min(2000).default(5000),
-  }),
-  attract: z.object({ cardMs: z.number().min(3000).default(12000) }),
-  motion: z.object({ reduced: z.boolean().default(false) }),
-  audio: z.object({
-    muted: z.boolean().default(false),
-    p1Hz: z.number().min(100).max(4000).default(660),
-    p2Hz: z.number().min(100).max(4000).default(440),
-  }),
+    resultsMinMs: z.number().min(0).default(3000),
+    namingGraceMs: z.number().min(1000).default(10000),
+    })
+    .prefault({}),
+  attract: z.object({ cardMs: z.number().min(3000).default(12000) }).prefault({}),
+  motion: z.object({ reduced: z.boolean().default(false) }).prefault({}),
+  audio: z
+    .object({
+      muted: z.boolean().default(false),
+      p1Hz: z.number().min(100).max(4000).default(660),
+      p2Hz: z.number().min(100).max(4000).default(440),
+    })
+    .prefault({}),
   highWash: z.boolean().default(false),
-  leaderboard: z.object({
-    keepPerVariant: z.number().int().min(1).default(50),
-    showTop: z.number().int().min(1).default(8),
-  }),
+  leaderboard: z
+    .object({
+      keepPerVariant: z.number().int().min(1).default(50),
+      showTop: z.number().int().min(1).default(8),
+    })
+    .prefault({}),
 })
 export type HubConfig = z.infer<typeof hubConfigSchema>
 

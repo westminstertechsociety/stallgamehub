@@ -51,7 +51,7 @@ function PlayInner() {
 
   const onInput = useCallback(
     (input: ClientInput) => {
-      send(EVENTS.input, input, true)
+      send(EVENTS.input, input)
       const v = viewRef.current
       if (!v || v.muted || !v.seat) return
       const hz = v.seat === 'P1' ? v.audio.p1Hz : v.audio.p2Hz
@@ -82,6 +82,13 @@ function PlayInner() {
     document.documentElement.dataset.highWash = String(view?.highWash ?? false)
     document.documentElement.dataset.reducedMotion = String(view?.reducedMotion ?? false)
   }, [view?.highWash, view?.reducedMotion])
+
+  // Muting mid-press, losing the link or changing phase must never leave the oscillator droning.
+  const muted = view?.muted ?? false
+  const phase = view?.phase
+  useEffect(() => {
+    beepStop()
+  }, [muted, phase, status])
 
   // A short blip marks a phase change so the player notices without looking down.
   const prevPhase = useRef<string | null>(null)
@@ -115,6 +122,7 @@ function PlayInner() {
       </Overlay>
     )
   }
+  const linkCopy = status === 'connecting' ? 'Connecting to the hub.' : 'Lost the host. Reconnecting.'
 
   if (!view.seat) {
     return (
@@ -229,15 +237,21 @@ function PlayInner() {
       </PlayFrame>
       {!linkOk && (
         <Overlay>
-          <p>Lost the host. Reconnecting.</p>
+          <p>{linkCopy}</p>
         </Overlay>
       )}
       {linkOk && view.pause && (
         <Overlay quiet>
-          <p>{view.pause.seat === mySeat ? 'Welcome back. Resuming.' : `${view.pause.seat} is reconnecting. Hold on.`}</p>
+          <p>
+            {view.pause.resumeAt
+              ? 'Everyone is back. Resuming.'
+              : view.pause.seats.includes(mySeat)
+                ? 'Welcome back. Waiting for the others.'
+                : `${view.pause.seats[0]} is reconnecting. Hold on.`}
+          </p>
         </Overlay>
       )}
-      {linkOk && view.seats[mySeat].stuck && (
+      {linkOk && view.seats[mySeat].stuck && held.Space != null && (
         <Overlay>
           <p>A key looks stuck. Let go of the space bar.</p>
         </Overlay>

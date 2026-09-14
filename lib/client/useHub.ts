@@ -56,6 +56,8 @@ export function useHub<V extends { seq: number }>(role: Role, seat: Seat | null 
       clock.burst()
     })
     socket.on('disconnect', (reason) => {
+      // Drop anything queued while offline: stale key events must never replay after a reconnect.
+      socket.sendBuffer.length = 0
       setStale(true)
       if (reason !== 'io server disconnect') setStatus('reconnecting')
     })

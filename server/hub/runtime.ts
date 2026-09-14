@@ -183,8 +183,18 @@ export class HubRuntime {
     this.dirty = true
   }
 
-  async reloadContent(): Promise<boolean> {
+  private reloading: Promise<boolean> | null = null
+
+  reloadContent(): Promise<boolean> {
+    if (!this.reloading) this.reloading = this.doReload().finally(() => (this.reloading = null))
+    return this.reloading
+  }
+
+  private async doReload(): Promise<boolean> {
     const next = await loadContent(this.games, this.content)
+    if (next.hub.port !== this.content.hub.port || next.hub.host !== this.content.hub.host) {
+      next.errors.push('port/host changes in hub.json take effect after a restart')
+    }
     this.content = next
     this.deps.config = next.hub
     this.deps.gameConfigs = next.games
@@ -235,10 +245,12 @@ export class HubRuntime {
     })
 
     socket.on(EVENTS.control, (raw: unknown) => {
-      if (data.role !== 'control') return
       if (!data.bucket.take()) return
       const parsed = controlCommandSchema.safeParse(raw)
       if (!parsed.success) return
+      // The projector's hidden chord may only hard-reset; everything else needs the control panel.
+      if (data.role === 'display' && parsed.data.cmd !== 'hardReset') return
+      if (data.role === 'play') return
       this.log.info(`control: ${JSON.stringify(parsed.data)}`)
       if (parsed.data.cmd === 'reloadContent') {
         void this.reloadContent()

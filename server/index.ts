@@ -45,7 +45,12 @@ const MIME: Record<string, string> = {
 
 /** Serves public/attract/* straight from disk so new portraits and manifest edits show up without a restart. */
 async function serveAttract(req: IncomingMessage, res: ServerResponse, urlPath: string): Promise<boolean> {
-  const rel = decodeURIComponent(urlPath.replace(/^\/attract\/?/, ''))
+  let rel: string
+  try {
+    rel = decodeURIComponent(urlPath.replace(/^\/attract\/?/, ''))
+  } catch {
+    return false
+  }
   const file = path.resolve(ATTRACT_DIR, rel)
   if (!file.startsWith(ATTRACT_DIR + path.sep) && file !== ATTRACT_DIR) return false
   try {
@@ -61,7 +66,13 @@ async function serveAttract(req: IncomingMessage, res: ServerResponse, urlPath: 
       res.end()
       return true
     }
-    createReadStream(file).pipe(res)
+    const stream = createReadStream(file)
+    // A file that vanishes or turns unreadable mid-stream must end this response, never the process.
+    stream.on('error', () => {
+      if (!res.headersSent) res.writeHead(500)
+      res.end()
+    })
+    stream.pipe(res)
     return true
   } catch {
     return false
@@ -120,9 +131,14 @@ async function main() {
       return
     }
     if (pathname.startsWith('/attract/')) {
-      void serveAttract(req, res, pathname).then((served) => {
-        if (!served) void handle(req, res)
-      })
+      serveAttract(req, res, pathname)
+        .then((served) => {
+          if (!served) return handle(req, res)
+        })
+        .catch(() => {
+          if (!res.headersSent) res.writeHead(500)
+          res.end()
+        })
       return
     }
     void handle(req, res)
@@ -142,8 +158,13 @@ async function main() {
   runtime = new HubRuntime(io, content, games, stores, log)
   runtime.start()
 
+  let shuttingDown = false
   const shutdown = async (signal: string) => {
+    if (shuttingDown) return
+    shuttingDown = true
     log.warn(`${signal}: shutting down`)
+    // Never hang on a stuck disk: give the flush five seconds, then go.
+    setTimeout(() => process.exit(1), 5000).unref()
     runtime?.stop()
     io.close()
     httpServer.close()

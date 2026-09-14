@@ -18,8 +18,10 @@ export class JsonStore<T> {
   private dirty = false
   private timer: NodeJS.Timeout | null = null
   private inFlight: Promise<void> | null = null
-  private again = false
   private counter = 0
+  /** True when the main file was unreadable at boot: the first write must not clobber the good backup. */
+  private protectBackup = false
+  private retry: NodeJS.Timeout | null = null
 
   constructor(
     private readonly file: string,
@@ -39,7 +41,10 @@ export class JsonStore<T> {
         const parsed = this.schema.safeParse(raw)
         if (parsed.success) {
           this.value = parsed.data
-          if (candidate !== this.file) this.log.warn(`${path.basename(this.file)}: main file unreadable, loaded backup`)
+          if (candidate !== this.file) {
+            this.log.warn(`${path.basename(this.file)}: main file unreadable, loaded backup`)
+            this.protectBackup = true
+          }
           return
         }
         this.log.warn(`${path.basename(candidate)}: invalid contents, ${parsed.error.issues.length} issue(s)`)
@@ -59,30 +64,27 @@ export class JsonStore<T> {
     this.timer = setTimeout(() => void this.flush(), this.debounceMs)
   }
 
-  /** Waits for every pending write. Safe to call on shutdown. */
+  /** Waits until nothing is dirty and nothing is in flight. Safe to call on shutdown. */
   async flush(): Promise<void> {
     if (this.timer) {
       clearTimeout(this.timer)
       this.timer = null
     }
-    if (this.inFlight) {
-      this.again = this.again || this.dirty
-      await this.inFlight
-      if (this.again) {
-        this.again = false
-        await this.flush()
-      }
-      return
+    if (this.retry) {
+      clearTimeout(this.retry)
+      this.retry = null
     }
-    if (!this.dirty) return
-    this.dirty = false
-    this.inFlight = this.writeNow().finally(() => {
-      this.inFlight = null
-    })
-    await this.inFlight
-    if (this.again || this.dirty) {
-      this.again = false
-      await this.flush()
+    for (let i = 0; i < 20; i++) {
+      if (this.inFlight) {
+        await this.inFlight
+        continue
+      }
+      if (!this.dirty) return
+      this.dirty = false
+      this.inFlight = this.writeNow().finally(() => {
+        this.inFlight = null
+      })
+      await this.inFlight
     }
   }
 
@@ -111,19 +113,35 @@ export class JsonStore<T> {
       } finally {
         await fh.close()
       }
-      try {
-        await copyFile(this.file, `${this.file}.bak`)
-      } catch {
-        // no previous file yet
+      if (this.protectBackup) {
+        // Keep the corrupt main file for forensics and leave the good backup alone this once.
+        try {
+          await copyFile(this.file, `${this.file}.corrupt`)
+        } catch {
+          // nothing to keep
+        }
+        this.protectBackup = false
+      } else {
+        try {
+          await copyFile(this.file, `${this.file}.bak`)
+        } catch {
+          // no previous file yet
+        }
       }
       await rename(tmp, this.file)
     } catch (err) {
       this.dirty = true
-      this.log.error(`${path.basename(this.file)}: write failed: ${(err as Error).message}`)
+      this.log.error(`${path.basename(this.file)}: write failed: ${(err as Error).message}, retrying in 2s`)
       try {
         await unlink(tmp)
       } catch {
         // already gone
+      }
+      if (!this.retry) {
+        this.retry = setTimeout(() => {
+          this.retry = null
+          void this.flush()
+        }, 2000)
       }
     }
   }

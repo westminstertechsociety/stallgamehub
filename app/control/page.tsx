@@ -14,7 +14,9 @@ function HoldButton({ label, onConfirm, ms = 900 }: { label: string; onConfirm: 
     timer.current = null
     setProgress(0)
   }
-  const begin = () => {
+  useEffect(() => stop, [])
+  const begin = (e: React.PointerEvent<HTMLButtonElement>) => {
+    e.currentTarget.setPointerCapture(e.pointerId)
     start.current = performance.now()
     const loop = () => {
       const p = Math.min(1, (performance.now() - start.current) / ms)
@@ -34,7 +36,6 @@ function HoldButton({ label, onConfirm, ms = 900 }: { label: string; onConfirm: 
       className="control-btn control-btn-hold"
       onPointerDown={begin}
       onPointerUp={stop}
-      onPointerLeave={stop}
       onPointerCancel={stop}
       onContextMenu={(e) => e.preventDefault()}
     >

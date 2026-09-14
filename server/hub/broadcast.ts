@@ -45,7 +45,7 @@ function countdownView(st: HubState, game: GameModule): CountdownView | null {
 function pauseView(st: HubState): PauseView | null {
   const p = st.pause
   if (!p) return null
-  return { seat: p.seat, graceEndsAt: p.graceEndsAt, resumeAt: p.resumeAt }
+  return { seats: [...p.seats], graceEndsAt: p.graceEndsAt, resumeAt: p.resumeAt }
 }
 
 function resultsView(st: HubState, game: GameModule): ResultsView | null {

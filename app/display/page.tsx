@@ -10,18 +10,7 @@ import { seatLabel } from '@/components/shared/SeatChip'
 import { Banner, Stage } from '@/components/display/Stage'
 import { LobbyBoard } from '@/components/display/LobbyBoard'
 import { ResultsBoard } from '@/components/display/ResultsBoard'
-import { Ranking } from '@/components/display/Ranking'
-
-function Attract({ view }: { view: DisplayView }) {
-  // Step 4 replaces this with the museum-style attract loop; the wake-up card stays.
-  return (
-    <div className="centre">
-      <h1 className="hero">Press space to play</h1>
-      <p className="lead">Sit at either laptop and press the space bar.</p>
-      <Ranking view={view} limit={3} />
-    </div>
-  )
-}
+import { AttractLoop } from '@/components/display/AttractLoop'
 
 function Playing({ view, serverNow }: { view: DisplayView; serverNow: () => number }) {
   const views = gameViews[view.gameId]
@@ -82,7 +71,7 @@ export default function DisplayPage() {
   switch (view.phase) {
     case 'ATTRACT':
       top = null
-      body = <Attract view={view} />
+      body = <AttractLoop view={view} />
       break
     case 'LOBBY':
     case 'COUNTDOWN':
@@ -125,7 +114,7 @@ export default function DisplayPage() {
         <Banner right={view.pause.resumeAt ? '' : `${secondsLeft(view.pause.graceEndsAt, now)}`}>
           {view.pause.resumeAt
             ? 'Resuming.'
-            : `${seatLabel(view.pause.seat, view.seats[view.pause.seat].name)} is reconnecting. Hold on.`}
+            : `${view.pause.seats.map((s) => seatLabel(s, view.seats[s].name)).join(' and ')} reconnecting. Hold on.`}
         </Banner>
       )}
     </>

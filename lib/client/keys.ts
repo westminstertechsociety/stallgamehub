@@ -26,7 +26,8 @@ export function attachKeyCapture(opts: KeyCaptureOptions): () => void {
     if (since == null) return
     held.delete(code)
     lastUp.set(code, ts)
-    if (opts.isAllowed(code)) opts.onInput({ key: code, type: 'up', clientTs: ts, durationMs: Math.max(0, ts - since) })
+    // A key that was accepted on the way down always gets its "up", even if the phase changed meanwhile.
+    opts.onInput({ key: code, type: 'up', clientTs: ts, durationMs: Math.max(0, ts - since) })
     opts.onHeldChange(snapshot())
   }
 
@@ -46,7 +47,9 @@ export function attachKeyCapture(opts: KeyCaptureOptions): () => void {
     const ts = e.timeStamp
     held.set(code, ts)
     const prevUp = lastUp.get(code)
-    opts.onInput({ key: code, type: 'down', clientTs: ts, gapMs: prevUp != null ? Math.max(0, ts - prevUp) : undefined })
+    const gap = prevUp != null ? Math.max(0, ts - prevUp) : undefined
+    // After minutes of silence the gap is meaningless (and past what the server accepts): omit it.
+    opts.onInput({ key: code, type: 'down', clientTs: ts, gapMs: gap != null && gap < 600_000 ? gap : undefined })
     opts.onHeldChange(snapshot())
   }
 
@@ -60,6 +63,10 @@ export function attachKeyCapture(opts: KeyCaptureOptions): () => void {
     if (document.visibilityState === 'hidden') releaseAll()
   }
   const onContextMenu = (e: Event) => e.preventDefault()
+  const onWheel = (e: WheelEvent) => {
+    if (e.ctrlKey || e.metaKey) e.preventDefault()
+  }
+  const onGesture = (e: Event) => e.preventDefault()
 
   window.addEventListener('keydown', onKeyDown, { capture: true })
   window.addEventListener('keyup', onKeyUp, { capture: true })
@@ -68,6 +75,9 @@ export function attachKeyCapture(opts: KeyCaptureOptions): () => void {
   document.addEventListener('visibilitychange', onVisibility)
   document.addEventListener('fullscreenchange', releaseAll)
   window.addEventListener('contextmenu', onContextMenu)
+  window.addEventListener('wheel', onWheel, { passive: false })
+  window.addEventListener('gesturestart', onGesture)
+  window.addEventListener('gesturechange', onGesture)
 
   return () => {
     releaseAll()
@@ -78,5 +88,8 @@ export function attachKeyCapture(opts: KeyCaptureOptions): () => void {
     document.removeEventListener('visibilitychange', onVisibility)
     document.removeEventListener('fullscreenchange', releaseAll)
     window.removeEventListener('contextmenu', onContextMenu)
+    window.removeEventListener('wheel', onWheel)
+    window.removeEventListener('gesturestart', onGesture)
+    window.removeEventListener('gesturechange', onGesture)
   }
 }

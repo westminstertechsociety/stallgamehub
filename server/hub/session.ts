@@ -60,7 +60,8 @@ export interface RoundState {
 }
 
 export interface PauseState {
-  seat: Seat
+  /** Participants currently disconnected. */
+  seats: Seat[]
   since: number
   graceEndsAt: number
   resumeAt: number | null
@@ -84,6 +85,8 @@ export interface ResultsState {
   naming: Partial<Record<Seat, NamingState>>
   entries: LeaderboardEntry[]
   offer: { to: Seat; from: Seat } | null
+  /** A tap cannot skip the results before this, so a still-mashing player sees them. */
+  restartAfter: number
 }
 
 export interface HubState {
@@ -273,8 +276,11 @@ function onSeatConnect(ctx: Ctx, seat: Seat) {
       const round = st.round
       if (round && round.participants.includes(seat)) {
         s.presence = 'playing'
-        if (st.pause && st.pause.seat === seat && st.pause.resumeAt == null) {
-          st.pause.resumeAt = ctx.now + ctx.t.resumeBeatMs
+        if (st.pause) {
+          st.pause.seats = st.pause.seats.filter((x) => x !== seat)
+          if (st.pause.seats.length === 0 && st.pause.resumeAt == null) {
+            st.pause.resumeAt = ctx.now + ctx.t.resumeBeatMs
+          }
         }
       } else {
         s.presence = 'watching'
@@ -283,8 +289,10 @@ function onSeatConnect(ctx: Ctx, seat: Seat) {
     }
     case 'RESULTS': {
       const r = st.results
-      if (r?.naming[seat]) s.presence = 'naming'
-      else if (r?.participants.includes(seat)) s.presence = 'done'
+      if (r?.naming[seat]) {
+        s.presence = 'naming'
+        r.namingDeadline = ctx.now + ctx.t.namingCapMs
+      } else if (r?.participants.includes(seat)) s.presence = 'done'
       else s.presence = 'watching'
       refreshOffer(ctx)
       break
@@ -314,9 +322,10 @@ function onSeatDisconnect(ctx: Ctx, seat: Seat) {
     case 'PLAYING': {
       const round = st.round
       if (round && round.participants.includes(seat)) {
-        if (st.phase === 'PLAYING') {
-          if (!st.pause) beginPause(ctx, seat)
-          else if (st.pause.seat === seat) st.pause.resumeAt = null
+        if (!st.pause) beginPause(ctx, seat)
+        else {
+          if (!st.pause.seats.includes(seat)) st.pause.seats.push(seat)
+          st.pause.resumeAt = null
         }
       } else {
         s.presence = 'absent'
@@ -325,7 +334,12 @@ function onSeatDisconnect(ctx: Ctx, seat: Seat) {
     }
     case 'RESULTS': {
       const r = st.results
-      if (!r?.naming[seat]) s.presence = r?.participants.includes(seat) ? 'done' : 'absent'
+      if (r?.naming[seat]) {
+        const grace = ctx.now + ctx.t.namingGraceMs
+        r.namingDeadline = r.namingDeadline == null ? grace : Math.min(r.namingDeadline, grace)
+      } else {
+        s.presence = r?.participants.includes(seat) ? 'done' : 'absent'
+      }
       refreshOffer(ctx)
       break
     }
@@ -421,7 +435,14 @@ function gesture(ctx: Ctx, s: SeatState, raw: Omit<InputEvent, 'gameNow'>): Gest
   s.hold = null
   if (!h || h.consumed) return null
   const duration = raw.durationMs ?? ctx.now - h.since
-  return duration >= ctx.t.holdMs ? 'hold' : 'tap'
+  return duration >= holdThreshold(ctx, s) ? 'hold' : 'tap'
+}
+
+/** Cancelling a ready choice takes a deliberate hold, so a finger resting on space does not undo it. */
+function holdThreshold(ctx: Ctx, s: SeatState): number {
+  const st = ctx.state
+  if ((st.phase === 'LOBBY' || st.phase === 'COUNTDOWN') && s.presence === 'ready') return ctx.t.acceptHoldMs
+  return ctx.t.holdMs
 }
 
 function tickGestures(ctx: Ctx) {
@@ -441,9 +462,9 @@ function tickGestures(ctx: Ctx) {
       continue
     }
     if (!h.consumed) {
-      if (heldFor >= ctx.t.holdMs) {
+      if (heldFor >= holdThreshold(ctx, s)) {
         h.consumed = true
-        h.repeatAt = ctx.now + ctx.t.cycleRepeatMs
+        h.repeatAt = s.presence === 'idle' ? ctx.now + ctx.t.cycleRepeatMs : 0
         onGesture(ctx, s, 'hold')
       }
     } else if (h.repeatAt && ctx.now >= h.repeatAt) {
@@ -503,7 +524,7 @@ function onGesture(ctx: Ctx, s: SeatState, g: Gesture) {
       acceptOffer(ctx)
       return
     }
-    if (g === 'tap' && r.holdEndsAt != null && r.offer?.to !== s.seat) {
+    if (g === 'tap' && r.holdEndsAt != null && !r.offer && ctx.now >= r.restartAfter) {
       toLobby(ctx)
     }
   }
@@ -536,6 +557,10 @@ function playingInput(ctx: Ctx, s: SeatState, raw: Omit<InputEvent, 'gameNow'>) 
 
 function onTick(ctx: Ctx) {
   const st = ctx.state
+  if (st.notice && ctx.now >= st.notice.until) {
+    st.notice = null
+    ctx.touch()
+  }
   stuckWatch(ctx)
   tickGestures(ctx)
   switch (st.phase) {
@@ -554,8 +579,12 @@ function onTick(ctx: Ctx) {
         return
       }
       if (st.pause) {
-        if (st.pause.resumeAt != null && ctx.now >= st.pause.resumeAt) resume(ctx)
-        else if (ctx.now >= st.pause.graceEndsAt) forfeit(ctx, st.pause.seat)
+        // Once everyone is back the resume beat always completes; the grace clock no longer applies.
+        if (st.pause.resumeAt != null) {
+          if (ctx.now >= st.pause.resumeAt) resume(ctx)
+        } else if (ctx.now >= st.pause.graceEndsAt) {
+          graceExpired(ctx)
+        }
         return
       }
       const next = ctx.game.onTick(round.gameState, roundClock(round, ctx.now))
@@ -573,7 +602,12 @@ function onTick(ctx: Ctx) {
         return
       }
       if (r.namingDeadline != null && ctx.now >= r.namingDeadline) {
-        for (const seat of SEATS) if (r.naming[seat]) submitName(ctx, seat)
+        // Present players get their letters as typed; a seat that never came back is dropped, not written as AAA.
+        for (const seat of SEATS) {
+          if (!r.naming[seat]) continue
+          if (st.seats[seat].connected) submitName(ctx, seat)
+          else dropNaming(ctx, seat)
+        }
       }
       if (r.holdEndsAt != null && ctx.now >= r.holdEndsAt) toLobbyOrAttract(ctx)
       return
@@ -633,6 +667,7 @@ function recomputeCountdown(ctx: Ctx) {
       // A versus-only game with one player ready: keep the lobby open, the other seat can still join.
       st.countdown = null
       st.phase = 'LOBBY'
+      st.idleDeadline = ctx.now + ctx.t.idleToAttractMs
       ctx.touch()
       return
     }
@@ -722,7 +757,7 @@ function beginPause(ctx: Ctx, seat: Seat) {
   const gameNow = roundClock(round, ctx.now)
   round.pausedAt = ctx.now
   const grace = round.mode === 'versus' ? ctx.t.pauseGraceVersusMs : ctx.t.pauseGraceSoloMs
-  st.pause = { seat, since: ctx.now, graceEndsAt: ctx.now + grace, resumeAt: null }
+  st.pause = { seats: [seat], since: ctx.now, graceEndsAt: ctx.now + grace, resumeAt: null }
   const game = ctx.game
   if (game.onPause) round.gameState = game.onPause(round.gameState, gameNow)
   ctx.touch()
@@ -740,6 +775,31 @@ function resume(ctx: Ctx) {
   const game = ctx.game
   if (game.onResume) round.gameState = game.onResume(round.gameState, roundClock(round, ctx.now))
   ctx.touch()
+}
+
+/** The pause grace ran out. Whoever is still missing loses; if everyone is missing the round is abandoned. */
+function graceExpired(ctx: Ctx) {
+  const st = ctx.state
+  const round = st.round
+  const pause = st.pause
+  if (!round || !pause) return
+  const missing = round.participants.filter((p) => pause.seats.includes(p))
+  const present = round.participants.filter((p) => !pause.seats.includes(p))
+  if (missing.length === 0) {
+    resume(ctx)
+    return
+  }
+  if (present.length === 0 || round.mode === 'solo') {
+    if (round.pausedAt != null) {
+      round.pausedTotal += ctx.now - round.pausedAt
+      round.pausedAt = null
+    }
+    st.pause = null
+    ctx.notice('Round abandoned.', 5000)
+    toLobbyOrAttract(ctx)
+    return
+  }
+  forfeit(ctx, missing[0] as Seat)
 }
 
 function forfeit(ctx: Ctx, seat: Seat) {
@@ -806,6 +866,7 @@ function enterResults(ctx: Ctx, outcome: GameOutcome) {
     naming,
     entries: [],
     offer: null,
+    restartAfter: ctx.now + ctx.t.resultsMinMs,
   }
   if (outcome.data !== undefined) ctx.effects.push({ type: 'gameData.set', gameId: game.id, data: outcome.data })
   st.round = null
@@ -831,7 +892,23 @@ function refreshOffer(ctx: Ctx) {
   const other = st.seats[to]
   const eligible = other.connected && (other.presence === 'watching' || other.presence === 'idle')
   const fromPresent = st.seats[from].connected
-  r.offer = eligible && fromPresent ? { to, from } : null
+  const namingDone = Object.keys(r.naming).length === 0
+  r.offer = eligible && fromPresent && namingDone ? { to, from } : null
+}
+
+/** Drop a name entry without writing anything (the seat never came back). */
+function dropNaming(ctx: Ctx, seat: Seat) {
+  const st = ctx.state
+  const r = st.results
+  if (!r?.naming[seat]) return
+  delete r.naming[seat]
+  st.seats[seat].presence = st.seats[seat].connected ? 'done' : 'absent'
+  if (Object.keys(r.naming).length === 0) {
+    r.holdEndsAt = ctx.now + ctx.t.resultsHoldMs
+    r.namingDeadline = null
+    refreshOffer(ctx)
+  }
+  ctx.touch()
 }
 
 function submitName(ctx: Ctx, seat: Seat) {
@@ -869,6 +946,7 @@ function submitName(ctx: Ctx, seat: Seat) {
   if (Object.keys(r.naming).length === 0) {
     r.holdEndsAt = ctx.now + ctx.t.resultsHoldMs
     r.namingDeadline = null
+    refreshOffer(ctx)
   }
   ctx.touch()
 }
@@ -909,6 +987,14 @@ function acceptOffer(ctx: Ctx) {
 
 function resetForPhase(ctx: Ctx, presence: (s: SeatState) => Presence) {
   const st = ctx.state
+  if (st.phase === 'RESULTS' && st.results) {
+    // An operator skip or a force must not throw away a legitimate score: write the letters as typed.
+    for (const seat of SEATS) {
+      if (!st.results.naming[seat]) continue
+      if (st.seats[seat].connected) submitName(ctx, seat)
+      else dropNaming(ctx, seat)
+    }
+  }
   st.countdown = null
   st.round = null
   st.pause = null
@@ -957,7 +1043,7 @@ function onControl(ctx: Ctx, cmd: ControlCommand) {
         ctx.log('warn', `selectGame: unknown game ${cmd.gameId}`)
         return
       }
-      if (st.gameId === cmd.gameId && st.phase !== 'PLAYING') return
+      if (st.gameId === cmd.gameId) return
       st.gameId = cmd.gameId
       for (const seat of SEATS) st.seats[seat].cursor = 0
       if (st.phase === 'ATTRACT') resetForPhase(ctx, (s) => (s.connected ? 'idle' : 'absent'))
@@ -1111,7 +1197,7 @@ function kick(ctx: Ctx, seat: Seat) {
   s.stuck = false
   if (!s.connected) s.presence = 'absent'
   else if (st.phase === 'PLAYING') s.presence = st.round?.participants.includes(seat) ? 'playing' : 'watching'
-  else if (st.phase === 'RESULTS') s.presence = st.results?.participants.includes(seat) ? 'done' : 'watching'
+  else if (st.phase === 'RESULTS') s.presence = 'done'
   else s.presence = 'idle'
   ctx.notice(`${seat} was reset.`, 4000)
   ctx.touch()

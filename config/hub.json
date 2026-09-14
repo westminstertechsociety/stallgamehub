@@ -14,7 +14,9 @@
     "holdMs": 600,
     "cycleRepeatMs": 700,
     "acceptHoldMs": 1000,
-    "stuckKeyMs": 5000
+    "stuckKeyMs": 5000,
+    "resultsMinMs": 3000,
+    "namingGraceMs": 10000
   },
   "attract": {
     "cardMs": 12000

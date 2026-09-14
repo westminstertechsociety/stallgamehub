@@ -76,7 +76,8 @@ export interface CountdownView {
 }
 
 export interface PauseView {
-  seat: Seat
+  /** Participants currently disconnected. The first is the one named on screen. */
+  seats: Seat[]
   graceEndsAt: number
   resumeAt: number | null
 }

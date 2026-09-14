@@ -1,3 +1,58 @@
 {
-  "cards": []
+  "cards": [
+    {
+      "name": "Ada Lovelace",
+      "year": "1843",
+      "fact": "Wrote the first published algorithm for a machine, a century before any computer existed.",
+      "image": "/attract/images/ada-lovelace.svg"
+    },
+    {
+      "name": "Alan Turing",
+      "year": "1936",
+      "fact": "Described a universal machine on paper. Every computer since is one of them.",
+      "image": "/attract/images/alan-turing.svg"
+    },
+    {
+      "name": "Grace Hopper",
+      "year": "1952",
+      "fact": "Built the first compiler, so programs could be written in words instead of numbers.",
+      "image": "/attract/images/grace-hopper.svg"
+    },
+    {
+      "name": "Katherine Johnson",
+      "year": "1962",
+      "fact": "Checked the orbit for John Glenn's flight by hand. He would not launch until she had.",
+      "image": "/attract/images/katherine-johnson.svg"
+    },
+    {
+      "name": "Claude Shannon",
+      "year": "1948",
+      "fact": "Showed that all information can be measured in bits. He named the unit too.",
+      "image": "/attract/images/claude-shannon.svg"
+    },
+    {
+      "name": "Hedy Lamarr",
+      "year": "1942",
+      "fact": "Co-invented frequency hopping, the idea behind Wi-Fi, Bluetooth and GPS.",
+      "image": "/attract/images/hedy-lamarr.svg"
+    },
+    {
+      "name": "Margaret Hamilton",
+      "year": "1969",
+      "fact": "Led the Apollo flight software. Her error handling kept the Moon landing on track.",
+      "image": "/attract/images/margaret-hamilton.svg"
+    },
+    {
+      "name": "Tim Berners-Lee",
+      "year": "1989",
+      "fact": "Proposed the World Wide Web at CERN, then gave it to everyone for free.",
+      "image": "/attract/images/tim-berners-lee.svg"
+    },
+    {
+      "name": "Radia Perlman",
+      "year": "1985",
+      "fact": "Invented the spanning tree protocol that stops networks looping. She wrote it as a poem.",
+      "image": "/attract/images/radia-perlman.svg"
+    }
+  ]
 }

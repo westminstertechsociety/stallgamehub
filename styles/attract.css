@@ -1,0 +1,88 @@
+/* Attract loop: a museum caption, not a screensaver. Hard cuts between cards; only the text rises in. */
+
+.attract {
+  display: grid;
+  min-height: 0;
+  height: 100%;
+}
+
+.attract-wake,
+.attract-board {
+  align-content: center;
+  gap: var(--space-6);
+}
+
+.attract-pioneer {
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: var(--display-gutter);
+  align-items: stretch;
+  /* Bleed the portrait to the screen edge through the stage padding. */
+  margin: calc(var(--display-gutter) * -0.6) 0 calc(var(--display-gutter) * -0.6) calc(var(--display-gutter) * -1);
+}
+
+.attract-noimage {
+  grid-template-columns: minmax(0, 1fr);
+  margin: 0;
+}
+
+.attract-portrait {
+  min-height: 0;
+  overflow: hidden;
+  background: var(--ground-2);
+}
+
+.attract-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.attract-text {
+  display: grid;
+  align-content: center;
+  gap: var(--space-7);
+  padding: var(--display-gutter) 0;
+  min-width: 0;
+}
+
+.attract-fact {
+  font-size: clamp(40px, 4.4vw, 88px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.005em;
+  max-width: 18ch;
+  text-wrap: balance;
+}
+
+.attract-noimage .attract-fact {
+  font-size: clamp(56px, 6vw, 120px);
+  max-width: 20ch;
+}
+
+.attract-who {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+}
+
+.attract-name {
+  font-size: var(--display-body);
+  font-weight: 800;
+  font-stretch: 118%;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.attract-year {
+  font-size: var(--display-body);
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.attract-credit {
+  font-size: var(--display-small);
+  color: var(--muted);
+  font-weight: 500;
+}

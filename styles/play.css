@@ -5,6 +5,10 @@
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
   background: var(--ground-2);
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+  cursor: none;
 }
 
 .play-top {
