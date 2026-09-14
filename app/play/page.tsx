@@ -35,6 +35,21 @@ function useLocalClock(active: boolean): number {
   return t
 }
 
+/** The superseded overlay must be dismissable from the keyboard too: kiosk laptops may have no mouse to hand. */
+function SupersededKeys({ onEnter }: { onEnter: () => void }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.code === 'Enter' || e.code === 'NumpadEnter') {
+        e.preventDefault()
+        onEnter()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onEnter])
+  return null
+}
+
 function PlayInner() {
   const params = useSearchParams()
   const seat = pinnedSeat(params.get('seat'))
@@ -105,6 +120,7 @@ function PlayInner() {
   if (superseded) {
     return (
       <Overlay>
+        <SupersededKeys onEnter={reconnect} />
         <p>
           {superseded.reason === 'another-tab'
             ? 'This seat is open in another window on this laptop.'
@@ -113,6 +129,7 @@ function PlayInner() {
         <button type="button" onClick={reconnect}>
           Use this window
         </button>
+        <p className="overlay-sub">Or press Enter.</p>
       </Overlay>
     )
   }
