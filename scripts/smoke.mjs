@@ -72,6 +72,7 @@ try {
   process.exit(1)
 }
 check(health?.ok, 'GET /health')
+check(Array.isArray(health?.content) && health.content.length === 0, `content files valid${health?.content?.length ? ': ' + health.content.join(' | ') : ''}`)
 const force = process.argv.includes('--force')
 if ((health?.seats?.P1 || health?.seats?.P2) && !force) {
   console.log('  FAIL a player laptop is already connected. The smoke takes both seats and plays fake rounds;')

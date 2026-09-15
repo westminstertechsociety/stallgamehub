@@ -36,7 +36,7 @@ export const morseConfigSchema = z.object({
   wordGapUnits: z.number().min(1).max(40).default(7),
   maxSymbolsPerLetter: z.number().int().min(5).max(10).default(6),
   stuckPressUnits: z.number().min(3).max(60).default(10),
-  bestOf: z.number().int().min(1).max(9).default(3),
+  bestOf: z.number().int().min(1).max(25).default(10),
   wordTimeLimitMs: z.number().min(5000).default(45_000),
   betweenWordsMs: z.number().min(0).default(2500),
   streamLength: z.number().int().min(3).max(20).default(8),
