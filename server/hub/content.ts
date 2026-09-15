@@ -129,7 +129,17 @@ export async function loadContent(
   for (const game of Object.values(games)) {
     const file = path.join(CONFIG_DIR, `${game.id}.json`)
     try {
-      const raw = await readJson(file)
+      let raw = await readJson(file)
+      // A config may point at a larger content file (a deck of items) with `deckFile`; it is inlined as `deck`.
+      const deckFile = (raw as { deckFile?: unknown } | null)?.deckFile
+      if (typeof deckFile === 'string') {
+        try {
+          const deck = await readJson(path.resolve(ROOT, deckFile))
+          raw = { ...(raw as object), deck }
+        } catch (err) {
+          errors.push(`${deckFile}: ${(err as Error).message}`)
+        }
+      }
       const parsed = game.configSchema.safeParse(raw)
       if (parsed.success) gameConfigs[game.id] = parsed.data
       else {

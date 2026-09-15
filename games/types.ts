@@ -152,4 +152,6 @@ export interface GamePlayerProps<PV> {
 export interface GameViews<DV = unknown, PV = unknown> {
   Display: ComponentType<GameDisplayProps<DV>>
   Player: ComponentType<GamePlayerProps<PV>>
+  /** The one-line instruction under the wordmark while this game is on the projector. */
+  headline?: (view: DV) => string
 }

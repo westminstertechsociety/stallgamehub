@@ -1,0 +1,9 @@
+{
+  "itemsPerMatch": 9,
+  "revealMs": 6000,
+  "speedBonus": 1,
+  "easyOpeners": 2,
+  "avoidRecentMatches": 3,
+  "learnHoldMs": 600,
+  "deckFile": "decks/human-or-ai.json"
+}

@@ -1,0 +1,75 @@
+/* Human or AI. The text is the whole screen; the clock is a bar that drains. */
+
+.hoa-display {
+  display: grid;
+  grid-template-rows: minmax(0, auto) auto auto minmax(0, 1fr);
+  justify-items: center;
+  align-content: start;
+  gap: 2vh;
+  min-height: 0;
+  width: 100%;
+}
+
+.hoa-text {
+  margin: 0;
+  max-width: min(62ch, 88vw);
+  font-size: clamp(26px, min(2.7vw, 4.6vh), 54px);
+  font-weight: 500;
+  line-height: 1.32;
+  text-align: left;
+  text-wrap: pretty;
+  white-space: pre-wrap;
+  overflow: hidden;
+  animation: rise var(--dur-base) var(--ease-out);
+}
+
+.hoa-text-revealed {
+  color: var(--muted);
+  font-size: clamp(22px, min(2.1vw, 3.6vh), 40px);
+}
+
+.bar {
+  width: min(62ch, 88vw);
+  height: clamp(10px, 1.8vh, 20px);
+  background: var(--ground-3);
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  width: 100%;
+  background: var(--ink);
+  transform-origin: left center;
+  transition: background var(--dur-fast) var(--ease-out);
+}
+
+.bar-urgent .bar-fill {
+  background: var(--p2);
+}
+
+.hoa-reveal {
+  display: grid;
+  justify-items: center;
+  gap: 1.5vh;
+}
+
+.hoa-verdict {
+  font-size: clamp(96px, min(12vw, 18vh), 220px);
+}
+
+.hoa-tell {
+  max-width: 40ch;
+  text-align: center;
+}
+
+.hoa-score {
+  font-family: var(--font-pixel);
+  font-size: clamp(36px, min(3.6vw, 6vh), 72px);
+  line-height: 1;
+}
+
+/* Player laptop */
+.play-bar {
+  width: min(100%, 720px);
+  height: 18px;
+}

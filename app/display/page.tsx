@@ -69,7 +69,8 @@ export default function DisplayPage() {
 
 
   const modeLabel = view.results?.variantLabel ?? view.countdown?.variantLabel ?? ''
-  const learn = view.phase === 'PLAYING' && Boolean((view.game as { learn?: unknown } | null)?.learn)
+  const views = gameViews[view.gameId]
+  const gameHeadline = view.phase === 'PLAYING' && view.game != null && views?.headline ? views.headline(view.game) : null
 
   let headline: React.ReactNode = null
   let bottom: React.ReactNode = null
@@ -87,9 +88,7 @@ export default function DisplayPage() {
       bottom = view.notice ? <span>{view.notice}</span> : <span>{view.gameName}</span>
       break
     case 'PLAYING':
-      headline = learn
-        ? 'Key this letter: short press for a dot, long press for a dash'
-        : 'Type the following word in morse code as fast as you can'
+      headline = gameHeadline ?? view.gameName
       body = <Playing view={view} serverNow={hub.serverNow} />
       bottom = <span>{modeLabel || view.gameName}</span>
       break

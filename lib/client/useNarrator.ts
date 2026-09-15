@@ -37,8 +37,8 @@ export function useNarrator(view: DisplayView | null, triviaEveryMs = TRIVIA_DEF
           voice.say(view.countdown?.mode === 'versus' ? 'countdown.versus' : 'countdown.solo', { priority: 3 })
           break
         case 'PLAYING': {
-          const morse = view.game as MorseDisplayView | null
-          const key = morse?.learn ? 'learn.start' : 'versus.start'
+          const learn = Boolean((view.game as { learn?: unknown } | null)?.learn)
+          const key = view.gameId === 'morse' ? (learn ? 'learn.start' : 'versus.start') : `${view.gameId}.start.${learn ? 'learn' : 'timed'}`
           voice.say(key, { priority: 3 })
           lastTrivia.current = Date.now()
           break
@@ -64,7 +64,15 @@ export function useNarrator(view: DisplayView | null, triviaEveryMs = TRIVIA_DEF
       voice.say('hotjoin', { priority: 2 })
     }
 
-    if (view.phase === 'PLAYING') {
+    if (view.phase === 'PLAYING' && view.gameId === 'human-or-ai') {
+      const g = view.game as { phase: string; source: string | null; index: number } | null
+      const was = before.game as { phase: string; index: number } | null
+      if (g && was && g.phase === 'reveal' && was.phase === 'item' && g.source) {
+        voice.say(`human-or-ai.reveal.${g.source}`, { priority: 1, cooldownMs: 3000 })
+      }
+    }
+
+    if (view.phase === 'PLAYING' && view.gameId === 'morse') {
       const morse = view.game as MorseDisplayView | null
       const was = before.game as MorseDisplayView | null
       if (morse && was) {
@@ -81,9 +89,13 @@ export function useNarrator(view: DisplayView | null, triviaEveryMs = TRIVIA_DEF
           }
         }
       }
+    }
+
+    if (view.phase === 'PLAYING') {
       const now = Date.now()
+      const triviaKey = view.gameId === 'morse' ? 'trivia' : `${view.gameId}.trivia`
       if (now - lastTrivia.current > triviaEveryMs && !voice.isSpeaking()) {
-        if (voice.say('trivia', { priority: 0 })) lastTrivia.current = now
+        if (voice.say(triviaKey, { priority: 0 })) lastTrivia.current = now
       }
     }
 

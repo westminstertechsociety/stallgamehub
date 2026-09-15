@@ -3,8 +3,8 @@
   "triviaEveryMs": 28000,
   "lines": {
     "attract.welcome": [
-      "Welcome to the Tech Society stall. Sit at either laptop and press the space bar to play.",
-      "This is a Morse code race. One key, two players, one projector. Press space on a laptop to begin."
+      "Welcome to Tech Society. Sit at either laptop and press the space bar to play.",
+      "This is a Morse code race. One key, two players. Press space on both laptops to begin."
     ],
     "lobby.wake": [
       "Someone is here. Press space when you are ready and we will start in a moment.",
@@ -81,6 +81,30 @@
     "idle": [
       "Still there? The projector will go back to its exhibit in a moment.",
       "If nobody presses anything, I will go back to talking about famous computer scientists."
+    ],
+    "human-or-ai.start.timed": [
+      "Human or A I. A short text appears on the projector. If you think a machine wrote it, hit space. If you think a person did, sit on your hands. Wrong buzzes cost a point.",
+      "Read the text. Space means you think it is A I. Silence means human. Buzz first and correctly for a bonus, buzz wrong and you are out for that one."
+    ],
+    "human-or-ai.start.learn": [
+      "Human or A I, no clock. Read the text on the projector, tap space if you think a machine wrote it, hold space if you think a person did. You get the tell straight away."
+    ],
+    "human-or-ai.reveal.ai": [
+      "That one was the machine.",
+      "A I. The machine wrote that one.",
+      "Machine."
+    ],
+    "human-or-ai.reveal.human": [
+      "A person wrote that one.",
+      "Human. A real person, at a real keyboard.",
+      "Human."
+    ],
+    "human-or-ai.trivia": [
+      "The human texts here are real office emails from before two thousand and two. Nobody had a chat bot to write them. They had coffee.",
+      "Language models are trained to produce the most likely next word. Humans are trained by deadlines. That is usually the tell.",
+      "People make typos, skip greetings and trail off. Models balance their clauses and sign off politely. Unless they are told not to.",
+      "The oldest trick in the book: a machine rarely leaves a sentence half finished. People do it all the",
+      "If everything in a message is spelled correctly, that is not proof of anything. But it is a clue."
     ]
   }
 }

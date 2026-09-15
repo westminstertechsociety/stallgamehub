@@ -258,4 +258,9 @@ function Player({ view, seat, held, builtAt, serverNow, reducedMotion }: GamePla
   )
 }
 
-export const morseViews: GameViews<MorseDisplayView, MorsePlayerView> = { Display, Player }
+export const morseViews: GameViews<MorseDisplayView, MorsePlayerView> = {
+  Display,
+  Player,
+  headline: (view) =>
+    view.learn ? 'Key this letter: short press for a dot, long press for a dash' : 'Type the following word in morse code as fast as you can',
+}

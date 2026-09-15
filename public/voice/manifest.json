@@ -1,17 +1,17 @@
 {
   "voice": "bf_emma",
-  "renderedAt": "2026-09-15T00:07:51.534Z",
+  "renderedAt": "2026-09-15T00:30:00.670Z",
   "clips": {
     "attract.welcome": [
       {
-        "file": "attract.welcome-0-8af4e4c091.mp3",
-        "seconds": 6,
-        "text": "Welcome to the Tech Society stall. Sit at either laptop and press the space bar to play."
+        "file": "attract.welcome-0-1436a31939.mp3",
+        "seconds": 5.5,
+        "text": "Welcome to Tech Society. Sit at either laptop and press the space bar to play."
       },
       {
-        "file": "attract.welcome-1-82fbba7ded.mp3",
-        "seconds": 6.6,
-        "text": "This is a Morse code race. One key, two players, one projector. Press space on a laptop to begin."
+        "file": "attract.welcome-1-988b20342d.mp3",
+        "seconds": 5.9,
+        "text": "This is a Morse code race. One key, two players. Press space on both laptops to begin."
       }
     ],
     "lobby.wake": [
@@ -264,6 +264,86 @@
         "file": "idle-1-e7a046831d.mp3",
         "seconds": 5.9,
         "text": "If nobody presses anything, I will go back to talking about famous computer scientists."
+      }
+    ],
+    "human-or-ai.start.timed": [
+      {
+        "file": "human-or-ai.start.timed-0-9ea7e9aaf3.mp3",
+        "seconds": 10.7,
+        "text": "Human or A I. A short text appears on the projector. If you think a machine wrote it, hit space. If you think a person did, sit on your hands. Wrong buzzes cost a point."
+      },
+      {
+        "file": "human-or-ai.start.timed-1-12eef094f8.mp3",
+        "seconds": 9.1,
+        "text": "Read the text. Space means you think it is A I. Silence means human. Buzz first and correctly for a bonus, buzz wrong and you are out for that one."
+      }
+    ],
+    "human-or-ai.start.learn": [
+      {
+        "file": "human-or-ai.start.learn-0-86acb28535.mp3",
+        "seconds": 10.3,
+        "text": "Human or A I, no clock. Read the text on the projector, tap space if you think a machine wrote it, hold space if you think a person did. You get the tell straight away."
+      }
+    ],
+    "human-or-ai.reveal.ai": [
+      {
+        "file": "human-or-ai.reveal.ai-0-5a3822d3e1.mp3",
+        "seconds": 2.3,
+        "text": "That one was the machine."
+      },
+      {
+        "file": "human-or-ai.reveal.ai-1-f8f5e265e4.mp3",
+        "seconds": 2.7,
+        "text": "A I. The machine wrote that one."
+      },
+      {
+        "file": "human-or-ai.reveal.ai-2-8d4b5bbace.mp3",
+        "seconds": 1.5,
+        "text": "Machine."
+      }
+    ],
+    "human-or-ai.reveal.human": [
+      {
+        "file": "human-or-ai.reveal.human-0-bac2904266.mp3",
+        "seconds": 2.4,
+        "text": "A person wrote that one."
+      },
+      {
+        "file": "human-or-ai.reveal.human-1-9fc4846992.mp3",
+        "seconds": 3.5,
+        "text": "Human. A real person, at a real keyboard."
+      },
+      {
+        "file": "human-or-ai.reveal.human-2-09cd253bc9.mp3",
+        "seconds": 1.3,
+        "text": "Human."
+      }
+    ],
+    "human-or-ai.trivia": [
+      {
+        "file": "human-or-ai.trivia-0-740b533b07.mp3",
+        "seconds": 8.2,
+        "text": "The human texts here are real office emails from before two thousand and two. Nobody had a chat bot to write them. They had coffee."
+      },
+      {
+        "file": "human-or-ai.trivia-1-78e59309e7.mp3",
+        "seconds": 7.8,
+        "text": "Language models are trained to produce the most likely next word. Humans are trained by deadlines. That is usually the tell."
+      },
+      {
+        "file": "human-or-ai.trivia-2-190d0b1c4e.mp3",
+        "seconds": 8.3,
+        "text": "People make typos, skip greetings and trail off. Models balance their clauses and sign off politely. Unless they are told not to."
+      },
+      {
+        "file": "human-or-ai.trivia-3-0b0f245020.mp3",
+        "seconds": 6.3,
+        "text": "The oldest trick in the book: a machine rarely leaves a sentence half finished. People do it all the"
+      },
+      {
+        "file": "human-or-ai.trivia-4-8774f0b3a5.mp3",
+        "seconds": 5.9,
+        "text": "If everything in a message is spelled correctly, that is not proof of anything. But it is a clue."
       }
     ],
     "pioneer.ada-lovelace": [
