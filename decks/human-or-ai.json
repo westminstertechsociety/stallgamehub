@@ -1,3 +1,534 @@
 {
-  "items": []
+  "generatedAt": "2026-09-15T00:53:58.705Z",
+  "items": [
+    {
+      "id": "a-074714e5",
+      "text": "I am confirming receipt of your emails and will begin investigating the possible communication issue now. Have you noticed any specific problems or patterns with the messages that might help identify the cause? Please clarify if there are particular contacts or times this has been occurring.",
+      "source": "ai",
+      "tell": "A three-sentence customer-service reply; possible communication issue is corporate cotton wool.",
+      "durationMs": 14500,
+      "difficulty": 1
+    },
+    {
+      "id": "a-0e8ce7d8",
+      "text": "There's been a change to the Q3 agreement due to a prior stock award that wasn't accounted for. This means the current terms are no longer valid as originally drafted.\n\nCan you help me put together a revised clause to reflect this? I need an example of how to properly adjust for previously vested stock in this type of agreement.",
+      "source": "ai",
+      "tell": "Explains the background to someone who already knows it; a model writes for a stranger.",
+      "durationMs": 15000,
+      "difficulty": 1
+    },
+    {
+      "id": "a-347c502d",
+      "text": "confirm saturday's schedule is finalized for 9 am start at the main office and everyone knows their roles.\nalso, do you need me to cover anything today before we confirm tomorrow's plan. send a reply by end of day so i can adjust my schedule accordingly.",
+      "source": "ai",
+      "tell": "Forty-six words to say is Saturday sorted; nobody types adjust my schedule accordingly to a friend.",
+      "durationMs": 14500,
+      "difficulty": 1
+    },
+    {
+      "id": "a-5c044704",
+      "text": "Hey Sam, I can help coordinate the outage planning input if you send me the current schedule and key dates. Just need the details so I can make sure everything lines up properly.\nLet me know what's urgent and I'll get on it quickly.",
+      "source": "ai",
+      "tell": "Offers help, lists what it needs, promises speed: the helpful-assistant shape in one paragraph.",
+      "durationMs": 14000,
+      "difficulty": 1
+    },
+    {
+      "id": "a-5cea37fe",
+      "text": "i need to step out for a bit to handle some personal stuff... i should be back by afternoon.\n\ni'll check emails periodically, but my responses might be delayed.",
+      "source": "ai",
+      "tell": "My responses might be delayed is an out-of-office line, not a person nipping out.",
+      "durationMs": 10250,
+      "difficulty": 1
+    },
+    {
+      "id": "a-60a498df",
+      "text": "Can you review the course outline and tell me if it covers all the needed topics? Do you believe the schedule listed on the draft is correct and feasible? I'd like to finalize this today so your quick confirmation would be appreciated. Did you see any conflicts I missed?",
+      "source": "ai",
+      "tell": "Four questions in a row, each fully formed; a person would ask one and wait.",
+      "durationMs": 15000,
+      "difficulty": 1
+    },
+    {
+      "id": "a-7ea00894",
+      "text": "Heard chatter about reviving Product X. Pls confirm we've addressed Sam's Q re recall issues before we proceed. Details from last summer in files.",
+      "source": "ai",
+      "tell": "Product X is a placeholder; a person would name the actual product.",
+      "durationMs": 9000,
+      "difficulty": 1
+    },
+    {
+      "id": "a-93a66fe9",
+      "text": "What time you thinking for the pickup and where should I meet you at? Pls confirm so I can plan initial accordingly.",
+      "source": "ai",
+      "tell": "Plan initial accordingly is not English anyone speaks; a model slip, not a typo.",
+      "durationMs": 8500,
+      "difficulty": 1
+    },
+    {
+      "id": "a-be27019a",
+      "text": "Please prepare a cost reduction analysis report specifically for Alex's group systems. The report should include recent cost data, potential savings, and efficiency improvements, and be delivered by the end of the week.\n\nThank you for your prompt attention to this request.",
+      "source": "ai",
+      "tell": "Thank you for your prompt attention to this request is form-letter language; nobody types it to a colleague.",
+      "durationMs": 13500,
+      "difficulty": 1
+    },
+    {
+      "id": "a-f259facf",
+      "text": "Please confirm your preferred format for official signatures on corporate documents.  This ensures consistency across all outgoing communications.\n\nWhat is your preference for displaying your name and title.",
+      "source": "ai",
+      "tell": "This ensures consistency across all outgoing communications is a policy sentence, not a colleague's.",
+      "durationMs": 10000,
+      "difficulty": 1
+    },
+    {
+      "id": "h-302ed5c4",
+      "text": "round one should go supplemental teams  7 to 1 then franchise teams in reverse order\nof how they ranked the previous year\n\nround 2 through what ever is the same as the other draft we did",
+      "source": "human",
+      "tell": "One unpunctuated run-on about a fantasy draft; the writer knew what they meant and typed it once.",
+      "durationMs": 12000,
+      "difficulty": 1
+    },
+    {
+      "id": "h-39bb600e",
+      "text": "tell me what you think - or any ideas to add - the changes were done by pat - i havent read it yet as it would be odd to pull it up here so i dont know if i agree with them or not",
+      "source": "human",
+      "tell": "Dashes instead of sentences and havent without an apostrophe; nobody generates this untidily on purpose.",
+      "durationMs": 14250,
+      "difficulty": 1
+    },
+    {
+      "id": "h-3a487505",
+      "text": "Hey, we kid!  Where'd we be without our humor?  Have a great weekend; thanks for taking the time to talk today.\n\nBest,\nAlex\n\nPS What was that package again?",
+      "source": "human",
+      "tell": "A PS tacked on after the sign-off is an afterthought, and models do not have afterthoughts.",
+      "durationMs": 10250,
+      "difficulty": 1
+    },
+    {
+      "id": "h-acb72ca8",
+      "text": "tee time on sat is 8 am so i should be done in time to go by 2 to the furniture store ok\n\nanything i can do for you today ?",
+      "source": "human",
+      "tell": "A whole message with no capitals or punctuation until a lone question mark at the end.",
+      "durationMs": 10750,
+      "difficulty": 1
+    },
+    {
+      "id": "h-ae06de94",
+      "text": "Thought you might want a little humor in your day?..as dumb as it may be!",
+      "source": "human",
+      "tell": "The odd ?.. punctuation is a typing slip; models punctuate cleanly.",
+      "durationMs": 6750,
+      "difficulty": 1
+    },
+    {
+      "id": "h-c8aa08ff",
+      "text": "Not much is going on over here, just gutting it out until the weekend.  It\nseems like the weeks get longer and longer, doesn't it?\n\nHow are things in your world?\nYou can come by whenever you want to get the check.  How much do I owe you\nagain?",
+      "source": "human",
+      "tell": "Small talk about the week dragging, then a debt to settle: two unrelated things, like real mail.",
+      "durationMs": 15000,
+      "difficulty": 1
+    },
+    {
+      "id": "h-cc02eb44",
+      "text": "FYI on the information your requested.  Alex is working to pull this together ASAP.  What exactly is the deadline?",
+      "source": "human",
+      "tell": "Your requested is a real typo for you requested; a model would not make that slip.",
+      "durationMs": 7750,
+      "difficulty": 1
+    },
+    {
+      "id": "h-da8cbf49",
+      "text": "Do I even know this guy, or has someone yet again confused me with the other Alex?  Since your one of the only names on this thing I recognize, besides Sam's, I thought I'd ask.",
+      "source": "human",
+      "tell": "Since your one of the only names misuses your for you're; a real slip, not a model's.",
+      "durationMs": 11750,
+      "difficulty": 1
+    },
+    {
+      "id": "h-f21c6d5c",
+      "text": "off the soapbox....\n\ni'm going to the grocery store (forgot some things), the dry cleaners, running and finishing up laundry detail...so that will take up a bit of time.",
+      "source": "human",
+      "tell": "Four dots, a bracket and laundry detail: a real errand list in a real voice.",
+      "durationMs": 10250,
+      "difficulty": 1
+    },
+    {
+      "id": "a-03adaf5d",
+      "text": "hi\ni need to ask about a package.\nit was supposed to arrive\ndid it get here yet!\ni have not seen it",
+      "source": "ai",
+      "tell": "Four flat sentences about one package with no detail of what it is: thin, like a model.",
+      "durationMs": 8750,
+      "difficulty": 2
+    },
+    {
+      "id": "a-0af45594",
+      "text": "I'm sorry to bother you with this but I need your approval on this expense report for the unusual equipment purchase before it gets processed...",
+      "source": "ai",
+      "tell": "Unusual equipment purchase describes instead of names; real mail says what was bought.",
+      "durationMs": 9250,
+      "difficulty": 2
+    },
+    {
+      "id": "a-162deb04",
+      "text": "I attached the draft slides that need a general review there are more detailed comments in the notes section. Please take a look when you have a moment.\n\nLet's aim to discuss it tomorrow morning at 9, I think that would be best.",
+      "source": "ai",
+      "tell": "I think that would be best softens a time it just proposed; models hedge their own suggestions.",
+      "durationMs": 13750,
+      "difficulty": 2
+    },
+    {
+      "id": "a-460cdb23",
+      "text": "Can u pls arrange a replacement badge for Morgan so I can pick it up today? Also, do I need to fill out any forms or just get it from security?",
+      "source": "ai",
+      "tell": "Can u pls, then a perfectly formed second sentence; the sloppiness is costume.",
+      "durationMs": 10750,
+      "difficulty": 2
+    },
+    {
+      "id": "a-69a64e56",
+      "text": "pls review the draft report I sent.  Need your feedback by end of day.\n\nAny notes or suggested changes, pls send them over. What are your thoughts on the conclusions section. Thx.",
+      "source": "ai",
+      "tell": "Every sentence is a request in the same shape; the conclusions section is generic.",
+      "durationMs": 11000,
+      "difficulty": 2
+    },
+    {
+      "id": "a-7dafe0a1",
+      "text": "confirming our call tomorrow for 60 minutes as discussed, please be on time and stick to the time limit",
+      "source": "ai",
+      "tell": "Restates the whole arrangement to the person who made it; models over-explain.",
+      "durationMs": 7750,
+      "difficulty": 2
+    },
+    {
+      "id": "a-86cb1062",
+      "text": "confirming interest for tomorrow and thinking we could start at 8 o'clock to get things going... let me know if that works or if you have another time in mind",
+      "source": "ai",
+      "tell": "Confirming interest and get things going are filler; nobody plans dinner in that register.",
+      "durationMs": 10500,
+      "difficulty": 2
+    },
+    {
+      "id": "a-90b14451",
+      "text": "thinking of grabbing some dinner or just hanging out later, if u want to pls let me know and we can set a time",
+      "source": "ai",
+      "tell": "Covers every option and asks you to set the time; a model hedges where a person suggests.",
+      "durationMs": 9000,
+      "difficulty": 2
+    },
+    {
+      "id": "a-95f3a3a4",
+      "text": "hey jordan i know this is the quick ask but after you look at the report it would be really helpful if you could send any feedback or corrections so we can get it finalized before the deadline appreciate it thanks for your quick help on this",
+      "source": "ai",
+      "tell": "I know this is the quick ask mangles a quick ask; a model's near miss on an idiom.",
+      "durationMs": 14750,
+      "difficulty": 2
+    },
+    {
+      "id": "a-98c4be83",
+      "text": "i need to settle the debt\ni owe you money\n\ncan you tell me how much i owe, do you have a figure, is it still 50, are we square if i pay that, will that cover it",
+      "source": "ai",
+      "tell": "Asks the same question four ways in a row; a person asks once.",
+      "durationMs": 12500,
+      "difficulty": 2
+    },
+    {
+      "id": "a-9e7e1e60",
+      "text": "Please update the list with the latest data and send me contact details or setup instructions for accessing the system. Need this today.",
+      "source": "ai",
+      "tell": "Contact details or setup instructions for accessing the system is generic; no real system is named.",
+      "durationMs": 8750,
+      "difficulty": 2
+    },
+    {
+      "id": "a-b566378b",
+      "text": "hey, is this Alex or Morgan who sent the email about the meeting agenda? I'm a bit confused because the name isn't clear in the signature.",
+      "source": "ai",
+      "tell": "The name isn't clear in the signature explains the confusion neatly; a person would just ask.",
+      "durationMs": 9500,
+      "difficulty": 2
+    },
+    {
+      "id": "a-c2527234",
+      "text": "Can you clarify if this count as an obligation? I didn't see it in the original agreement.",
+      "source": "ai",
+      "tell": "Original agreement is generic filler; there is no detail a real colleague would need.",
+      "durationMs": 7250,
+      "difficulty": 2
+    },
+    {
+      "id": "a-d15632cb",
+      "text": "Any updates from wholesale clients on feedback regarding their trading mandates or exposure stance? Pls send comments from Alex, Morgan, and Casey if available. Need the latest info for an upcoming review. Thx for swift replies.",
+      "source": "ai",
+      "tell": "Trading mandates or exposure stance parrots the topic; thx for swift replies thanks nobody in particular.",
+      "durationMs": 12000,
+      "difficulty": 2
+    },
+    {
+      "id": "a-f1490c07",
+      "text": "The revised proposal looks good. I approve and am ready to proceed with the next steps.",
+      "source": "ai",
+      "tell": "Approves without naming one thing about the proposal; a person mentions what they liked.",
+      "durationMs": 7000,
+      "difficulty": 2
+    },
+    {
+      "id": "h-0117a287",
+      "text": "Hey Alex, give me a call when you get a chance so we can chat about this.\nAlso, send me your phone number.  I can't find it.",
+      "source": "human",
+      "tell": "Admitting you lost someone's number is a small human confession a model would not add.",
+      "durationMs": 9750,
+      "difficulty": 2
+    },
+    {
+      "id": "h-28e7c18b",
+      "text": "What's your preference today?  I can either meet you at our house, or pick up\nAlex at your place.",
+      "source": "human",
+      "tell": "Our house and your place assume shared context; a model explains, a person just refers.",
+      "durationMs": 7750,
+      "difficulty": 2
+    },
+    {
+      "id": "h-41a0c062",
+      "text": "i'm definitely interested in the movie/dinner (i have a couple things in mind) but it probably won't be till around 8 o'clock or so...if that's ok with you.",
+      "source": "human",
+      "tell": "Lowercase, brackets and till around 8 o'clock or so: hedged plans typed by a real person.",
+      "durationMs": 10000,
+      "difficulty": 2
+    },
+    {
+      "id": "h-474f6f54",
+      "text": "I am very interested in what the wholesale customers have to say about our issues.  Do they have a mandate to not trade, are they wanting to turn down their exposures etc. If any customers say this, then let me know.\n\nPls keep me posted.",
+      "source": "human",
+      "tell": "Are they wanting to turn down their exposures etc is loose speech written down, not prose.",
+      "durationMs": 14250,
+      "difficulty": 2
+    },
+    {
+      "id": "h-59339a57",
+      "text": "I discussed this issue Friday with Alex, however, since it is an issue I am\nnot entirely knowledgeable about, I think Alex should run this by you...",
+      "source": "human",
+      "tell": "Trails off with an ellipsis after passing the buck; a person dodging responsibility, in writing.",
+      "durationMs": 9750,
+      "difficulty": 2
+    },
+    {
+      "id": "h-5993150e",
+      "text": "Thanks for your comments on the agreement.  As an FYI, the stock awards\nalready have been made, so we had to soften the language in the agreement to\naddress that situation.\n\nI appreciate your other thoughts.\n\nAlex, could you or someone in your group help me in putting together an\nexample as suggested by Sam?",
+      "source": "human",
+      "tell": "Two topics and two people addressed in one message: an internal thread, not a composed note.",
+      "durationMs": 15000,
+      "difficulty": 2
+    },
+    {
+      "id": "h-66f50b28",
+      "text": "Alex said that this is a revival of the product that was worked on\nlong ago and never finalized.  Do you remember what our concerns were?  I\nhave sleep since then and do not remember.",
+      "source": "human",
+      "tell": "I have sleep since then is a garbled phrase a person leaves in; a model fixes its grammar.",
+      "durationMs": 11750,
+      "difficulty": 2
+    },
+    {
+      "id": "h-824b1a4b",
+      "text": "I am sending you a draft of the outline  of the course on energy derivatives.\nI would  appreciate your comments before I finalize it.\n\nBy the way, did we agree on the time schedule for the class?\nTuesday or Thursday evening would work for me.",
+      "source": "human",
+      "tell": "By the way changes subject mid-message to scheduling; a human afterthought.",
+      "durationMs": 14250,
+      "difficulty": 2
+    },
+    {
+      "id": "h-879dad4b",
+      "text": "keep me posted on the trip.  i probably need to plan it soon so that i can plan for vacation time.",
+      "source": "human",
+      "tell": "Plan it soon so I can plan: the clumsy repetition of a person typing, not composing.",
+      "durationMs": 8250,
+      "difficulty": 2
+    },
+    {
+      "id": "h-888c5c65",
+      "text": "Alex sent me this draft today, but I think that you should review these slides since I know that you have been working on this.  Let's discuss in the morning.  Tuesday is my last day before I leave on vacation.\n\nThanks, Sam.",
+      "source": "human",
+      "tell": "Mentions their own holiday as a deadline; a personal constraint models rarely invent.",
+      "durationMs": 13500,
+      "difficulty": 2
+    },
+    {
+      "id": "h-ab43b3b7",
+      "text": "Also, can you provide for him a report on what systems his group currently has and whether or not there is an opportunity to reduce some of his costs by using the system that you set me up with.\n\nNo need to reply, pls contact Alex.",
+      "source": "human",
+      "tell": "No need to reply, pls contact Alex ends a request abruptly; models close politely.",
+      "durationMs": 14500,
+      "difficulty": 2
+    },
+    {
+      "id": "h-b168ea90",
+      "text": "looking forward to the call.  i'll only have 60 minutes max, however, so\ncounting on you to facilitate forcefully.",
+      "source": "human",
+      "tell": "Facilitate forcefully is an odd personal turn of phrase; models pick the expected word, people pick the funny one.",
+      "durationMs": 7750,
+      "difficulty": 2
+    },
+    {
+      "id": "h-bc2c23e6",
+      "text": "are you guys having trouble pulling the hourly iso data?  if not, let me know\nso i can get this query fixed.  it is missing data for certain days and data\nfor imports/exports.  thanks for your help.",
+      "source": "human",
+      "tell": "If not, let me know is backwards logic a rushed person types and a model would tidy.",
+      "durationMs": 12250,
+      "difficulty": 2
+    },
+    {
+      "id": "h-c1edb748",
+      "text": "i didn't get around to calling you this weekend, but am hoping to touch base this week.  ok to give a call in the evenings?  i'm beginning to think about this as a long term project and look forward to hearing your thoughts.",
+      "source": "human",
+      "tell": "Admits not getting round to a call, then asks permission to phone in the evenings. Specific and human.",
+      "durationMs": 13750,
+      "difficulty": 2
+    },
+    {
+      "id": "h-e0199383",
+      "text": "If no dinner then we can just pick someplace relatively low key to hang out and chat...Sorry Alex, no downtown clubbing for you.",
+      "source": "human",
+      "tell": "An inside joke aimed at one person; the teasing only lands if you know Alex.",
+      "durationMs": 8750,
+      "difficulty": 2
+    },
+    {
+      "id": "h-f4ed4532",
+      "text": "Attached for your review and commentary is a copy of the draft review I\nprepared for Alex.  I would appreciate your views and please make changes\nyou feel are necessary and appropriate.  It is set up for Thursday morning at\n9 am.  I could use your help.\n\n What do you think?",
+      "source": "human",
+      "tell": "I could use your help. What do you think? repeats the ask; a person underlining, not a model.",
+      "durationMs": 15000,
+      "difficulty": 2
+    },
+    {
+      "id": "a-0605e2fb",
+      "text": "when might you have some time this week to chat about project x and what it means down the line. i need to get your thoughts on a few things. does monday or tuesday work for you.",
+      "source": "ai",
+      "tell": "Project x is a placeholder and what it means down the line says nothing; empty but fluent.",
+      "durationMs": 12250,
+      "difficulty": 3
+    },
+    {
+      "id": "a-086bc494",
+      "text": "morgan is handling the trip and i need to know what she has planned so far\nshe should send me her updates",
+      "source": "ai",
+      "tell": "No punctuation at all but perfectly ordered clauses; sloppiness applied evenly is a model's.",
+      "durationMs": 8500,
+      "difficulty": 3
+    },
+    {
+      "id": "a-1113b5cf",
+      "text": "got the file from Jordan. put it on the shared drive by end of day.",
+      "source": "ai",
+      "tell": "Two flawless clipped sentences with no reason given; people usually say why.",
+      "durationMs": 6750,
+      "difficulty": 3
+    },
+    {
+      "id": "a-3a0bd68f",
+      "text": "update the report by eod. fix the typos in section three.\n\nreschedule the meeting with alex. use next wednesday.",
+      "source": "ai",
+      "tell": "Four instructions of identical shape, each a tidy imperative; people ramble, models list.",
+      "durationMs": 7750,
+      "difficulty": 3
+    },
+    {
+      "id": "a-4527221c",
+      "text": "Sam, send over the agenda and dial-in for the call. Also need the prep details from you, like whether there's a specific deck to read, or any shared notes.",
+      "source": "ai",
+      "tell": "Like whether there's a specific deck to read lists examples for the reader; models illustrate.",
+      "durationMs": 10250,
+      "difficulty": 3
+    },
+    {
+      "id": "a-bc2eb809",
+      "text": "Hi Alex I need to discuss the draft message could we have a quick call if you send me your number.",
+      "source": "ai",
+      "tell": "The draft message is vague where a person names the thing; the run-on is too orderly.",
+      "durationMs": 8250,
+      "difficulty": 3
+    },
+    {
+      "id": "a-d424c8f8",
+      "text": "our hourly iso data pulls are failing again. the files just aren't showing up in the sftp location.\n\ncan you check the auth or job status on your end. something is definately wrong with the feed.",
+      "source": "ai",
+      "tell": "Definately is the only slip in an otherwise polished diagnosis; a planted typo.",
+      "durationMs": 12000,
+      "difficulty": 3
+    },
+    {
+      "id": "a-f774305c",
+      "text": "Hey Alex, can we push our lunch back a bit. Something came up. What time works for you.",
+      "source": "ai",
+      "tell": "Every sentence is a complete balanced clause; a real something came up is messier.",
+      "durationMs": 7500,
+      "difficulty": 3
+    },
+    {
+      "id": "h-1078f2dd",
+      "text": "Could you let me know if you receive this?  I've been sending you emails\nlately and, having gotten no response, am concerned about whether there's\nsome sort of problem on my end, your end, or both.  Thanks very much.",
+      "source": "human",
+      "tell": "Worrying that emails are vanishing is a specific, slightly anxious human situation.",
+      "durationMs": 12750,
+      "difficulty": 3
+    },
+    {
+      "id": "h-15da8116",
+      "text": "I have your name written on a piece of paper.  Do I owe you a call?",
+      "source": "human",
+      "tell": "A scrap of paper and a half-remembered promise: a real, specific situation no prompt would invent.",
+      "durationMs": 7000,
+      "difficulty": 3
+    },
+    {
+      "id": "h-30171280",
+      "text": "Alex asked me to get with you and coordinate any outage planning input that you need from our group.  Please let me know how I can be of assistance.\n\nThanks, Sam.",
+      "source": "human",
+      "tell": "Get with you is regional office speech; models default to meet with you.",
+      "durationMs": 10750,
+      "difficulty": 3
+    },
+    {
+      "id": "h-30ff5517",
+      "text": "We have a conference call scheduled for tomorrow.  What is the specific topic of discussion and do we need to prepare anything and forward it to you for that discussion.",
+      "source": "human",
+      "tell": "A question with no question mark and a clause bolted on the end: typed, not composed.",
+      "durationMs": 10500,
+      "difficulty": 3
+    },
+    {
+      "id": "h-4b728985",
+      "text": "I was about to call you. I have an emergency here.\nCan we push the lunch to Friday?",
+      "source": "human",
+      "tell": "Three short blunt sentences and no apology: someone in a hurry, not a model being polite.",
+      "durationMs": 7500,
+      "difficulty": 3
+    },
+    {
+      "id": "h-5529bb7b",
+      "text": "Alex has requested that we set you up with signature authority for\ndevelopment documents.  How do you want you name to read on the corporate\ndocuments?",
+      "source": "human",
+      "tell": "How do you want you name to read drops the r in your; a genuine typo.",
+      "durationMs": 9500,
+      "difficulty": 3
+    },
+    {
+      "id": "h-746fca23",
+      "text": "This sounds better than the limitations you were describing in the meeting.  We should be able to work with this.",
+      "source": "human",
+      "tell": "Refers to the meeting with no explanation; only someone who was there writes like this.",
+      "durationMs": 8000,
+      "difficulty": 3
+    },
+    {
+      "id": "h-f22c18cd",
+      "text": "Let's see if we can update this list somehow. Let me know who I can contact\nfor this or how we can set this up.",
+      "source": "human",
+      "tell": "Somehow is vague on purpose; a person delegates the how, a model would spell out steps.",
+      "durationMs": 9250,
+      "difficulty": 3
+    }
+  ],
+  "reviewedAt": "2026-09-15"
 }

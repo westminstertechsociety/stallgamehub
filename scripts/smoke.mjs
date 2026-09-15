@@ -149,6 +149,34 @@ check(await until(() => display.latest?.phase === 'RESULTS', 8000), 'match decid
 check(display.latest?.results?.winner === 'P1', 'P1 wins the match')
 const how2 = await nameIfAsked(p1)
 check(await until(() => display.latest?.results?.entries?.length === 1, 3000), `head-to-head on the leaderboard: ${display.latest?.results?.entries?.[0]?.scoreText ?? '?'} (${how2})`)
+console.log('human-or-ai')
+control.emit('control:cmd', { cmd: 'forceAttract' })
+control.emit('control:cmd', { cmd: 'selectGame', gameId: 'human-or-ai' })
+await sleep(300)
+await tap(p1)
+await sleep(250)
+if (quick) {
+  await tap(p1)
+  await sleep(200)
+  await tap(p2)
+} else {
+  await pickOption(p1, 'versus')
+  await pickOption(p2, 'versus')
+}
+check(await until(() => display.latest?.phase === 'PLAYING', 6000), 'human or ai round starts')
+check((display.latest?.game?.total ?? 0) > 0, `deck loaded: ${display.latest?.game?.total} items in the match`)
+// P1 buzzes on every item, P2 stays silent: the match resolves either way and P1 gets every AI item right.
+let items = 0
+while (display.latest?.phase === 'PLAYING' && items < 12) {
+  const idx = display.latest.game.index
+  await sleep(600)
+  await tap(p1)
+  await until(() => display.latest?.phase !== 'PLAYING' || display.latest?.game?.index !== idx, 30000)
+  items++
+}
+check(await until(() => display.latest?.phase === 'RESULTS', 8000), `nine items played (${items})`)
+check(display.latest?.results?.headline?.length > 0, `headline: ${display.latest?.results?.headline}`)
+
 const voiceRes = await fetch(URL + '/voice/manifest.json').catch(() => null)
 check(voiceRes?.ok, 'narrator manifest served')
 const manifest = voiceRes?.ok ? await voiceRes.json() : null

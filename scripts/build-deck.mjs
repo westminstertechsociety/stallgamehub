@@ -371,15 +371,14 @@ async function availableModels(preferred) {
   return found
 }
 
+// Non-thinking models only: reasoning models spend the small token budget on hidden thoughts and return nothing.
 const GENERATORS = [
-  'deepseek/deepseek-v4.1-flash',
-  'qwen/qwen3.7-flash',
-  'z-ai/glm-5.3-flash',
+  'deepseek/deepseek-v4-flash-0731',
   'google/gemini-2.5-flash-lite',
   'openai/gpt-4.1-nano',
   'mistralai/mistral-small-3.2-24b-instruct',
   'meta-llama/llama-3.3-70b-instruct',
-  'deepseek/deepseek-v4-flash-0731',
+  'deepseek/deepseek-chat-v3.1',
 ]
 const JUDGES = ['deepseek/deepseek-v4.1-flash', 'google/gemini-2.5-flash-lite', 'openai/gpt-4.1-nano', 'qwen/qwen3.7-flash', 'z-ai/glm-5.3-flash']
 const TELL_MODEL = ['anthropic/claude-haiku-4.5', 'anthropic/claude-3-haiku']
@@ -389,11 +388,53 @@ const STYLES = [
   'friendly and slightly rushed, a greeting, no sign-off',
   'plain and neutral, short sentences, no greeting',
   'a little over-formal, full sentences, polite close',
-  'chatty, one exclamation mark, a fragment or two',
-  'clipped bullet-like phrasing without bullets, abbreviations like pls and thx',
-  'apologetic tone, one run-on sentence',
-  'brisk manager voice, an instruction and a deadline',
+  'chatty, at most one exclamation mark, a fragment or two',
+  'clipped phrasing, abbreviations like pls and thx, no greeting',
+  'apologetic tone, one run-on sentence, no sign-off',
+  'brisk manager voice, an instruction and a deadline, no pleasantries',
+  'trailing off with an ellipsis somewhere, lowercase, no greeting',
+  'mildly annoyed but polite, two sentences, no greeting',
 ]
+
+// Phrases that give a model away on sight. Any of these and the draft is thrown out.
+const BANNED = /\b(just wanted to|hope (?:you're|you are|this finds you)|i hope you|looking forward to|thanks for understanding|thank you for your understanding|let me know if you (?:have any|need anything)|don't hesitate|feel free|circle back|align|touch base|reach out|going forward|at your earliest convenience|kindly|as per|please find|wanted to check in|checking in|quick (?:update|question|rundown)|heads[- ]up|happy to|excited to|thrilled|awesome|fantastic|wonderful|appreciate your|your (?:hard work|dedication|patience|input is)|it truly|truly|solid work|great work|absolutely|totally|definitely|super\b|bunch|hop on|game plan|bandwidth|deep dive|leverage|streamline|robust|delve|navigate|landscape|crucial|ensure|utilize|facilitate|additionally|furthermore|moreover|in conclusion|to summarize)\b/i
+
+/** Straight quotes, plain dashes: the typography a 2001 email client produced. */
+function normalise(text) {
+  return text
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/[\u201c\u201d]/g, '"')
+    .replace(/\u2026/g, '...')
+    .replace(/\s*[\u2014\u2013]\s*/g, (m) => (m.trim() ? ', ' : ' - '))
+    .replace(/[\u00a0]/g, ' ')
+    .replace(/\*\*/g, '')
+    .replace(/[ \t]+\n/g, '\n')
+    .trim()
+}
+
+/** Any capitalised name outside the neutral pool becomes one from the pool. */
+function poolNames(text) {
+  const known = new Set(NEUTRAL)
+  let k = 0
+  return text.replace(/\b([A-Z][a-z]{2,})\b(?=[,!.\s]|$)/g, (m, w, off) => {
+    if (known.has(w)) return w
+    const atStart = off === 0 || /[.!?]\s*$/.test(text.slice(0, off))
+    if (atStart || !FIRST_NAMES.has(w.toLowerCase())) return m
+    return NEUTRAL[k++ % NEUTRAL.length]
+  })
+}
+
+function shapeOf(text, reg) {
+  const bits = []
+  bits.push(reg.lower ? 'entirely lowercase' : 'normal capitalisation')
+  bits.push(reg.greeting ? 'opens with a greeting' : 'no greeting')
+  bits.push(/[!]/.test(text) ? `${(text.match(/!/g) ?? []).length} exclamation mark(s)` : 'no exclamation marks')
+  bits.push(/\.\.\./.test(text) ? 'uses an ellipsis' : 'no ellipsis')
+  bits.push(/\?/.test(text) ? 'asks a question' : 'no question')
+  bits.push(`${(text.match(/[.!?](\s|$)/g) ?? []).length} sentences`)
+  bits.push(reg.lines > 2 ? 'two short paragraphs' : 'one paragraph')
+  return bits.join(', ')
+}
 
 async function generateAi(humans) {
   const cache = path.join(work, 'ai.json')
@@ -406,80 +447,88 @@ async function generateAi(humans) {
     if (existing[h.id]?.text) continue
     const n = h.register.words
     const style = STYLES[Math.floor(rand() * STYLES.length)]
-    const model = models[i++ % models.length]
-    const temperature = 0.7 + rand() * 0.6
-    // Step 1: describe the purpose without copying, so the counterpart shares domain and register.
+    const temperature = 0.8 + rand() * 0.5
     const brief = await chat(
-      model,
+      models[i % models.length],
       [
         {
           role: 'system',
-          content: 'You describe short workplace emails. Reply with one line: the purpose of the message and its tone, no names, no quoting.',
+          content: 'You describe short workplace emails. Reply with one line: the purpose of the message, no names, no quoting, no judgement of quality.',
         },
         { role: 'user', content: h.text },
       ],
       { temperature: 0.3, max_tokens: 80 },
     )
-    // Step 2: write a new one with the same purpose and length.
-    const prompt = `Write the body of a short workplace email with this purpose: ${brief.trim()}
-Constraints: exactly ${n} words, give or take 2. Style: ${style}. Use ordinary first names only if you must (Alex, Sam, Jordan, Taylor, Morgan, Casey). No subject line, no company names, no dates, no prices, no phone numbers, no links, nothing about 2001. ${h.register.lines > 2 ? 'Use two short paragraphs.' : 'One paragraph.'} Do not mention AI, machines or writing. Output only the email body.`
+    const prompt = `Write the body of a short internal email with this purpose: ${brief.trim()}
+Shape to match: ${shapeOf(h.text, h.register)}. Length: ${n} words, give or take 2.
+Voice: ${style}. This is a real person typing quickly to a colleague they know. Sound plain and specific, not polished. Do not be helpful or warm. No pleasantries, no "hope you are well", no "let me know if", no "looking forward", no "just wanted to". Straight quotes, no dashes. Use first names from this list only if you need one: Alex, Sam, Jordan, Taylor, Morgan, Casey. No subject line, no company names, no dates, no prices, no phone numbers, no links. Output only the email body.`
     let best = null
-    for (let attempt = 0; attempt < 3; attempt++) {
-      const out = (await chat(model, [{ role: 'user', content: prompt }], { temperature, max_tokens: 220 }))
-        .replace(/^["“]|["”]$/g, '')
-        .replace(/^subject:.*\n/i, '')
-        .trim()
+    for (let attempt = 0; attempt < 5; attempt++) {
+      const m = models[(i + attempt) % models.length]
+      let out = await chat(m, [{ role: 'user', content: prompt }], { temperature, max_tokens: 300 })
+      out = poolNames(normalise(out.replace(/^["“]|["”]$/g, '').replace(/^subject:.*\n/i, '').trim()))
       const wn = words(out).length
-      const score = Math.abs(wn - n) + (/\bAI\b|language model|assistant/i.test(out) ? 100 : 0) + (FORMAT_SKIP.test(out) ? 50 : 0)
-      if (!best || score < best.score) best = { out, score, wn }
+      if (wn === 0) continue
+      const banned = BANNED.test(out)
+      const score = Math.abs(wn - n) + (banned ? 20 : 0) + (/\bAI\b|language model|assistant/i.test(out) ? 100 : 0) + (FORMAT_SKIP.test(out) ? 50 : 0)
+      if (!best || score < best.score) best = { out, score, wn, model: m }
       if (best.score <= 2) break
     }
-    if (!best || best.score >= 50 || best.wn < 15 || best.wn > 60) {
-      log(`  ${h.id}: could not match (${best?.wn} words), skipping`)
+    i++
+    if (!best || best.score >= 20 || best.wn < 15 || best.wn > 60) {
+      log(`  ${h.id}: no clean match (${best?.wn ?? 0} words, score ${best?.score}), skipping`)
       continue
     }
-    existing[h.id] = { id: `a-${sha(best.out)}`, text: best.out, source: 'ai', model, style, temperature: Math.round(temperature * 100) / 100, pairedWith: h.id }
+    existing[h.id] = { id: `a-${sha(best.out)}`, text: best.out, source: 'ai', model: best.model, style, temperature: Math.round(temperature * 100) / 100, pairedWith: h.id }
     writeJson(cache, existing)
-    log(`  ${h.id} -> ${existing[h.id].id} via ${model} (${best.wn} words) $${spent.toFixed(3)} so far`)
+    log(`  ${h.id} -> ${existing[h.id].id} via ${best.model} (${best.wn} words) $${spent.toFixed(3)} so far`)
   }
   return existing
 }
 
 // ------------------------------------------------------------------ calibration: cheap judges guess, difficulty follows
 
-async function calibrate(items) {
+async function calibrate(humans, ai) {
+  // Pairwise: each judge sees the human item and its counterpart and must name the machine. Single-item
+  // judgements are useless here (cheap models call everything human); pairs give a real signal.
   const cache = path.join(work, 'votes.json')
   const votes = readJson(cache, {})
   const judges = await availableModels(JUDGES)
   log(`judges: ${judges.join(', ')}`)
-  for (const it of items) {
-    votes[it.id] ||= {}
+  const rand = mulberry32(99)
+  for (const h of humans) {
+    const a = ai[h.id]
+    if (!a) continue
+    votes[h.id] ||= {}
     for (const j of judges) {
-      if (votes[it.id][j]) continue
+      if (votes[h.id][j]) continue
+      const aiFirst = rand() < 0.5
+      const [first, second] = aiFirst ? [a.text, h.text] : [h.text, a.text]
       const out = await chat(
         j,
         [
           {
             role: 'system',
-            content: 'You are judging whether a short email was written by a person or generated by a language model. Answer with exactly one word: human or ai.',
+            content: 'Two short emails. Exactly one was generated by a language model, the other was typed by a person. Answer with exactly one letter, A or B, for the machine-written one.',
           },
-          { role: 'user', content: it.text },
+          { role: 'user', content: `A:\n${first}\n\nB:\n${second}` },
         ],
-        { temperature: 0, max_tokens: 5 },
+        { temperature: 0, max_tokens: 3 },
       )
-      votes[it.id][j] = /\bai\b/i.test(out) ? 'ai' : 'human'
+      const pick = /\bB\b/i.test(out) ? 'B' : 'A'
+      votes[h.id][j] = (pick === 'A') === aiFirst ? 'right' : 'wrong'
     }
     writeJson(cache, votes)
   }
-  log(`calibrated ${items.length} items, $${spent.toFixed(3)} spent`)
+  log(`calibrated ${humans.length} pairs, $${spent.toFixed(3)} spent`)
   return votes
 }
 
-function difficultyFrom(item, votes) {
-  const v = Object.values(votes[item.id] ?? {})
+function difficultyFrom(pairId, votes) {
+  const v = Object.values(votes[pairId] ?? {})
   if (v.length === 0) return 2
-  const right = v.filter((x) => x === item.source).length / v.length
-  return right >= 0.99 ? 1 : right >= 0.5 ? 2 : 3
+  const right = v.filter((x) => x === 'right').length / v.length
+  return right >= 0.99 ? 1 : right >= 0.6 ? 2 : 3
 }
 
 // ------------------------------------------------------------------ tells: drafted by a small Claude, edited by hand
@@ -528,8 +577,7 @@ function assemble(humans, ai, votes, tells) {
         // Hand-edited tells in the existing deck win over fresh drafts.
         tell: old?.tell || tells[it.id] || '',
         durationMs: old?.durationMs ?? Math.round(Math.min(15, Math.max(6, 3 + n * 0.25)) * 1000),
-        difficulty: old?.difficulty ?? difficultyFrom(it, votes),
-        domain: it.style ? undefined : undefined,
+        difficulty: old?.difficulty ?? difficultyFrom(h.id, votes),
       })
     }
   }
@@ -554,7 +602,7 @@ if (want('--generate') && (explicit || Object.keys(ai).length < humans.length)) 
 const paired = humans.filter((h) => ai[h.id])
 const all = [...paired, ...paired.map((h) => ai[h.id])]
 let votes = readJson(path.join(work, 'votes.json'), {})
-if (want('--calibrate') && (explicit || Object.keys(votes).length < all.length)) votes = await calibrate(all)
+if (want('--calibrate') && (explicit || Object.keys(votes).length < paired.length)) votes = await calibrate(paired, ai)
 
 let tells = readJson(path.join(work, 'tells.json'), {})
 if (want('--tells') && (explicit || Object.keys(tells).length < all.length)) tells = await draftTells(all)
