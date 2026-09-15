@@ -57,6 +57,8 @@ export const hubConfigSchema = z.object({
     .object({
       keepPerVariant: z.number().int().min(1).default(50),
       showTop: z.number().int().min(1).default(8),
+      /** Ask winners for three-letter initials. Off by default: no personal data is collected. */
+      names: z.boolean().default(false),
     })
     .prefault({}),
 })

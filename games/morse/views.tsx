@@ -209,7 +209,7 @@ function Player({ view, seat, held, builtAt, serverNow, reducedMotion }: GamePla
   } else if (view.wrong && gameNow - view.wrong.at < 2500) {
     status = (
       <p className="play-lead morse-wrong" key={view.wrong.at}>
-        That was {view.wrong.got}. {view.learn ? 'Try again.' : `Need ${view.wrong.expected}.`}
+        That was {view.wrong.got}. {view.learn ? 'Try again.' : 'Back to the start of the word.'}
       </p>
     )
   } else if (view.learn) {

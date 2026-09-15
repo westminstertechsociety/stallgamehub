@@ -187,7 +187,7 @@ export default function ControlPage() {
         <div className="control-lb">
           {view.leaderboard.map((e) => (
             <span key={e.id} style={{ display: 'contents' }}>
-              <span>{e.name}</span>
+              <span>{e.name || '—'}</span>
               <span>{view.variants.find((v) => v.id === e.variantId)?.label ?? e.variantId}</span>
               <span>{e.scoreText}</span>
             </span>

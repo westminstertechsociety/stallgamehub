@@ -877,10 +877,27 @@ function enterResults(ctx: Ctx, outcome: GameOutcome) {
   const game = ctx.game
   const variant = game.variants.find((v) => v.id === round.variantId)
   const naming: Partial<Record<Seat, NamingState>> = {}
+  const entries: LeaderboardEntry[] = []
   for (const seat of round.participants) {
     const s = st.seats[seat]
     const so = outcome.seats[seat]
-    if (variant?.scored && so?.qualifies && s.connected) {
+    if (variant?.scored && so?.qualifies && !ctx.deps.config.leaderboard.names) {
+      // No initials are collected: the score goes on the board anonymously, right now.
+      const entry: LeaderboardEntry = {
+        id: ctx.deps.newId(),
+        name: '',
+        score: so.score,
+        scoreText: so.scoreText,
+        gameId: st.gameId,
+        variantId: round.variantId,
+        mode: round.mode,
+        at: ctx.now,
+        detail: so.detail,
+      }
+      entries.push(entry)
+      ctx.effects.push({ type: 'leaderboard.add', entry })
+      s.presence = 'done'
+    } else if (variant?.scored && so?.qualifies && s.connected) {
       const capAt = ctx.now + ctx.t.namingCapMs
       naming[seat] = { letters: [0, 0, 0], cursor: 0, capAt, deadline: capAt }
       s.presence = 'naming'
@@ -901,7 +918,7 @@ function enterResults(ctx: Ctx, outcome: GameOutcome) {
     seed: round.seed,
     holdEndsAt: anyNaming ? null : ctx.now + ctx.t.resultsHoldMs,
     naming,
-    entries: [],
+    entries,
     offer: null,
     restartAfter: ctx.now + ctx.t.resultsMinMs,
   }

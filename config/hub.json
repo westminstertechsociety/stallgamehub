@@ -37,6 +37,7 @@
   "highWash": false,
   "leaderboard": {
     "keepPerVariant": 50,
-    "showTop": 8
+    "showTop": 8,
+    "names": false
   }
 }

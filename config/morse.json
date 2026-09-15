@@ -5,7 +5,7 @@
   "wordGapUnits": 7,
   "maxSymbolsPerLetter": 6,
   "stuckPressUnits": 10,
-  "bestOf": 3,
+  "bestOf": 10,
   "wordTimeLimitMs": 45000,
   "betweenWordsMs": 2500,
   "streamLength": 8,

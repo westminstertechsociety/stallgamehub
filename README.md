@@ -141,7 +141,7 @@ Everything is in `config/morse.json`, in units of `unitMs` (200 ms by default).
 | `wordGapUnits` | 7 | Silence this long highlights the next letter on the cheat sheet. |
 | `maxSymbolsPerLetter` | 6 | A letter with this many symbols is committed whatever it is. |
 | `stuckPressUnits` | 10 | A press longer than this is thrown away (a bag on the space bar). |
-| `bestOf` | 3 | Words per match. |
+| `bestOf` | 10 | Words per match (head-to-head ends when one player has won six). |
 | `wordTimeLimitMs` | 45000 | Nobody finishes in this time: the word ends. |
 | `betweenWordsMs` | 2500 | Pause after a word before the next one. |
 | `learn.letterGapUnits` | 5 | Learn mode gets longer gaps. |
@@ -154,15 +154,15 @@ Too easy, or good players are waiting for letters to commit: lower `letterGapUni
 
 Dots and dashes feel inverted for fast tappers: lower `dotMaxUnits` to 0.8. For slow, careful people raise it to 1.2.
 
-Rounds drag: lower `bestOf` to 1 or `wordTimeLimitMs` to 30000.
+Rounds drag: lower `bestOf` to 5 or `wordTimeLimitMs` to 30000.
 
-A wrong letter is never appended. It flashes on the player's screen with the letter they made and the one needed, and they try again, so progress on the projector is always the correct prefix. Play a round in Learn mode with someone who has never seen Morse before you tune anything: that is the audience.
+A wrong letter is never appended: it flashes on the player's screen with the letter they made, and their word resets to nothing, so progress on the projector is always a correct prefix keyed without a mistake. Play a round in Learn mode with someone who has never seen Morse before you tune anything: that is the audience.
 
 To seed ghosts, play a few Time attack rounds yourself before the fair. The fastest run per word is kept in `data/game-data.json` and replayed in the second lane of Ghost race.
 
 ## Leaderboard and data
 
-`data/leaderboard.json`, `data/game-data.json` (ghost runs) and `data/session.json` survive restarts. Every write goes to a temp file, is synced, then renamed into place, with the previous version kept as `.bak`. If a file is ever damaged the backup is loaded and the damaged copy is kept as `.corrupt-<time>`. "Clear leaderboard" and "Clear ghosts" on `/control` reset them; deleting a file while the hub is stopped also resets it (a missing file is treated as deliberate, so the backup is not restored). `http://HOST-IP:3000/api/leaderboard` returns the whole leaderboard as JSON if you want to show it elsewhere.
+No initials or names are collected: the leaderboard holds anonymous times only (`leaderboard.names` in `config/hub.json` turns the three-letter entry back on if you ever want it). `data/leaderboard.json`, `data/game-data.json` (ghost runs) and `data/session.json` survive restarts. Every write goes to a temp file, is synced, then renamed into place, with the previous version kept as `.bak`. If a file is ever damaged the backup is loaded and the damaged copy is kept as `.corrupt-<time>`. "Clear leaderboard" and "Clear ghosts" on `/control` reset them; deleting a file while the hub is stopped also resets it (a missing file is treated as deliberate, so the backup is not restored). `http://HOST-IP:3000/api/leaderboard` returns the whole leaderboard as JSON if you want to show it elsewhere.
 
 ## Pre-fair checklist
 

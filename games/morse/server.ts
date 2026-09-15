@@ -280,8 +280,10 @@ function applyEvents(s: MorseState, l: Lane, events: DecoderEvent[], gameNow: nu
       l.wrong = null
       if (l.committed === s.word) l.doneMs = gameNow - s.wordStartedAt
     } else {
+      // A wrong letter sends the player back to the start of the word.
       g.ok = false
       l.wrong = { got: ev.letter, expected, at: gameNow }
+      l.committed = ''
     }
   }
 }

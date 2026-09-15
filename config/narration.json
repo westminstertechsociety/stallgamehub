@@ -15,8 +15,8 @@
       "Just you for now. We will start with a lesson. Anyone who joins the other seat turns this into a race."
     ],
     "countdown.versus": [
-      "Two players. Head-to-head it is. Same word, first to key it wins.",
-      "Two of you. Excellent. Same word on the projector, first one to key it in Morse takes it."
+      "Two players. Head-to-head it is. Same word, first to key it wins. Best of ten.",
+      "Two of you. Excellent. Same word on the projector, first one to key it in Morse takes it. First to six."
     ],
     "learn.start": [
       "Learn mode. One letter at a time. A short press is a dot, a long press is a dash. The projector is patient, take your time.",
@@ -31,25 +31,34 @@
       "And the next one.",
       "Keep going, one more word."
     ],
-    "won.P1": ["Player one takes it.", "That one goes to player one."],
-    "won.P2": ["Player two takes it.", "That one goes to player two."],
-    "won.ghost": ["The ghost takes it. It has had a lot of practice.", "The ghost wins that word. Ghosts do not get nervous."],
+    "won.P1": [
+      "Player one takes it.",
+      "That one goes to player one."
+    ],
+    "won.P2": [
+      "Player two takes it.",
+      "That one goes to player two."
+    ],
+    "won.ghost": [
+      "The ghost takes it. It has had a lot of practice.",
+      "The ghost wins that word. Ghosts do not get nervous."
+    ],
     "wrong": [
-      "Not quite. Have another go.",
-      "Close, but that was a different letter. Try again.",
-      "That was not the letter we needed. The cheat sheet is right there."
+      "Not quite. Back to the start of the word.",
+      "That was a different letter. The word starts again, have another go.",
+      "Wrong letter, so the word resets. The cheat sheet is right there."
     ],
     "hotjoin": [
       "A second player has appeared. Hold space on the other laptop to play head-to-head.",
       "Someone new at the other seat. Hold space to challenge them."
     ],
     "results.solo": [
-      "Round over. Enter three letters for the leaderboard: tap space to change a letter, hold to confirm it.",
-      "Done. Put your initials on the board: tap space to pick a letter, hold to lock it in."
+      "Round over. Your time is on the board. Press space to play again.",
+      "Done. That one is on the leaderboard. Press space for another go."
     ],
     "results.versus": [
-      "Match over. Winner, enter your initials. Runner up, there is always a rematch.",
-      "That is the match. Winner, three letters for the leaderboard please."
+      "Match over. Winner, your time is on the board. Runner up, there is always a rematch.",
+      "That is the match. The winner's time goes on the leaderboard. Press space to play again."
     ],
     "results.learn": [
       "That is the end of the lesson. Fancy a race? Press space to play again.",

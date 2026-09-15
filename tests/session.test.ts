@@ -18,8 +18,9 @@ const config = hubConfigSchema.parse({
   attract: {},
   motion: {},
   audio: {},
-  leaderboard: {},
-  // Most tests exercise the option picker; quick start has its own test below.
+  // Most tests exercise initials entry and the option picker; the fair defaults (no names, quick start)
+  // have their own tests below.
+  leaderboard: { names: true },
   lobby: { quickStart: false, soloVariant: 'solo' },
 })
 
@@ -536,4 +537,21 @@ test('quick start: one tap confirms, alone plays the configured solo variant, tw
   sim.advance(config.timings.versusCountdownMs + 40)
   assert.equal(sim.state.phase, 'PLAYING')
   assert.equal(sim.state.round?.mode, 'versus')
+})
+
+test('with names off, a qualifying score goes on the board at once and nobody is asked for initials', () => {
+  const deps = makeDeps()
+  deps.config = { ...config, leaderboard: { ...config.leaderboard, names: false } }
+  const sim = new Sim(deps)
+  sim.connect('P1')
+  sim.tap('P1')
+  sim.tap('P1')
+  sim.advance(config.timings.soloCountdownMs + 40)
+  for (let i = 0; i < 3; i++) sim.tap('P1')
+  assert.equal(sim.state.phase, 'RESULTS')
+  assert.equal(sim.state.seats.P1.presence, 'done')
+  assert.equal(sim.state.results?.holdEndsAt != null, true)
+  const add = sim.effects.find((e) => e.type === 'leaderboard.add')
+  assert.ok(add && add.type === 'leaderboard.add')
+  assert.equal(add.entry.name, '')
 })

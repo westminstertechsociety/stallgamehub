@@ -107,11 +107,17 @@ check(display.latest?.countdown?.mode === 'versus', 'second seat confirms: head-
 check(await until(() => display.latest?.phase === 'PLAYING', 6000), 'round starts')
 for (let i = 0; i < 10; i++) await press(p2, 30)
 check(await until(() => display.latest?.phase === 'RESULTS', 3000) && display.latest.results.winner === 'P2', 'P2 wins press-space')
-for (let i = 0; i < 3; i++) {
-  await hold(p2)
-  await sleep(150)
+const nameIfAsked = async (p) => {
+  await sleep(300)
+  if (!p.latest?.results?.naming) return 'anonymous score'
+  for (let i = 0; i < 3; i++) {
+    await hold(p)
+    await sleep(150)
+  }
+  return 'initials entered'
 }
-check(await until(() => display.latest?.results?.entries?.length === 1, 3000), 'name entered, leaderboard written')
+const how1 = await nameIfAsked(p2)
+check(await until(() => display.latest?.results?.entries?.length === 1, 3000), `leaderboard written (${how1})`)
 
 console.log('morse')
 control.emit('control:cmd', { cmd: 'forceAttract' })
@@ -131,20 +137,17 @@ if (quick) {
 await sleep(250)
 check(display.latest?.countdown?.mode === 'versus', 'morse head-to-head countdown')
 check(await until(() => display.latest?.phase === 'PLAYING', 6000), 'morse round starts')
-for (let w = 0; w < 2; w++) {
+// Key words until P1 has the majority (best of N is configured in config/morse.json).
+for (let w = 0; w < 12 && display.latest?.phase === 'PLAYING'; w++) {
   const word = display.latest.game.word
   for (const ch of word) await keyLetter(p1, ch)
   check(await until(() => display.latest?.phase === 'RESULTS' || display.latest?.game?.phase === 'between' || display.latest?.game?.word !== word, 3000), `keyed ${word}`)
   await sleep(2800)
 }
-check(await until(() => display.latest?.phase === 'RESULTS', 8000), 'best of three decided')
+check(await until(() => display.latest?.phase === 'RESULTS', 8000), 'match decided')
 check(display.latest?.results?.winner === 'P1', 'P1 wins the match')
-check(p1.latest?.results?.naming != null, 'winner asked for a name')
-for (let i = 0; i < 3; i++) {
-  await hold(p1)
-  await sleep(150)
-}
-check(await until(() => display.latest?.results?.entries?.length === 1, 3000), `head-to-head on the leaderboard: ${display.latest?.results?.entries?.[0]?.scoreText ?? '?'}`)
+const how2 = await nameIfAsked(p1)
+check(await until(() => display.latest?.results?.entries?.length === 1, 3000), `head-to-head on the leaderboard: ${display.latest?.results?.entries?.[0]?.scoreText ?? '?'} (${how2})`)
 const voiceRes = await fetch(URL + '/voice/manifest.json').catch(() => null)
 check(voiceRes?.ok, 'narrator manifest served')
 const manifest = voiceRes?.ok ? await voiceRes.json() : null

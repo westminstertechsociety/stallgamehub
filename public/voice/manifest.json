@@ -1,6 +1,6 @@
 {
   "voice": "bf_emma",
-  "renderedAt": "2026-09-14T23:50:47.641Z",
+  "renderedAt": "2026-09-15T00:07:51.534Z",
   "clips": {
     "attract.welcome": [
       {
@@ -40,14 +40,14 @@
     ],
     "countdown.versus": [
       {
-        "file": "countdown.versus-0-91250d9569.mp3",
-        "seconds": 4.7,
-        "text": "Two players. Head-to-head it is. Same word, first to key it wins."
+        "file": "countdown.versus-0-dca00a0b48.mp3",
+        "seconds": 5.4,
+        "text": "Two players. Head-to-head it is. Same word, first to key it wins. Best of ten."
       },
       {
-        "file": "countdown.versus-1-bebdeee03b.mp3",
-        "seconds": 5.9,
-        "text": "Two of you. Excellent. Same word on the projector, first one to key it in Morse takes it."
+        "file": "countdown.versus-1-9216ebcba5.mp3",
+        "seconds": 6.8,
+        "text": "Two of you. Excellent. Same word on the projector, first one to key it in Morse takes it. First to six."
       }
     ],
     "learn.start": [
@@ -129,19 +129,19 @@
     ],
     "wrong": [
       {
-        "file": "wrong-0-5a209778df.mp3",
-        "seconds": 2.4,
-        "text": "Not quite. Have another go."
+        "file": "wrong-0-b9b1f8e2ec.mp3",
+        "seconds": 3,
+        "text": "Not quite. Back to the start of the word."
       },
       {
-        "file": "wrong-1-38fa9bddef.mp3",
-        "seconds": 3.5,
-        "text": "Close, but that was a different letter. Try again."
+        "file": "wrong-1-9e0b7625e8.mp3",
+        "seconds": 4.4,
+        "text": "That was a different letter. The word starts again, have another go."
       },
       {
-        "file": "wrong-2-b3eb62e325.mp3",
-        "seconds": 4.1,
-        "text": "That was not the letter we needed. The cheat sheet is right there."
+        "file": "wrong-2-3c71ecac7d.mp3",
+        "seconds": 4.4,
+        "text": "Wrong letter, so the word resets. The cheat sheet is right there."
       }
     ],
     "hotjoin": [
@@ -158,26 +158,26 @@
     ],
     "results.solo": [
       {
-        "file": "results.solo-0-e9d72cad69.mp3",
-        "seconds": 6.6,
-        "text": "Round over. Enter three letters for the leaderboard: tap space to change a letter, hold to confirm it."
+        "file": "results.solo-0-fe9a2aac31.mp3",
+        "seconds": 4.4,
+        "text": "Round over. Your time is on the board. Press space to play again."
       },
       {
-        "file": "results.solo-1-b704818921.mp3",
-        "seconds": 5.3,
-        "text": "Done. Put your initials on the board: tap space to pick a letter, hold to lock it in."
+        "file": "results.solo-1-412522b06c.mp3",
+        "seconds": 4.2,
+        "text": "Done. That one is on the leaderboard. Press space for another go."
       }
     ],
     "results.versus": [
       {
-        "file": "results.versus-0-793b87bb25.mp3",
+        "file": "results.versus-0-447296baab.mp3",
         "seconds": 5.2,
-        "text": "Match over. Winner, enter your initials. Runner up, there is always a rematch."
+        "text": "Match over. Winner, your time is on the board. Runner up, there is always a rematch."
       },
       {
-        "file": "results.versus-1-1837197ea0.mp3",
-        "seconds": 4.3,
-        "text": "That is the match. Winner, three letters for the leaderboard please."
+        "file": "results.versus-1-149b637fc7.mp3",
+        "seconds": 5.5,
+        "text": "That is the match. The winner's time goes on the leaderboard. Press space to play again."
       }
     ],
     "results.learn": [

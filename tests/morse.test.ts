@@ -130,15 +130,17 @@ test('versus: first to key the word wins it, best of three ends the match', () =
   assert.ok(out.data, 'best runs are persisted')
 })
 
-test('a wrong letter is rejected with feedback and progress stays on the correct prefix', () => {
+test('a wrong letter resets the word: the player starts again from no letters', () => {
   let s = morse.init(ctxFor('solo', 'timeattack', ['P1']))
   const word = s.word
-  const wrong = word[0] === 'E' ? 'T' : 'E'
-  const r = keyLetter(s, 'P1', wrong, 100)
+  let r = keyLetter(s, 'P1', word[0] as string, 100)
+  assert.equal(r.state.lanes.P1.committed, word[0])
+  const wrong = word[1] === 'E' ? 'T' : 'E'
+  r = keyLetter(r.state, 'P1', wrong, r.t)
   s = r.state
-  assert.equal(s.lanes.P1.committed, '')
+  assert.equal(s.lanes.P1.committed, '', 'progress is wiped')
   assert.equal(s.lanes.P1.wrong?.got, wrong)
-  assert.equal(s.lanes.P1.wrong?.expected, word[0])
+  assert.equal(s.lanes.P1.wrong?.expected, word[1])
   const r2 = keyLetter(s, 'P1', word[0] as string, r.t)
   assert.equal(r2.state.lanes.P1.committed, word[0])
   assert.equal(r2.state.lanes.P1.wrong, null)

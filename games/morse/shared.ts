@@ -55,7 +55,7 @@ export interface StreamGroup {
   symbols: string
   /** Decoded letter, '?' for an unknown pattern, null while pending. */
   letter: string | null
-  /** true = accepted, false = rejected (wrong letter), null while pending. */
+  /** true = accepted, false = rejected (wrong letter, word restarts), null while pending. */
   ok: boolean | null
 }
 

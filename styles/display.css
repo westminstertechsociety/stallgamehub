@@ -260,6 +260,10 @@
   font-size: var(--display-body);
 }
 
+.ranking-row-anon {
+  grid-template-columns: 2ch minmax(0, 1fr);
+}
+
 .ranking-rank {
   color: var(--muted);
 }
